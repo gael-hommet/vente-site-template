@@ -53,7 +53,7 @@ export function PanoramaAdapter({ src, alt, className }: PanoramaAdapterProps) {
         if (e.key === "ArrowLeft") el.scrollLeft -= 60;
       }}
       className={cn(
-        "no-scrollbar relative cursor-grab overflow-x-auto overflow-y-hidden rounded-[var(--radius-lg)] active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-[var(--ring)]",
+        "no-scrollbar relative cursor-grab overflow-x-auto overflow-y-hidden rounded-[var(--radius-lg)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] active:cursor-grabbing",
         className,
       )}
     >

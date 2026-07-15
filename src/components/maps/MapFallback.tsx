@@ -28,14 +28,14 @@ export function MapFallback({ label, lat, lng, directionsUrl, className }: MapFa
   return (
     <div
       className={cn(
-        "flex h-full w-full flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-border bg-surface-2 p-6 text-center",
+        "border-border bg-surface-2 flex h-full w-full flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border p-6 text-center",
         className,
       )}
     >
-      <MapPin className="size-6 text-brand" aria-hidden />
-      <p className="font-medium text-foreground">{label}</p>
+      <MapPin className="text-brand size-6" aria-hidden />
+      <p className="text-foreground font-medium">{label}</p>
       {lat != null && lng != null && (
-        <p className="text-xs tabular-nums text-muted">
+        <p className="text-muted text-xs tabular-nums">
           {lat.toFixed(5)}, {lng.toFixed(5)}
         </p>
       )}

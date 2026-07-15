@@ -4,17 +4,14 @@ import { cn } from "@/lib/utils";
 import { Button } from "./button";
 
 /** Inline spinner. Decorative by default; pass a label for standalone use. */
-export function Spinner({
-  className,
-  label,
-}: {
-  className?: string;
-  label?: string;
-}) {
+export function Spinner({ className, label }: { className?: string; label?: string }) {
   return (
     <span role={label ? "status" : undefined} className="inline-flex items-center gap-2">
-      <Loader2 className={cn("size-5 animate-spin text-brand motion-reduce:animate-none", className)} aria-hidden />
-      {label ? <span className="text-sm text-muted">{label}</span> : null}
+      <Loader2
+        className={cn("text-brand size-5 animate-spin motion-reduce:animate-none", className)}
+        aria-hidden
+      />
+      {label ? <span className="text-muted text-sm">{label}</span> : null}
     </span>
   );
 }
@@ -25,9 +22,9 @@ export function LoadingState({ label = "Chargement…" }: { label?: string }) {
     <div
       role="status"
       aria-live="polite"
-      className="flex min-h-40 w-full flex-col items-center justify-center gap-3 text-muted"
+      className="text-muted flex min-h-40 w-full flex-col items-center justify-center gap-3"
     >
-      <Loader2 className="size-6 animate-spin text-brand motion-reduce:animate-none" aria-hidden />
+      <Loader2 className="text-brand size-6 animate-spin motion-reduce:animate-none" aria-hidden />
       <span className="text-sm">{label}</span>
     </div>
   );
@@ -38,7 +35,7 @@ export function Skeleton({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded-[var(--radius-md)] bg-surface-2 motion-reduce:animate-none",
+        "bg-surface-2 animate-pulse rounded-[var(--radius-md)] motion-reduce:animate-none",
         className,
       )}
     />
@@ -63,13 +60,13 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "flex min-h-40 w-full flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-border bg-surface p-6 text-center",
+        "border-border bg-surface flex min-h-40 w-full flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border p-6 text-center",
         className,
       )}
     >
-      <AlertTriangle className="size-6 text-warning" aria-hidden />
-      <p className="font-semibold text-foreground">{title}</p>
-      {description ? <p className="max-w-sm text-sm text-muted">{description}</p> : null}
+      <AlertTriangle className="text-warning size-6" aria-hidden />
+      <p className="text-foreground font-semibold">{title}</p>
+      {description ? <p className="text-muted max-w-sm text-sm">{description}</p> : null}
       {onRetry ? (
         <Button variant="outline" size="sm" onClick={onRetry} className="mt-1">
           {retryLabel}

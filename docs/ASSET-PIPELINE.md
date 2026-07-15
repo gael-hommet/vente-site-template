@@ -23,13 +23,13 @@ Règles fondamentales :
 
 ## Scripts disponibles
 
-| Script | Rôle |
-| --- | --- |
-| `assets:audit` | Inventorie les assets et signale les problèmes (poids excessif, formats non optimisés, dimensions). |
-| `assets:images` | Images → **AVIF/WebP** (via **sharp**). |
-| `assets:video` | Vidéos → **mp4/webm** + **poster** + **séquence d'images** (via **ffmpeg**). |
-| `assets:models` | Modèles 3D → nettoyage GLB, compression, textures (via **@gltf-transform**). |
-| `assets:all` | Enchaîne l'ensemble des pipelines ci-dessus. |
+| Script          | Rôle                                                                                                |
+| --------------- | --------------------------------------------------------------------------------------------------- |
+| `assets:audit`  | Inventorie les assets et signale les problèmes (poids excessif, formats non optimisés, dimensions). |
+| `assets:images` | Images → **AVIF/WebP** (via **sharp**).                                                             |
+| `assets:video`  | Vidéos → **mp4/webm** + **poster** + **séquence d'images** (via **ffmpeg**).                        |
+| `assets:models` | Modèles 3D → nettoyage GLB, compression, textures (via **@gltf-transform**).                        |
+| `assets:all`    | Enchaîne l'ensemble des pipelines ci-dessus.                                                        |
 
 La skill `/ingest-assets` orchestre ces scripts sur le contenu de `input/assets/`.
 

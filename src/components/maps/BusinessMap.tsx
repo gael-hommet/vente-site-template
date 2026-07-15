@@ -50,12 +50,11 @@ export function BusinessMap({
     let instance: MLMap | null = null;
     let cancelled = false;
 
-    if (!detectWebGL()) {
-      setFailed(true);
-      return;
-    }
-
     (async () => {
+      if (!detectWebGL()) {
+        if (!cancelled) setFailed(true);
+        return;
+      }
       try {
         const maplibregl = (await import("maplibre-gl")).default;
         if (cancelled || !containerRef.current) return;
@@ -93,7 +92,12 @@ export function BusinessMap({
 
   return (
     <div className={cn("relative overflow-hidden rounded-[var(--radius-lg)]", className)}>
-      <div ref={containerRef} className="absolute inset-0" aria-label={fallback.label} role="application" />
+      <div
+        ref={containerRef}
+        className="absolute inset-0"
+        aria-label={fallback.label}
+        role="application"
+      />
       <MapContext.Provider value={map}>{children}</MapContext.Provider>
     </div>
   );

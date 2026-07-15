@@ -13,8 +13,16 @@ export function EngineStatus({ className }: { className?: string }) {
 
   const rows: { label: string; value: string; ok: boolean }[] = [
     { label: "Tier", value: detected ? tier : "détection…", ok: detected },
-    { label: "WebGL", value: profile.webgl ? "disponible" : "indisponible (fallback)", ok: profile.webgl },
-    { label: "Reduced motion", value: profile.reducedMotion ? "actif" : "inactif", ok: !profile.reducedMotion },
+    {
+      label: "WebGL",
+      value: profile.webgl ? "disponible" : "indisponible (fallback)",
+      ok: profile.webgl,
+    },
+    {
+      label: "Reduced motion",
+      value: profile.reducedMotion ? "actif" : "inactif",
+      ok: !profile.reducedMotion,
+    },
     { label: "Save-data", value: profile.saveData ? "actif" : "inactif", ok: !profile.saveData },
     { label: "DPR", value: String(profile.dpr), ok: true },
   ];
@@ -38,7 +46,9 @@ export function EngineStatus({ className }: { className?: string }) {
         {rows.map((r) => (
           <div key={r.label} className="flex items-center justify-between gap-2">
             <dt className="text-muted">{r.label}</dt>
-            <dd className={cn("tabular-nums", r.ok ? "text-foreground" : "text-warning")}>{r.value}</dd>
+            <dd className={cn("tabular-nums", r.ok ? "text-foreground" : "text-warning")}>
+              {r.value}
+            </dd>
           </div>
         ))}
       </dl>

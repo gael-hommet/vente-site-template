@@ -12,7 +12,7 @@ export function SceneLoader() {
   const { progress } = useProgress();
   return (
     <Html center>
-      <div className="flex flex-col items-center gap-2 text-muted">
+      <div className="text-muted flex flex-col items-center gap-2">
         <Spinner />
         <span className="text-xs tabular-nums">{Math.round(progress)}%</span>
       </div>

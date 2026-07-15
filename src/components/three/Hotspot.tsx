@@ -33,8 +33,8 @@ export function Hotspot({ position, label, description, occlude = false }: Hotsp
         </button>
         {open && (
           <div className="glass mt-2 w-48 rounded-[var(--radius-md)] p-3 text-left shadow-[var(--shadow-md)]">
-            <p className="text-sm font-semibold text-foreground">{label}</p>
-            {description && <p className="mt-1 text-xs text-muted">{description}</p>}
+            <p className="text-foreground text-sm font-semibold">{label}</p>
+            {description && <p className="text-muted mt-1 text-xs">{description}</p>}
           </div>
         )}
       </div>

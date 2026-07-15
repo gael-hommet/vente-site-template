@@ -14,7 +14,13 @@ export interface ParallaxLayerProps extends React.HTMLAttributes<HTMLDivElement>
  * Lightweight parallax using Motion's useScroll (no scroll-jacking, no GSAP).
  * Disabled under reduced motion. Good for depth on hero/photo layers.
  */
-export function ParallaxLayer({ speed = 60, axis = "y", children, style, ...props }: ParallaxLayerProps) {
+export function ParallaxLayer({
+  speed = 60,
+  axis = "y",
+  children,
+  style,
+  ...props
+}: ParallaxLayerProps) {
   const reduced = useReducedMotion();
   const ref = React.useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({

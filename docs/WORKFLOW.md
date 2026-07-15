@@ -35,9 +35,11 @@ Depuis le terminal du Codespace : `claude`. On pilote ensuite la génération av
 ## Les skills
 
 ### `/ingest-assets`
+
 Ingère `input/assets/` et déclenche les pipelines `assets:*` (sharp, ffmpeg, @gltf-transform) pour produire les dérivés optimisés dans `public/`. Ne modifie jamais les originaux ; génère un rapport. Détail : `docs/ASSET-PIPELINE.md`.
 
 ### `/build-site`
+
 Génère le site à partir du brief et des assets ingérés. C'est l'étape principale. Elle délègue à la chaîne d'agents :
 
 - **business-researcher** — analyse le secteur et le contexte concurrentiel.
@@ -51,12 +53,15 @@ Génère le site à partir du brief et des assets ingérés. C'est l'étape prin
 - **accessibility-reviewer** — accessibilité (reduced-motion, contrastes, sémantique).
 
 ### `/preview-site`
+
 Prépare et lance la prévisualisation locale (`pnpm dev`) pour visualiser le rendu.
 
 ### `/audit-site`
+
 Passe le site au crible : lint, typecheck, tests, build, audits SEO/perf/a11y (`audit:site`). Produit un rapport de conformité et signale les corrections à apporter. Délègue principalement à **qa-engineer**, **performance-engineer**, **accessibility-reviewer** et **seo-engineer**.
 
 ### `/finalize-site`
+
 Verrouille la livraison une fois l'audit vert : contrôles finaux, checklist de « Definition of Done » (voir `docs/DEFINITION-OF-DONE.md`), préparation de la démo privée.
 
 ---

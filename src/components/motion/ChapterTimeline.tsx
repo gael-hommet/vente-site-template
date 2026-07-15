@@ -26,10 +26,7 @@ export function ChapterTimeline({
   className?: string;
 }) {
   return (
-    <nav
-      aria-label="Chapitres"
-      className={cn("flex flex-col gap-3", className)}
-    >
+    <nav aria-label="Chapitres" className={cn("flex flex-col gap-3", className)}>
       {chapters.map((chapter, i) => {
         const active = i === activeIndex;
         return (
@@ -50,7 +47,7 @@ export function ChapterTimeline({
             <span
               className={cn(
                 "text-sm transition-colors",
-                active ? "font-medium text-foreground" : "text-muted",
+                active ? "text-foreground font-medium" : "text-muted",
               )}
             >
               {chapter.label}

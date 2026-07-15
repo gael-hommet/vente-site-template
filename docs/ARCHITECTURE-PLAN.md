@@ -11,18 +11,18 @@ is written. It is the contract the rest of the build follows.
 
 ## 1. Environment (audited)
 
-| Tool          | Version        | Notes                                         |
-| ------------- | -------------- | --------------------------------------------- |
-| OS            | Ubuntu 24.04   | Codespaces devcontainer                       |
-| Node          | v24.14.0       | Compatible with Next 16                        |
-| npm           | 11.9.0         | Not used as PM (pnpm is the single PM)        |
-| pnpm          | 10.32.1        | **Single package manager**, lockfile committed |
-| corepack      | 0.34.6         | Pins pnpm via `packageManager` field          |
-| git           | 2.53.0         |                                               |
-| Claude Code   | 2.1.209        | Drives skills/agents/rules/hooks              |
-| ffmpeg        | **absent**     | Installed via devcontainer feature; video scripts degrade gracefully |
-| CPU / RAM     | 2 vCPU / 7.8 GiB | Modest → keep bundle lean, avoid parallel builds |
-| Disk          | ~20 GiB free   | Playwright browsers installed on demand only  |
+| Tool        | Version          | Notes                                                                |
+| ----------- | ---------------- | -------------------------------------------------------------------- |
+| OS          | Ubuntu 24.04     | Codespaces devcontainer                                              |
+| Node        | v24.14.0         | Compatible with Next 16                                              |
+| npm         | 11.9.0           | Not used as PM (pnpm is the single PM)                               |
+| pnpm        | 10.32.1          | **Single package manager**, lockfile committed                       |
+| corepack    | 0.34.6           | Pins pnpm via `packageManager` field                                 |
+| git         | 2.53.0           |                                                                      |
+| Claude Code | 2.1.209          | Drives skills/agents/rules/hooks                                     |
+| ffmpeg      | **absent**       | Installed via devcontainer feature; video scripts degrade gracefully |
+| CPU / RAM   | 2 vCPU / 7.8 GiB | Modest → keep bundle lean, avoid parallel builds                     |
+| Disk        | ~20 GiB free     | Playwright browsers installed on demand only                         |
 
 ## 2. Architecture
 
@@ -43,12 +43,12 @@ from this template is exactly one client site, so a monorepo adds cost with no b
 
 ### Strict separation of animation responsibilities
 
-| Layer   | Owns                                                              |
-| ------- | ---------------------------------------------------------------- |
-| Motion  | micro-interactions, enter/exit, hover/press, layout, gestures    |
-| GSAP + ScrollTrigger | cinematic timelines, pinned scenes, scrub, camera/sequence control |
-| Lenis   | smooth scroll, synced to ScrollTrigger, disabled on reduced-motion |
-| R3F     | WebGL scenes only; never SSR; always behind a WebGL boundary + fallback |
+| Layer                | Owns                                                                    |
+| -------------------- | ----------------------------------------------------------------------- |
+| Motion               | micro-interactions, enter/exit, hover/press, layout, gestures           |
+| GSAP + ScrollTrigger | cinematic timelines, pinned scenes, scrub, camera/sequence control      |
+| Lenis                | smooth scroll, synced to ScrollTrigger, disabled on reduced-motion      |
+| R3F                  | WebGL scenes only; never SSR; always behind a WebGL boundary + fallback |
 
 ## 3. Version pins (compatibility-critical)
 
@@ -63,6 +63,7 @@ from this template is exactly one client site, so a monorepo adds cost with no b
 Every optional capability is reachable, but only what a site actually uses is bundled.
 
 ### CORE — installed, tested, activated
+
 next, react, react-dom, typescript, tailwindcss, @tailwindcss/postcss,
 class-variance-authority, clsx, tailwind-merge, lucide-react,
 motion, gsap, lenis,
@@ -71,12 +72,14 @@ react-hook-form, zod, @hookform/resolvers,
 maplibre-gl
 
 ### CORE (dev/test)
+
 eslint + eslint-config-next, prettier, prettier-plugin-tailwindcss,
 vitest, @vitejs/plugin-react, jsdom, @testing-library/react, @testing-library/jest-dom, @testing-library/user-event,
 @playwright/test, @axe-core/playwright,
 sharp, @gltf-transform/cli
 
 ### ADAPTER ONLY — integration written, package NOT installed (avoids bundle bloat + build risk)
+
 Rationale: each needs an external asset (`.riv`, Spline scene, HDR) or ships its own
 WebGL/three copy that can clash with our pinned `three`. We provide a dynamic-import
 adapter + graceful fallback, so a future site enables it by installing one package.
@@ -92,6 +95,7 @@ adapter + graceful fallback, so a future site enables it by installing one packa
 - `@splinetool/react-spline` — `SplineScene` adapter, poster fallback.
 
 ### REJECTED (for the CORE build)
+
 - `@react-three/rapier` — physics not required by any core scene; heavy WASM. Documented
   as opt-in in COMPATIBILITY.md; add only if a client scene needs simulation.
 
@@ -129,10 +133,10 @@ The template is "done" only when all of these pass:
 ## 7. Build order
 
 0. Plan (this doc) → 1. Scaffold + core deps → 2. Tokens & design system →
-3. Animation engine → 4. 3D engine + quality tiers → 5. Cinematic (native + Theatre adapter) →
-6. Three video modes → 7. Asset pipeline → 8. Special FX adapters → 9. Photo/2.5D →
-10. Maps → 11. Conversion → 12. SEO → 13. Analytics → 14. A11y/perf →
-15. Tests → 16. Lab + home → 17. Claude config → 18. Devcontainer → 19. Brief →
-20. Docs → 21. Final validation.
+1. Animation engine → 4. 3D engine + quality tiers → 5. Cinematic (native + Theatre adapter) →
+2. Three video modes → 7. Asset pipeline → 8. Special FX adapters → 9. Photo/2.5D →
+3. Maps → 11. Conversion → 12. SEO → 13. Analytics → 14. A11y/perf →
+4. Tests → 16. Lab + home → 17. Claude config → 18. Devcontainer → 19. Brief →
+5. Docs → 21. Final validation.
 
 Verify (`typecheck` + `build`) is run at checkpoints, not just at the end.

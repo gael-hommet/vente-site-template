@@ -42,7 +42,7 @@ export function DrawerContent({
       >
         {children}
         <DialogPrimitive.Close
-          className="absolute right-4 top-4 rounded-[var(--radius-sm)] p-1 text-muted hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-[var(--ring)]"
+          className="text-muted hover:bg-surface-2 hover:text-foreground absolute top-4 right-4 rounded-[var(--radius-sm)] p-1 focus-visible:outline-2 focus-visible:outline-[var(--ring)]"
           aria-label="Fermer le menu"
         >
           <X className="size-5" />

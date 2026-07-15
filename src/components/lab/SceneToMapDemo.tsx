@@ -16,9 +16,9 @@ export function SceneToMapDemo() {
   return (
     <SceneToMapTransition
       length={2}
-      className="overflow-hidden rounded-[var(--radius-lg)] border border-border"
+      className="border-border overflow-hidden rounded-[var(--radius-lg)] border"
       scene={
-        <div className="relative grid h-full w-full place-items-center bg-surface-2">
+        <div className="bg-surface-2 relative grid h-full w-full place-items-center">
           <ShaderGradientBackground />
           <LiquidMetalLogo text="SCÈNE" className="text-5xl sm:text-7xl" />
         </div>
@@ -28,7 +28,11 @@ export function SceneToMapDemo() {
           center={DEMO_CENTER}
           zoom={15}
           className="h-full w-full"
-          fallback={{ label: "Position fictive (démonstration)", lat: DEMO_CENTER[1], lng: DEMO_CENTER[0] }}
+          fallback={{
+            label: "Position fictive (démonstration)",
+            lat: DEMO_CENTER[1],
+            lng: DEMO_CENTER[0],
+          }}
         >
           <LocationMarker position={DEMO_CENTER} title="Position fictive (démo)" />
         </BusinessMap>

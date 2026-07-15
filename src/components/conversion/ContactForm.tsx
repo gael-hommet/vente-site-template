@@ -37,7 +37,8 @@ export function ContactForm({ className }: { className?: string }) {
     } else setServerError("Envoi impossible pour le moment. Réessayez.");
   });
 
-  if (done) return <FormSuccess title="Message envoyé" description="Merci, nous vous répondrons vite." />;
+  if (done)
+    return <FormSuccess title="Message envoyé" description="Merci, nous vous répondrons vite." />;
 
   return (
     <form
@@ -62,15 +63,15 @@ export function ContactForm({ className }: { className?: string }) {
         <LabeledField id="c-message" label="Message" required error={errors.message?.message}>
           {(aria) => <Textarea rows={5} {...aria} {...register("message")} />}
         </LabeledField>
-        <label className="flex items-start gap-2 text-sm text-muted">
-          <input type="checkbox" className="mt-1 accent-brand" {...register("consent")} />
+        <label className="text-muted flex items-start gap-2 text-sm">
+          <input type="checkbox" className="accent-brand mt-1" {...register("consent")} />
           <span>
             J&apos;accepte d&apos;être recontacté.
-            {errors.consent && <span className="block text-danger">{errors.consent.message}</span>}
+            {errors.consent && <span className="text-danger block">{errors.consent.message}</span>}
           </span>
         </label>
         {serverError && (
-          <p role="alert" className="text-sm text-danger">
+          <p role="alert" className="text-danger text-sm">
             {serverError}
           </p>
         )}

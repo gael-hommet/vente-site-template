@@ -52,13 +52,21 @@ async function main() {
   console.log(c.bold("SEO"));
   has("src/app/sitemap.ts") ? ok("sitemap.ts présent") : fa("sitemap.ts manquant");
   has("src/app/robots.ts") ? ok("robots.ts présent") : fa("robots.ts manquant");
-  has("src/lib/seo/metadata.ts") ? ok("système de metadata présent") : wa("src/lib/seo/metadata.ts manquant");
-  has("src/lib/seo/jsonld.ts") ? ok("générateurs JSON-LD présents") : wa("src/lib/seo/jsonld.ts manquant");
-  has("src/config/business.ts") ? ok("business.ts (source de vérité) présent") : fa("business.ts manquant");
+  has("src/lib/seo/metadata.ts")
+    ? ok("système de metadata présent")
+    : wa("src/lib/seo/metadata.ts manquant");
+  has("src/lib/seo/jsonld.ts")
+    ? ok("générateurs JSON-LD présents")
+    : wa("src/lib/seo/jsonld.ts manquant");
+  has("src/config/business.ts")
+    ? ok("business.ts (source de vérité) présent")
+    : fa("business.ts manquant");
 
   console.log(c.bold("\nAccessibilité"));
   const layout = await read("src/app/layout.tsx");
-  /lang=/.test(layout) ? ok("attribut lang défini sur <html>") : wa("attribut lang absent de <html>");
+  /lang=/.test(layout)
+    ? ok("attribut lang défini sur <html>")
+    : wa("attribut lang absent de <html>");
   const files = await walkSrc();
   let skip = false;
   for (const f of files) {
@@ -78,14 +86,22 @@ async function main() {
     if (/<img\s/.test(src)) rawImg++;
     if (/console\.log\(/.test(src)) consoleLogs++;
   }
-  rawImg === 0 ? ok("aucune balise <img> brute (next/image utilisé)") : wa(`${rawImg} fichier(s) avec <img> brut — préférez next/image`);
-  consoleLogs === 0 ? ok("aucun console.log résiduel") : wa(`${consoleLogs} fichier(s) contiennent console.log`);
+  rawImg === 0
+    ? ok("aucune balise <img> brute (next/image utilisé)")
+    : wa(`${rawImg} fichier(s) avec <img> brut — préférez next/image`);
+  consoleLogs === 0
+    ? ok("aucun console.log résiduel")
+    : wa(`${consoleLogs} fichier(s) contiennent console.log`);
   has(".env.example") ? ok(".env.example présent") : wa(".env.example manquant");
 
   console.log(c.bold("\nRésumé"));
-  console.log(`  ${c.green(pass + " OK")}  ${c.yellow(warn + " avertissements")}  ${c.red(fail + " échecs")}`);
   console.log(
-    c.dim("\n  Astuce: combinez avec `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:a11y` pour un audit complet.\n"),
+    `  ${c.green(pass + " OK")}  ${c.yellow(warn + " avertissements")}  ${c.red(fail + " échecs")}`,
+  );
+  console.log(
+    c.dim(
+      "\n  Astuce: combinez avec `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:a11y` pour un audit complet.\n",
+    ),
   );
   process.exit(fail > 0 ? 1 : 0);
 }

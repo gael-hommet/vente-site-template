@@ -15,8 +15,7 @@ interface SceneState {
 
 export const useSceneStore = create<SceneState>((set, get) => ({
   progress: {},
-  setProgress: (id, value) =>
-    set((state) => ({ progress: { ...state.progress, [id]: value } })),
+  setProgress: (id, value) => set((state) => ({ progress: { ...state.progress, [id]: value } })),
   getProgress: (id) => get().progress[id] ?? 0,
 }));
 

@@ -62,7 +62,6 @@ export async function deliverLead(
   // 3. Local dev logger (always, when no real channel is configured).
   if (!anyRealChannel) {
     if (process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
       console.info(`\n📥 [lead:${kind}] (simulé — aucun envoi externe)\n`, data, "\n");
     }
     return { ok: true, channels: ["local-log"], simulated: true };

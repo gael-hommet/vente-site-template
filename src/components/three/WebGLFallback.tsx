@@ -20,7 +20,7 @@ export function WebGLFallback({ poster, video, alt, className, children }: WebGL
   return (
     <div
       className={cn(
-        "relative flex h-full w-full items-center justify-center overflow-hidden rounded-[var(--radius-lg)] bg-surface-2",
+        "bg-surface-2 relative flex h-full w-full items-center justify-center overflow-hidden rounded-[var(--radius-lg)]",
         className,
       )}
     >
@@ -37,9 +37,20 @@ export function WebGLFallback({ poster, video, alt, className, children }: WebGL
           <source src={video} />
         </video>
       ) : poster ? (
-        <Image src={poster} alt={alt} fill sizes="100vw" className="object-cover" priority={false} />
+        <Image
+          src={poster}
+          alt={alt}
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority={false}
+        />
       ) : (
-        <div className="grid place-items-center p-8 text-center text-sm text-muted" role="img" aria-label={alt}>
+        <div
+          className="text-muted grid place-items-center p-8 text-center text-sm"
+          role="img"
+          aria-label={alt}
+        >
           {children ?? alt}
         </div>
       )}

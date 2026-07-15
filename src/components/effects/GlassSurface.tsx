@@ -45,7 +45,7 @@ export function GlassSurface({
       {tint > 0 && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-[inherit] bg-foreground"
+          className="bg-foreground pointer-events-none absolute inset-0 rounded-[inherit]"
           style={{ opacity: tint * 0.08 }}
         />
       )}

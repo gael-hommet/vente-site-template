@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/site";
 /** Sticky, glassy site header shell used by the template pages. */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60">
+    <header className="border-border/60 sticky top-0 z-40 border-b">
       <div className="glass">
         <Container>
           <div className="flex h-16 items-center justify-between gap-4">
@@ -15,7 +15,10 @@ export function SiteHeader() {
               href="/"
               className="flex items-center gap-2 rounded-[var(--radius-sm)] font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-[var(--ring)]"
             >
-              <span className="inline-block size-2.5 rounded-full bg-brand shadow-[var(--shadow-glow)]" aria-hidden />
+              <span
+                className="bg-brand inline-block size-2.5 rounded-full shadow-[var(--shadow-glow)]"
+                aria-hidden
+              />
               {siteConfig.name}
             </Link>
             <div className="flex items-center gap-1">

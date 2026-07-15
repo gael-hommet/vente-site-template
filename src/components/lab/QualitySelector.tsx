@@ -43,14 +43,16 @@ export function QualitySelector({ className }: { className?: string }) {
           aria-pressed={override === null}
           className={cn(
             "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-[var(--ring)]",
-            override === null ? "border-foreground text-foreground" : "border-border text-muted hover:text-foreground",
+            override === null
+              ? "border-foreground text-foreground"
+              : "border-border text-muted hover:text-foreground",
           )}
         >
           Auto
         </button>
       </div>
-      <p className="text-xs text-muted">
-        Tier actif : <span className="font-medium text-foreground">{tier}</span>
+      <p className="text-muted text-xs">
+        Tier actif : <span className="text-foreground font-medium">{tier}</span>
         {override ? " (forcé)" : " (détecté)"}
       </p>
     </div>

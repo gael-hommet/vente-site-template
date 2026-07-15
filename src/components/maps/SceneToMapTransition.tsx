@@ -48,7 +48,10 @@ export function SceneToMapTransition({
         >
           {scene}
         </div>
-        <div className={cn("absolute inset-0", showMap ? "" : "pointer-events-none")} style={{ opacity: mapOpacity }}>
+        <div
+          className={cn("absolute inset-0", showMap ? "" : "pointer-events-none")}
+          style={{ opacity: mapOpacity }}
+        >
           {showMap && map}
         </div>
       </div>

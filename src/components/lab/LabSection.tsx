@@ -19,13 +19,13 @@ export function LabSection({
   id?: string;
 }) {
   return (
-    <section id={id} className={cn("scroll-mt-20 border-t border-border py-14", className)}>
+    <section id={id} className={cn("border-border scroll-mt-20 border-t py-14", className)}>
       <div className="mb-6 flex flex-col gap-2">
         <div className="flex items-center gap-3">
           <Badge variant="neutral">{String(index).padStart(2, "0")}</Badge>
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
         </div>
-        {description && <p className="max-w-2xl text-sm text-muted">{description}</p>}
+        {description && <p className="text-muted max-w-2xl text-sm">{description}</p>}
       </div>
       {children}
     </section>

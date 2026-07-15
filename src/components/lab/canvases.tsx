@@ -8,7 +8,7 @@ import { ProductRevealScene } from "@/scenes/product-reveal/ProductRevealScene";
 export function LogoCanvas() {
   return (
     <AdaptiveCanvas
-      className="aspect-[16/10] w-full overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface-2"
+      className="border-border bg-surface-2 aspect-[16/10] w-full overflow-hidden rounded-[var(--radius-lg)] border"
       fallback={{ poster: "/assets/poster.svg", alt: "Rendu logo (fallback image)" }}
     >
       <LogoRevealScene />
@@ -20,7 +20,7 @@ export function LogoCanvas() {
 export function ProductCanvas() {
   return (
     <AdaptiveCanvas
-      className="aspect-[16/10] w-full overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface-2"
+      className="border-border bg-surface-2 aspect-[16/10] w-full overflow-hidden rounded-[var(--radius-lg)] border"
       fallback={{ poster: "/assets/poster.svg", alt: "Rendu produit (fallback image)" }}
     >
       <ProductRevealScene />

@@ -29,14 +29,24 @@ export interface ImageSequencePlayerProps {
  * we never blast hundreds of requests on first paint. Handles DPR + resize.
  */
 export const ImageSequencePlayer = React.forwardRef<ImageSequenceHandle, ImageSequencePlayerProps>(
-  function ImageSequencePlayer({ frames, alt, className, preload = "window", windowSize = 8 }, ref) {
+  function ImageSequencePlayer(
+    { frames, alt, className, preload = "window", windowSize = 8 },
+    ref,
+  ) {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const cacheRef = React.useRef<Map<number, HTMLImageElement>>(new Map());
     const progressRef = React.useRef(0);
     const rafRef = React.useRef<number | null>(null);
     const lastDrawn = React.useRef(-1);
+    // Holds the latest `draw` so `schedule` can stay stable and the
+    // draw↔schedule retry loop never forms a dependency cycle.
+    const drawRef = React.useRef<() => void>(() => {});
 
     const frameCount = frames.length;
+
+    const schedule = React.useCallback(() => {
+      if (rafRef.current == null) rafRef.current = requestAnimationFrame(() => drawRef.current());
+    }, []);
 
     const ensureFrame = React.useCallback(
       (index: number): HTMLImageElement | undefined => {
@@ -61,7 +71,10 @@ export const ImageSequencePlayer = React.forwardRef<ImageSequenceHandle, ImageSe
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const index = Math.min(frameCount - 1, Math.max(0, Math.round(progressRef.current * (frameCount - 1))));
+      const index = Math.min(
+        frameCount - 1,
+        Math.max(0, Math.round(progressRef.current * (frameCount - 1))),
+      );
       // Preload a window around the target.
       const lo = Math.max(0, index - windowSize);
       const hi = Math.min(frameCount - 1, index + windowSize);
@@ -90,11 +103,11 @@ export const ImageSequencePlayer = React.forwardRef<ImageSequenceHandle, ImageSe
       const dh = img.naturalHeight * scale;
       ctx.clearRect(0, 0, w, h);
       ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    }, [ensureFrame, frameCount, windowSize]);
+    }, [ensureFrame, frameCount, windowSize, schedule]);
 
-    const schedule = React.useCallback(() => {
-      if (rafRef.current == null) rafRef.current = requestAnimationFrame(draw);
+    // Keep drawRef pointing at the latest draw for the stable scheduler.
+    React.useEffect(() => {
+      drawRef.current = draw;
     }, [draw]);
 
     React.useImperativeHandle(

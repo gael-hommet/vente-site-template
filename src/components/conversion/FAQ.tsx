@@ -14,14 +14,22 @@ export interface FAQItem {
  */
 export function FAQ({ items, className }: { items: FAQItem[]; className?: string }) {
   return (
-    <div className={cn("divide-y divide-border rounded-[var(--radius-lg)] border border-border", className)}>
+    <div
+      className={cn(
+        "divide-border border-border divide-y rounded-[var(--radius-lg)] border",
+        className,
+      )}
+    >
       {items.map((item, i) => (
         <details key={i} className="group px-5">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-medium text-foreground focus-visible:outline-2 focus-visible:outline-[var(--ring)]">
+          <summary className="text-foreground flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-medium focus-visible:outline-2 focus-visible:outline-[var(--ring)]">
             {item.question}
-            <ChevronDown className="size-5 shrink-0 text-muted transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden />
+            <ChevronDown
+              className="text-muted size-5 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+              aria-hidden
+            />
           </summary>
-          <p className="pb-5 text-sm leading-relaxed text-muted">{item.answer}</p>
+          <p className="text-muted pb-5 text-sm leading-relaxed">{item.answer}</p>
         </details>
       ))}
     </div>

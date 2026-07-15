@@ -22,12 +22,27 @@ const COMMANDS: { cmd: string; desc: string }[] = [
 ];
 
 const MODULES: { group: string; items: string[] }[] = [
-  { group: "Design system", items: ["Button", "GlassButton", "Card", "Dialog", "Drawer", "Form fields"] },
-  { group: "Motion", items: ["Reveal", "Parallax", "MagneticButton", "SplitText", "ScrollProgress"] },
-  { group: "Cinématique (GSAP)", items: ["PinnedSequence", "ScrollScene", "ChapterTimeline", "Lenis"] },
-  { group: "3D (R3F)", items: ["AdaptiveCanvas", "ScrollCamera", "Stages", "Hotspot", "PostFX", "Fallback"] },
+  {
+    group: "Design system",
+    items: ["Button", "GlassButton", "Card", "Dialog", "Drawer", "Form fields"],
+  },
+  {
+    group: "Motion",
+    items: ["Reveal", "Parallax", "MagneticButton", "SplitText", "ScrollProgress"],
+  },
+  {
+    group: "Cinématique (GSAP)",
+    items: ["PinnedSequence", "ScrollScene", "ChapterTimeline", "Lenis"],
+  },
+  {
+    group: "3D (R3F)",
+    items: ["AdaptiveCanvas", "ScrollCamera", "Stages", "Hotspot", "PostFX", "Fallback"],
+  },
   { group: "Vidéo contrôlée", items: ["ImageSequence", "ScrollVideo", "MediaFallback"] },
-  { group: "Photo / 2.5D", items: ["LayeredPhoto", "BeforeAfter", "KenBurns", "Gallery", "Panorama"] },
+  {
+    group: "Photo / 2.5D",
+    items: ["LayeredPhoto", "BeforeAfter", "KenBurns", "Gallery", "Panorama"],
+  },
   { group: "Carte", items: ["BusinessMap", "SceneToMapTransition", "MapFallback"] },
   { group: "Conversion", items: ["LeadForm", "CTA", "Proof", "Offer", "FAQ", "Footer"] },
   { group: "SEO / Analytics", items: ["Metadata", "JSON-LD", "sitemap", "robots", "events"] },
@@ -42,12 +57,12 @@ export default function HomePage() {
             <Badge variant="neutral">Moteur technique · usage interne</Badge>
             <Heading level="display" as="h1">
               Vente Site Engine
-              <span className="mt-2 block text-brand">Template prêt</span>
+              <span className="text-brand mt-2 block">Template prêt</span>
             </Heading>
             <Text size="lg" tone="muted" className="max-w-xl">
-              L&apos;usine à sites commerciaux premium, cinématiques, 3D, performants, accessibles et
-              optimisés pour convertir. Cette page racine n&apos;est pas un site client : c&apos;est
-              le tableau de bord du moteur.
+              L&apos;usine à sites commerciaux premium, cinématiques, 3D, performants, accessibles
+              et optimisés pour convertir. Cette page racine n&apos;est pas un site client :
+              c&apos;est le tableau de bord du moteur.
             </Text>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg">
@@ -71,10 +86,10 @@ export default function HomePage() {
           {COMMANDS.map((c) => (
             <li key={c.cmd}>
               <Card className="flex flex-col gap-1 p-5">
-                <code className="font-[family-name:var(--font-mono)] text-sm font-semibold text-brand">
+                <code className="text-brand font-[family-name:var(--font-mono)] text-sm font-semibold">
                   {c.cmd}
                 </code>
-                <span className="text-sm text-muted">{c.desc}</span>
+                <span className="text-muted text-sm">{c.desc}</span>
               </Card>
             </li>
           ))}
@@ -91,7 +106,7 @@ export default function HomePage() {
                 {m.items.map((it) => (
                   <span
                     key={it}
-                    className="rounded-full bg-surface-2 px-2.5 py-1 text-xs text-muted"
+                    className="bg-surface-2 text-muted rounded-full px-2.5 py-1 text-xs"
                   >
                     {it}
                   </span>

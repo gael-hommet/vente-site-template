@@ -7,7 +7,7 @@ import { Field, Label, FieldError } from "@/components/ui/field";
 /** Honeypot input — visually hidden, off the tab order. Bots fill it. */
 export function Honeypot({ register }: { register: React.InputHTMLAttributes<HTMLInputElement> }) {
   return (
-    <div aria-hidden className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+    <div aria-hidden className="absolute top-0 left-[-9999px] h-0 w-0 overflow-hidden">
       <label>
         Société (ne pas remplir)
         <input tabIndex={-1} autoComplete="off" {...register} />
@@ -28,7 +28,11 @@ export function LabeledField({
   label: string;
   error?: string;
   required?: boolean;
-  children: (aria: { id: string; "aria-invalid": boolean; "aria-describedby"?: string }) => React.ReactNode;
+  children: (aria: {
+    id: string;
+    "aria-invalid": boolean;
+    "aria-describedby"?: string;
+  }) => React.ReactNode;
 }) {
   const errorId = `${id}-error`;
   return (
@@ -52,11 +56,11 @@ export function FormSuccess({ title, description }: { title: string; description
   return (
     <div
       role="status"
-      className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-success/30 bg-success/10 p-8 text-center"
+      className="border-success/30 bg-success/10 flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border p-8 text-center"
     >
-      <CheckCircle2 className="size-8 text-success" aria-hidden />
-      <p className="text-lg font-semibold text-foreground">{title}</p>
-      {description && <p className="max-w-sm text-sm text-muted">{description}</p>}
+      <CheckCircle2 className="text-success size-8" aria-hidden />
+      <p className="text-foreground text-lg font-semibold">{title}</p>
+      {description && <p className="text-muted max-w-sm text-sm">{description}</p>}
     </div>
   );
 }

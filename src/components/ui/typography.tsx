@@ -18,8 +18,7 @@ const headingVariants = cva("font-[family-name:var(--font-display)] tracking-tig
 type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
 
 export interface HeadingProps
-  extends React.HTMLAttributes<HTMLHeadingElement>,
-    VariantProps<typeof headingVariants> {
+  extends React.HTMLAttributes<HTMLHeadingElement>, VariantProps<typeof headingVariants> {
   as?: HeadingTag;
 }
 
@@ -72,8 +71,7 @@ const textVariants = cva("", {
 });
 
 export interface TextProps
-  extends React.HTMLAttributes<HTMLParagraphElement>,
-    VariantProps<typeof textVariants> {
+  extends React.HTMLAttributes<HTMLParagraphElement>, VariantProps<typeof textVariants> {
   as?: "p" | "span" | "div";
 }
 

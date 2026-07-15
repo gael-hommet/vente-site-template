@@ -21,8 +21,7 @@ export function MaskReveal({ children, className, direction = "up", delay = 0 }:
   const reduced = useReducedMotion();
   if (reduced) return <div className={className}>{children}</div>;
 
-  const hidden =
-    direction === "up" ? "inset(100% 0% 0% 0%)" : "inset(0% 100% 0% 0%)";
+  const hidden = direction === "up" ? "inset(100% 0% 0% 0%)" : "inset(0% 100% 0% 0%)";
 
   return (
     <motion.div

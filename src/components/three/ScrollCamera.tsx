@@ -31,10 +31,7 @@ export function ScrollCamera({
   const camera = useThree((s) => s.camera);
   const target = React.useRef(new THREE.Vector3());
   const lookTarget = React.useRef(new THREE.Vector3());
-  const sorted = React.useMemo(
-    () => [...keyframes].sort((a, b) => a.at - b.at),
-    [keyframes],
-  );
+  const sorted = React.useMemo(() => [...keyframes].sort((a, b) => a.at - b.at), [keyframes]);
 
   useFrame((_, delta) => {
     const p = readSceneProgress(sceneId);

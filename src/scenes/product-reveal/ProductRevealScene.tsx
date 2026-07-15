@@ -27,8 +27,16 @@ export function ProductRevealScene() {
           <RoundedBox args={[1.4, 2.2, 0.6]} radius={0.12} smoothness={6} castShadow>
             <meshStandardMaterial color="#3b4a6b" metalness={0.4} roughness={0.25} />
           </RoundedBox>
-          <Hotspot position={[0.8, 0.9, 0.4]} label="Finition premium" description="Matériau et reflets pilotés par l'environnement." />
-          <Hotspot position={[-0.8, -0.6, 0.4]} label="Détail produit" description="Placez ici un point d'intérêt réel." />
+          <Hotspot
+            position={[0.8, 0.9, 0.4]}
+            label="Finition premium"
+            description="Matériau et reflets pilotés par l'environnement."
+          />
+          <Hotspot
+            position={[-0.8, -0.6, 0.4]}
+            label="Détail produit"
+            description="Placez ici un point d'intérêt réel."
+          />
         </group>
       </ProductStage>
       <PostFX />

@@ -9,8 +9,4 @@ export { SplitTextFallback, type SplitTextProps } from "./SplitTextFallback";
 export { ScrollProgress } from "./ScrollProgress";
 export { PinnedSequence, type PinnedSequenceProps } from "./PinnedSequence";
 export { ScrollScene, type ScrollSceneProps } from "./ScrollScene";
-export {
-  ChapterTimeline,
-  chapterIndexFromProgress,
-  type Chapter,
-} from "./ChapterTimeline";
+export { ChapterTimeline, chapterIndexFromProgress, type Chapter } from "./ChapterTimeline";

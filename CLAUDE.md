@@ -34,7 +34,7 @@ fichier ne contient que l'essentiel permanent.
 ## 3D (React Three Fiber)
 
 - **Jamais de WebGL en SSR.** Scènes lourdes en `next/dynamic({ ssr: false })`.
-- Toujours une **WebGL boundary + fallback** image/vidéo. Aucun contenu ne doit *exiger* WebGL pour être lisible.
+- Toujours une **WebGL boundary + fallback** image/vidéo. Aucun contenu ne doit _exiger_ WebGL pour être lisible.
 - Tiers **ULTRA / BALANCED / LITE** (détection device + reduced-motion + save-data). DPR adaptatif, cull/pause hors écran.
 
 ## Responsive

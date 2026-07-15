@@ -24,7 +24,9 @@ export function KenBurnsScene({ src, alt, className, duration = 20 }: KenBurnsSc
       <div
         className="absolute inset-0"
         style={{
-          animation: reduced ? undefined : `vse-kenburns ${duration}s ease-in-out infinite alternate`,
+          animation: reduced
+            ? undefined
+            : `vse-kenburns ${duration}s ease-in-out infinite alternate`,
           transformOrigin: "center",
         }}
       >

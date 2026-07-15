@@ -40,13 +40,13 @@ Des générateurs produisent le balisage **schema.org** injecté dans les pages.
 
 ### Types par secteur
 
-| Secteur | Type schema.org |
-| --- | --- |
-| Automobile (concession/vente) | `AutoDealer` / `AutomotiveBusiness` |
-| Beauté / esthétique | `BeautySalon` / `HealthAndBeautyBusiness` |
-| Restauration | `Restaurant` |
-| Hôtellerie | `Hotel` |
-| Services professionnels | `ProfessionalService` |
+| Secteur                       | Type schema.org                           |
+| ----------------------------- | ----------------------------------------- |
+| Automobile (concession/vente) | `AutoDealer` / `AutomotiveBusiness`       |
+| Beauté / esthétique           | `BeautySalon` / `HealthAndBeautyBusiness` |
+| Restauration                  | `Restaurant`                              |
+| Hôtellerie                    | `Hotel`                                   |
+| Services professionnels       | `ProfessionalService`                     |
 
 Le générateur choisit le type le plus spécifique correspondant au secteur déclaré dans le brief, et retombe sur `LocalBusiness` par défaut.
 

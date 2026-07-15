@@ -26,44 +26,64 @@ interface ThemeContextValue {
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 
+function isTheme(value: string | null): value is Theme {
+  return value === "light" || value === "dark" || value === "system";
+}
+
+function readStored(): Theme {
+  if (typeof window === "undefined") return "system";
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return isTheme(stored) ? stored : "system";
+}
+
+function systemPrefersDark(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function applyTheme(next: Theme) {
+  const root = document.documentElement;
+  if (next === "system") root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", next);
+}
+
+// Minimal external store so theme reads flow through useSyncExternalStore
+// (no synchronous setState in an effect, hydration-safe).
+const themeListeners = new Set<() => void>();
+
+function subscribeTheme(onChange: () => void) {
+  themeListeners.add(onChange);
+  const mql =
+    typeof window !== "undefined" ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  mql?.addEventListener("change", onChange);
+  return () => {
+    themeListeners.delete(onChange);
+    mql?.removeEventListener("change", onChange);
+  };
+}
+
+function writeTheme(next: Theme) {
+  localStorage.setItem(STORAGE_KEY, next);
+  applyTheme(next);
+  themeListeners.forEach((l) => l());
+}
+
+function resolvedSnapshot(): "light" | "dark" {
+  const t = readStored();
+  return t === "dark" || (t === "system" && systemPrefersDark()) ? "dark" : "light";
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>("system");
-  const [resolved, setResolved] = React.useState<"light" | "dark">("light");
-
-  const apply = React.useCallback((next: Theme) => {
-    const root = document.documentElement;
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const isDark = next === "dark" || (next === "system" && systemDark);
-    if (next === "system") root.removeAttribute("data-theme");
-    else root.setAttribute("data-theme", next);
-    setResolved(isDark ? "dark" : "light");
-  }, []);
-
-  React.useEffect(() => {
-    const stored = (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? "system";
-    setThemeState(stored);
-    apply(stored);
-    const mql = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
-      if ((localStorage.getItem(STORAGE_KEY) as Theme | null) === "system" || !localStorage.getItem(STORAGE_KEY))
-        apply("system");
-    };
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
-  }, [apply]);
-
-  const setTheme = React.useCallback(
-    (next: Theme) => {
-      setThemeState(next);
-      localStorage.setItem(STORAGE_KEY, next);
-      apply(next);
-    },
-    [apply],
+  const theme = React.useSyncExternalStore(subscribeTheme, readStored, () => "system" as Theme);
+  const resolved = React.useSyncExternalStore(
+    subscribeTheme,
+    resolvedSnapshot,
+    () => "light" as const,
   );
 
+  const setTheme = React.useCallback((next: Theme) => writeTheme(next), []);
   const toggle = React.useCallback(() => {
-    setTheme(resolved === "dark" ? "light" : "dark");
-  }, [resolved, setTheme]);
+    writeTheme(resolvedSnapshot() === "dark" ? "light" : "dark");
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, resolved, setTheme, toggle }}>

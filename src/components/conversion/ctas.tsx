@@ -111,7 +111,7 @@ export function StickyMobileCTA({
   return (
     <div
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-border p-3 md:hidden",
+        "border-border fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t p-3 md:hidden",
         "glass",
         className,
       )}

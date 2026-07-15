@@ -42,9 +42,9 @@ export function InteractiveHotspots({ src, alt, hotspots, className }: Interacti
             <Plus className="size-4" />
           </button>
           {open === i && (
-            <div className="glass absolute left-1/2 top-4 z-10 w-48 -translate-x-1/2 rounded-[var(--radius-md)] p-3 shadow-[var(--shadow-md)]">
-              <p className="text-sm font-semibold text-foreground">{h.label}</p>
-              {h.description && <p className="mt-1 text-xs text-muted">{h.description}</p>}
+            <div className="glass absolute top-4 left-1/2 z-10 w-48 -translate-x-1/2 rounded-[var(--radius-md)] p-3 shadow-[var(--shadow-md)]">
+              <p className="text-foreground text-sm font-semibold">{h.label}</p>
+              {h.description && <p className="text-muted mt-1 text-xs">{h.description}</p>}
             </div>
           )}
         </div>

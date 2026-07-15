@@ -30,7 +30,6 @@ export function track(name: AnalyticsEventName, payload: AnalyticsPayload = {}):
   if (typeof window === "undefined") return;
 
   if (process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line no-console
     console.debug(`%c[analytics] ${name}`, "color:#6d5cff", payload);
   }
 

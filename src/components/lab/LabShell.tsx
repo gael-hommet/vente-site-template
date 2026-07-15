@@ -11,7 +11,13 @@ import { Button } from "@/components/ui/button";
 import { GlassButton } from "@/components/ui/glass-button";
 import { Card, GlassCard } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { LoadingState } from "@/components/ui/states";
 
 import { Reveal, RevealGroup } from "@/components/motion/Reveal";
@@ -56,10 +62,13 @@ const SceneToMapDemo = dynamic(() => import("./SceneToMapDemo").then((m) => m.Sc
   ssr: false,
   loading: () => <LoadingState />,
 });
-const ImageSequenceDemo = dynamic(() => import("./ImageSequenceDemo").then((m) => m.ImageSequenceDemo), {
-  ssr: false,
-  loading: () => <LoadingState />,
-});
+const ImageSequenceDemo = dynamic(
+  () => import("./ImageSequenceDemo").then((m) => m.ImageSequenceDemo),
+  {
+    ssr: false,
+    loading: () => <LoadingState />,
+  },
+);
 
 function LenisDemo() {
   const { scrollTo } = useSmoothScroll();
@@ -68,7 +77,7 @@ function LenisDemo() {
       <Button variant="outline" onClick={() => scrollTo("#lab-top")}>
         Remonter en douceur (Lenis)
       </Button>
-      <p className="text-sm text-muted">
+      <p className="text-muted text-sm">
         Lenis est actif globalement et synchronisé à ScrollTrigger ; désactivé sous reduced-motion.
       </p>
     </div>
@@ -81,7 +90,7 @@ export function LabShell() {
   return (
     <div id="lab-top" className="mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
       {/* Sticky quality selector */}
-      <div className="sticky top-16 z-30 -mx-5 mb-6 border-b border-border bg-background/80 px-5 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+      <div className="border-border bg-background/80 sticky top-16 z-30 -mx-5 mb-6 border-b px-5 py-3 backdrop-blur sm:-mx-6 sm:px-6">
         <QualitySelector />
       </div>
 
@@ -90,7 +99,7 @@ export function LabShell() {
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight sm:text-5xl">
             Laboratoire
           </h1>
-          <p className="mt-3 max-w-xl text-muted">
+          <p className="text-muted mt-3 max-w-xl">
             Démonstrations techniques des briques du moteur — sans marque ni asset protégé. Utilisez
             le sélecteur ULTRA / BALANCED / LITE pour prévisualiser chaque parcours d&apos;appareil.
           </p>
@@ -98,7 +107,11 @@ export function LabShell() {
         <EngineStatus />
       </div>
 
-      <LabSection index={1} title="Design system" description="Boutons, cartes, badges, dialog accessible.">
+      <LabSection
+        index={1}
+        title="Design system"
+        description="Boutons, cartes, badges, dialog accessible."
+      >
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-3">
             <Button>Brand</Button>
@@ -111,11 +124,11 @@ export function LabShell() {
           <div className="grid gap-4 sm:grid-cols-2">
             <Card className="p-6">
               <p className="font-semibold">Card</p>
-              <p className="text-sm text-muted">Surface opaque standard.</p>
+              <p className="text-muted text-sm">Surface opaque standard.</p>
             </Card>
             <GlassCard className="p-6">
               <p className="font-semibold">GlassCard</p>
-              <p className="text-sm text-muted">Verre progressif (fallback opaque).</p>
+              <p className="text-muted text-sm">Verre progressif (fallback opaque).</p>
             </GlassCard>
           </div>
           <Dialog>
@@ -124,7 +137,7 @@ export function LabShell() {
             </DialogTrigger>
             <DialogContent>
               <DialogTitle className="text-lg font-semibold">Dialog accessible</DialogTitle>
-              <DialogDescription className="mt-2 text-sm text-muted">
+              <DialogDescription className="text-muted mt-2 text-sm">
                 Focus trap, ESC, scroll lock via Radix. Testé au clavier.
               </DialogDescription>
             </DialogContent>
@@ -132,7 +145,11 @@ export function LabShell() {
         </div>
       </LabSection>
 
-      <LabSection index={2} title="Motion — micro-interactions" description="Reveal, magnétisme, split text (fallback sans dépendance premium).">
+      <LabSection
+        index={2}
+        title="Motion — micro-interactions"
+        description="Reveal, magnétisme, split text (fallback sans dépendance premium)."
+      >
         <div className="flex flex-col gap-8">
           <RevealGroup className="grid gap-3 sm:grid-cols-3">
             <Card className="p-6">Reveal 1</Card>
@@ -149,7 +166,11 @@ export function LabShell() {
         </div>
       </LabSection>
 
-      <LabSection index={3} title="Timeline GSAP / ScrollTrigger" description="Chorégraphie d'entrée scrubbée au scroll (non épinglée).">
+      <LabSection
+        index={3}
+        title="Timeline GSAP / ScrollTrigger"
+        description="Chorégraphie d'entrée scrubbée au scroll (non épinglée)."
+      >
         <ScrollScene
           className="grid grid-cols-4 gap-3"
           build={({ root, gsap }) => {
@@ -160,31 +181,55 @@ export function LabShell() {
           }}
         >
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} data-box className="grid aspect-square place-items-center rounded-[var(--radius-md)] bg-surface-2 text-muted">
+            <div
+              key={i}
+              data-box
+              className="bg-surface-2 text-muted grid aspect-square place-items-center rounded-[var(--radius-md)]"
+            >
               {i + 1}
             </div>
           ))}
         </ScrollScene>
       </LabSection>
 
-      <LabSection index={4} title="Lenis — smooth scroll" description="Défilement fluide synchronisé, respectant reduced-motion.">
+      <LabSection
+        index={4}
+        title="Lenis — smooth scroll"
+        description="Défilement fluide synchronisé, respectant reduced-motion."
+      >
         <LenisDemo />
       </LabSection>
 
-      <LabSection index={5} title="React Three Fiber — primitives" description="Produit primitif orbitrable avec hotspots accessibles.">
+      <LabSection
+        index={5}
+        title="React Three Fiber — primitives"
+        description="Produit primitif orbitrable avec hotspots accessibles."
+      >
         <ProductCanvas />
       </LabSection>
 
-      <LabSection index={6} title="Caméra pilotée par le scroll" description="Le visiteur contrôle le film avec son scroll (GSAP pin + R3F).">
+      <LabSection
+        index={6}
+        title="Caméra pilotée par le scroll"
+        description="Le visiteur contrôle le film avec son scroll (GSAP pin + R3F)."
+      >
         <JourneyDemo />
       </LabSection>
 
-      <LabSection index={7} title="Postprocessing (ULTRA)" description="Bloom + vignette raisonnables, actifs uniquement en ULTRA.">
+      <LabSection
+        index={7}
+        title="Postprocessing (ULTRA)"
+        description="Bloom + vignette raisonnables, actifs uniquement en ULTRA."
+      >
         <LogoCanvas />
       </LabSection>
 
-      <LabSection index={8} title="ShaderGradient (fallback CSS)" description="Fond mesh animé, sans dépendance ni three.js embarqué.">
-        <div className="relative h-64 overflow-hidden rounded-[var(--radius-lg)] border border-border">
+      <LabSection
+        index={8}
+        title="ShaderGradient (fallback CSS)"
+        description="Fond mesh animé, sans dépendance ni three.js embarqué."
+      >
+        <div className="border-border relative h-64 overflow-hidden rounded-[var(--radius-lg)] border">
           <ShaderGradientBackground />
           <div className="relative grid h-full place-items-center">
             <span className="text-lg font-medium">Arrière-plan animé</span>
@@ -192,31 +237,56 @@ export function LabShell() {
         </div>
       </LabSection>
 
-      <LabSection index={9} title="Liquid metal (CSS)" description="Wordmark métallique animé, statique sous reduced-motion.">
+      <LabSection
+        index={9}
+        title="Liquid metal (CSS)"
+        description="Wordmark métallique animé, statique sous reduced-motion."
+      >
         <LiquidMetalLogo text="LIQUID METAL" className="text-4xl sm:text-6xl" />
       </LabSection>
 
-      <LabSection index={10} title="Liquid glass avec fallback" description="GlassSurface : verre enrichi → backdrop-filter → opaque.">
+      <LabSection
+        index={10}
+        title="Liquid glass avec fallback"
+        description="GlassSurface : verre enrichi → backdrop-filter → opaque."
+      >
         <div className="relative overflow-hidden rounded-[var(--radius-lg)] p-8">
           <ShaderGradientBackground />
           <GlassSurface className="p-6">
             <p className="font-semibold">GlassSurface</p>
-            <p className="text-sm text-muted">Aucun composant essentiel ne dépend d&apos;une réfraction WebGL.</p>
+            <p className="text-muted text-sm">
+              Aucun composant essentiel ne dépend d&apos;une réfraction WebGL.
+            </p>
           </GlassSurface>
         </div>
       </LabSection>
 
-      <LabSection index={11} title="Séquence d'images (générée localement)" description="Frames dessinées côté client, scrubbées par un slider.">
+      <LabSection
+        index={11}
+        title="Séquence d'images (générée localement)"
+        description="Frames dessinées côté client, scrubbées par un slider."
+      >
         <ImageSequenceDemo />
       </LabSection>
 
-      <LabSection index={12} title="Vidéo scrubbée" description="Activée en déposant une petite vidéo locale (voir ASSET-PIPELINE). Ici : poster de repli.">
-        <div className="aspect-video w-full overflow-hidden rounded-[var(--radius-lg)] border border-border">
-          <MediaFallback poster="/assets/poster.svg" alt="Aucune vidéo locale — poster de repli affiché" />
+      <LabSection
+        index={12}
+        title="Vidéo scrubbée"
+        description="Activée en déposant une petite vidéo locale (voir ASSET-PIPELINE). Ici : poster de repli."
+      >
+        <div className="border-border aspect-video w-full overflow-hidden rounded-[var(--radius-lg)] border">
+          <MediaFallback
+            poster="/assets/poster.svg"
+            alt="Aucune vidéo locale — poster de repli affiché"
+          />
         </div>
       </LabSection>
 
-      <LabSection index={13} title="Parallaxe 2.5D" description="Photo en couches réagissant au pointeur (statique sous reduced-motion).">
+      <LabSection
+        index={13}
+        title="Parallaxe 2.5D"
+        description="Photo en couches réagissant au pointeur (statique sous reduced-motion)."
+      >
         <div className="grid gap-6 lg:grid-cols-2">
           <LayeredPhoto
             alt="Scène 2.5D de démonstration"
@@ -226,18 +296,30 @@ export function LabShell() {
               { src: "/assets/demo-3.svg", depth: 0.3 },
             ]}
           />
-          <KenBurnsScene src="/assets/demo-5.svg" alt="Photo animée (Ken Burns)" className="aspect-[16/10] rounded-[var(--radius-lg)]" />
+          <KenBurnsScene
+            src="/assets/demo-5.svg"
+            alt="Photo animée (Ken Burns)"
+            className="aspect-[16/10] rounded-[var(--radius-lg)]"
+          />
         </div>
       </LabSection>
 
-      <LabSection index={14} title="Transition vers MapLibre" description="Carte keyless + transition scène → carte. Position fictive.">
+      <LabSection
+        index={14}
+        title="Transition vers MapLibre"
+        description="Carte keyless + transition scène → carte. Position fictive."
+      >
         <div className="flex flex-col gap-6">
           <MapDemo />
           <SceneToMapDemo />
         </div>
       </LabSection>
 
-      <LabSection index={15} title="Formulaire local" description="react-hook-form + zod, endpoint simulé, anti-spam, états succès/erreur.">
+      <LabSection
+        index={15}
+        title="Formulaire local"
+        description="react-hook-form + zod, endpoint simulé, anti-spam, états succès/erreur."
+      >
         <div className="max-w-lg">
           <LeadForm />
         </div>
@@ -245,18 +327,35 @@ export function LabShell() {
 
       <LabSection index={16} title="Photos : avant/après, galerie, panorama, Ken Burns">
         <div className="flex flex-col gap-6">
-          <BeforeAfter beforeSrc="/assets/before.svg" afterSrc="/assets/after.svg" beforeAlt="Avant" afterAlt="Après" />
-          <InteriorGallery
-            images={[1, 2, 3, 4, 5, 6].map((n) => ({ src: `/assets/demo-${n}.svg`, alt: `Photo ${n}` }))}
+          <BeforeAfter
+            beforeSrc="/assets/before.svg"
+            afterSrc="/assets/after.svg"
+            beforeAlt="Avant"
+            afterAlt="Après"
           />
-          <PanoramaAdapter src="/assets/pano.svg" alt="Panorama de démonstration" className="h-64" />
+          <InteriorGallery
+            images={[1, 2, 3, 4, 5, 6].map((n) => ({
+              src: `/assets/demo-${n}.svg`,
+              alt: `Photo ${n}`,
+            }))}
+          />
+          <PanoramaAdapter
+            src="/assets/pano.svg"
+            alt="Panorama de démonstration"
+            className="h-64"
+          />
         </div>
       </LabSection>
 
-      <LabSection index={17} title="Reduced motion & tiers" description="Le moteur respecte prefers-reduced-motion et adapte le rendu.">
+      <LabSection
+        index={17}
+        title="Reduced motion & tiers"
+        description="Le moteur respecte prefers-reduced-motion et adapte le rendu."
+      >
         <Reveal>
-          <p className="text-sm text-muted">
-            Reduced motion : <span className="font-medium text-foreground">{reduced ? "ACTIF" : "inactif"}</span>.
+          <p className="text-muted text-sm">
+            Reduced motion :{" "}
+            <span className="text-foreground font-medium">{reduced ? "ACTIF" : "inactif"}</span>.
             {reduced
               ? " Les animations non essentielles sont supprimées, le contenu reste accessible."
               : " Activez-le dans les préférences système pour voir le comportement dégradé."}

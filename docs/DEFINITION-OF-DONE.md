@@ -7,6 +7,7 @@ Porte de sortie avant de déclarer un site livrable. `/finalize-site` s'appuie s
 ## Checklist
 
 ### Base technique
+
 - [ ] `pnpm install` **propre** (aucun avertissement de peer, aucun `--force`/`--legacy-peer-deps`).
 - [ ] `pnpm lint` → **0 erreur**.
 - [ ] `pnpm typecheck` → **0 erreur**.
@@ -15,21 +16,25 @@ Porte de sortie avant de déclarer un site livrable. `/finalize-site` s'appuie s
 - [ ] `pnpm check` (= lint + typecheck + test + build) → vert.
 
 ### Rendu
+
 - [ ] La route **`/`** rend correctement.
 - [ ] La route **`/lab`** rend correctement.
 - [ ] **Aucune erreur console** (ni warning bloquant) au chargement et à l'interaction.
 
 ### Accessibilité & résilience
+
 - [ ] **`prefers-reduced-motion` honoré** : animations réduites, pas de mouvement imposé.
 - [ ] **Fallback WebGL vérifié** : sans WebGL / en tier LITE, poster/vidéo/séquence s'affiche, pas de canvas noir.
 - [ ] Tests a11y (`pnpm test:a11y`) verts.
 
 ### Configuration projet
+
 - [ ] **`.claude/` valide** : skills et agents présents et fonctionnels.
 - [ ] Le **devcontainer prépare correctement le prochain Codespace** (Node 22, pnpm, ffmpeg, Playwright, install).
 - [ ] Le **README décrit le parcours** (brief → build → preview → audit → finalize).
 
 ### Contenu & conformité
+
 - [ ] Aucun **fait inventé** : avis, notes, récompenses, prix, adresses proviennent uniquement du brief vérifié (voir `docs/SEO-GUIDE.md`).
 - [ ] Métadonnées, JSON-LD, sitemap et robots générés et cohérents.
 

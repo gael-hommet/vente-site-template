@@ -48,12 +48,42 @@ async function main() {
 
     const mp4 = path.join(OUT_VIDEO, `${base}.mp4`);
     if (!existsSync(mp4)) {
-      run("ffmpeg", ["-y", "-i", src, "-vf", scale, "-c:v", "libx264", "-crf", "23", "-preset", "slow", "-movflags", "+faststart", "-an", mp4]);
+      run("ffmpeg", [
+        "-y",
+        "-i",
+        src,
+        "-vf",
+        scale,
+        "-c:v",
+        "libx264",
+        "-crf",
+        "23",
+        "-preset",
+        "slow",
+        "-movflags",
+        "+faststart",
+        "-an",
+        mp4,
+      ]);
     }
 
     const webm = path.join(OUT_VIDEO, `${base}.webm`);
     if (!existsSync(webm)) {
-      run("ffmpeg", ["-y", "-i", src, "-vf", scale, "-c:v", "libvpx-vp9", "-crf", "34", "-b:v", "0", "-an", webm]);
+      run("ffmpeg", [
+        "-y",
+        "-i",
+        src,
+        "-vf",
+        scale,
+        "-c:v",
+        "libvpx-vp9",
+        "-crf",
+        "34",
+        "-b:v",
+        "0",
+        "-an",
+        webm,
+      ]);
     }
 
     const poster = path.join(OUT_POSTERS, `${base}.jpg`);
@@ -64,13 +94,28 @@ async function main() {
     if (makeSequence) {
       const seqDir = path.join(OUT_SEQUENCES, base);
       await ensureDir(seqDir);
-      run("ffmpeg", ["-y", "-i", src, "-vf", `fps=${SEQUENCE_FPS},${scale}`, "-c:v", "libwebp", "-quality", "70", path.join(seqDir, "frame-%04d.webp")]);
+      run("ffmpeg", [
+        "-y",
+        "-i",
+        src,
+        "-vf",
+        `fps=${SEQUENCE_FPS},${scale}`,
+        "-c:v",
+        "libwebp",
+        "-quality",
+        "70",
+        path.join(seqDir, "frame-%04d.webp"),
+      ]);
       console.log(color.green(`  → séquence WebP: ${path.relative(process.cwd(), seqDir)}`));
     }
     console.log(color.green(`  → ${base}: mp4 + webm + poster`));
   }
   header("Terminé");
-  console.log(color.dim("  Originaux conservés. Aucune piste audio n'est encodée (pas de lecture sonore auto)."));
+  console.log(
+    color.dim(
+      "  Originaux conservés. Aucune piste audio n'est encodée (pas de lecture sonore auto).",
+    ),
+  );
 }
 
 main().catch((e) => {

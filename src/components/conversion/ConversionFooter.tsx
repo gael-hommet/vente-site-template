@@ -11,7 +11,7 @@ import type { BusinessConfig } from "@/types";
 export function ConversionFooter({ business }: { business: BusinessConfig }) {
   const { name, telephone, email, address, geo, openingHours } = business;
   return (
-    <footer className="border-t border-border bg-surface-2 py-14">
+    <footer className="border-border bg-surface-2 border-t py-14">
       <Container>
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           <div className="flex flex-col gap-3">
@@ -19,14 +19,14 @@ export function ConversionFooter({ business }: { business: BusinessConfig }) {
               {name}
             </Heading>
             {address && (
-              <address className="text-sm not-italic text-muted">
+              <address className="text-muted text-sm not-italic">
                 {[address.streetAddress, address.postalCode, address.addressLocality]
                   .filter(Boolean)
                   .join(", ")}
               </address>
             )}
             {email && (
-              <a href={`mailto:${email}`} className="text-sm text-brand hover:underline">
+              <a href={`mailto:${email}`} className="text-brand text-sm hover:underline">
                 {email}
               </a>
             )}
@@ -35,7 +35,7 @@ export function ConversionFooter({ business }: { business: BusinessConfig }) {
           {openingHours && openingHours.length > 0 && (
             <div className="flex flex-col gap-2">
               <Text weight="semibold">Horaires</Text>
-              <ul className="text-sm text-muted">
+              <ul className="text-muted text-sm">
                 {openingHours.map((h, i) => (
                   <li key={i}>
                     {h.dayOfWeek.join(", ")} : {h.opens}–{h.closes}

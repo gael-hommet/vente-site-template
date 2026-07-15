@@ -55,7 +55,9 @@ async function main() {
       "draco",
     ]);
     if (!ok || !existsSync(out)) {
-      console.log(color.yellow(`  ⚠ Échec de l'optimisation de ${base}. Vérifiez le modèle source.`));
+      console.log(
+        color.yellow(`  ⚠ Échec de l'optimisation de ${base}. Vérifiez le modèle source.`),
+      );
       continue;
     }
     const after = await fileSize(out);
@@ -64,7 +66,9 @@ async function main() {
     );
   }
   header("Terminé");
-  console.log(color.dim("  Chargez les modèles via <Model src=\"/models/…\" draco /> et un <Suspense>."));
+  console.log(
+    color.dim('  Chargez les modèles via <Model src="/models/…" draco /> et un <Suspense>.'),
+  );
 }
 
 main().catch((e) => {

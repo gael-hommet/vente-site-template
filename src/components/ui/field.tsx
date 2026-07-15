@@ -5,19 +5,18 @@ import { cn } from "@/lib/utils";
  * wire aria-invalid / aria-describedby to FieldError for screen readers. */
 
 export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
-  return (
-    <label className={cn("text-sm font-medium text-foreground", className)} {...props} />
-  );
+  return <label className={cn("text-foreground text-sm font-medium", className)} {...props} />;
 }
 
 const controlBase =
   "w-full rounded-[var(--radius-md)] border border-border bg-surface px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--ring)] disabled:opacity-50 aria-[invalid=true]:border-danger aria-[invalid=true]:outline-[var(--danger)]";
 
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  ({ className, ...props }, ref) => (
-    <input ref={ref} className={cn(controlBase, "h-11", className)} {...props} />
-  ),
-);
+export const Input = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ className, ...props }, ref) => (
+  <input ref={ref} className={cn(controlBase, "h-11", className)} {...props} />
+));
 Input.displayName = "Input";
 
 export const Textarea = React.forwardRef<
@@ -36,27 +35,15 @@ export const Select = React.forwardRef<
 ));
 Select.displayName = "Select";
 
-export function FieldError({
-  id,
-  children,
-}: {
-  id?: string;
-  children?: React.ReactNode;
-}) {
+export function FieldError({ id, children }: { id?: string; children?: React.ReactNode }) {
   if (!children) return null;
   return (
-    <p id={id} role="alert" className="text-sm text-danger">
+    <p id={id} role="alert" className="text-danger text-sm">
       {children}
     </p>
   );
 }
 
-export function Field({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+export function Field({ className, children }: { className?: string; children: React.ReactNode }) {
   return <div className={cn("flex flex-col gap-1.5", className)}>{children}</div>;
 }

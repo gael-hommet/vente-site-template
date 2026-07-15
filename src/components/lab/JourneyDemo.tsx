@@ -2,10 +2,17 @@
 
 import * as React from "react";
 import { AdaptiveCanvas } from "@/components/three/AdaptiveCanvas";
-import { VehicleJourneyScene, VEHICLE_JOURNEY_ID } from "@/scenes/vehicle-journey/VehicleJourneyScene";
+import {
+  VehicleJourneyScene,
+  VEHICLE_JOURNEY_ID,
+} from "@/scenes/vehicle-journey/VehicleJourneyScene";
 import { useScrubProgress } from "@/hooks/useScrubProgress";
 import { useSceneStore } from "@/lib/three/scene-store";
-import { ChapterTimeline, chapterIndexFromProgress, type Chapter } from "@/components/motion/ChapterTimeline";
+import {
+  ChapterTimeline,
+  chapterIndexFromProgress,
+  type Chapter,
+} from "@/components/motion/ChapterTimeline";
 
 const CHAPTERS: Chapter[] = [
   { id: "intro", label: "Entrée" },
@@ -43,7 +50,7 @@ export function JourneyDemo() {
         >
           <VehicleJourneyScene />
         </AdaptiveCanvas>
-        <div className="pointer-events-none absolute left-6 top-1/2 -translate-y-1/2">
+        <div className="pointer-events-none absolute top-1/2 left-6 -translate-y-1/2">
           <ChapterTimeline chapters={CHAPTERS} activeIndex={active} />
         </div>
         <p className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-4 py-1.5 text-xs text-white backdrop-blur-sm">

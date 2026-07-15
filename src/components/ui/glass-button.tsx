@@ -25,7 +25,7 @@ export const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>
       <Comp
         ref={ref}
         className={cn(
-          "glass group relative inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] font-medium text-foreground shadow-[var(--shadow-md)] transition-transform duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] hover:shadow-[var(--shadow-lg)] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] disabled:pointer-events-none disabled:opacity-50",
+          "glass group text-foreground relative inline-flex items-center justify-center gap-2 rounded-[var(--radius-lg)] font-medium shadow-[var(--shadow-md)] transition-transform duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50",
           sizes[size],
           className,
         )}

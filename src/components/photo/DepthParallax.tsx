@@ -79,7 +79,11 @@ export function ParallaxDepthLayer({
   const ty = useTransform(srcY, (v) => (ctx?.reduced ? 0 : v * amount));
 
   return (
-    <motion.div style={{ x: tx, y: ty }} className={cn("absolute inset-0", className)} {...(props as React.ComponentProps<typeof motion.div>)}>
+    <motion.div
+      style={{ x: tx, y: ty }}
+      className={cn("absolute inset-0", className)}
+      {...(props as React.ComponentProps<typeof motion.div>)}
+    >
       {children}
     </motion.div>
   );

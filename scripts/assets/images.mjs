@@ -55,17 +55,26 @@ async function main() {
         if (fmt === "avif") await pipe.avif({ quality: QUALITY.avif }).toFile(out);
         else await pipe.webp({ quality: QUALITY.webp }).toFile(out);
         savedBytes += Math.max(0, srcSize - (await fileSize(out)));
-        console.log(`  ${color.green("→")} ${path.relative(process.cwd(), out)} (${human(await fileSize(out))})`);
+        console.log(
+          `  ${color.green("→")} ${path.relative(process.cwd(), out)} (${human(await fileSize(out))})`,
+        );
       }
     }
     // A universal poster JPEG for <video>/OG fallback.
     const poster = path.join(OUT_IMAGES, `${base}-poster.jpg`);
     if (!existsSync(poster)) {
-      await sharp(src).resize({ width: 1200, withoutEnlargement: true }).jpeg({ quality: QUALITY.jpeg }).toFile(poster);
+      await sharp(src)
+        .resize({ width: 1200, withoutEnlargement: true })
+        .jpeg({ quality: QUALITY.jpeg })
+        .toFile(poster);
     }
   }
   header("Terminé");
-  console.log(color.green(`  Économie estimée: ${human(savedBytes)}. Originaux conservés dans input/assets/.`));
+  console.log(
+    color.green(
+      `  Économie estimée: ${human(savedBytes)}. Originaux conservés dans input/assets/.`,
+    ),
+  );
 }
 
 main().catch((e) => {

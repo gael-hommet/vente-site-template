@@ -43,7 +43,9 @@ export function QuoteRequest({ services, className }: QuoteRequestProps) {
   });
 
   if (done)
-    return <FormSuccess title="Demande de devis reçue" description="Nous préparons votre proposition." />;
+    return (
+      <FormSuccess title="Demande de devis reçue" description="Nous préparons votre proposition." />
+    );
 
   return (
     <form
@@ -82,15 +84,15 @@ export function QuoteRequest({ services, className }: QuoteRequestProps) {
         <LabeledField id="q-details" label="Détails" error={errors.details?.message}>
           {(aria) => <Textarea rows={4} {...aria} {...register("details")} />}
         </LabeledField>
-        <label className="flex items-start gap-2 text-sm text-muted">
-          <input type="checkbox" className="mt-1 accent-brand" {...register("consent")} />
+        <label className="text-muted flex items-start gap-2 text-sm">
+          <input type="checkbox" className="accent-brand mt-1" {...register("consent")} />
           <span>
             J&apos;accepte d&apos;être recontacté pour ce devis.
-            {errors.consent && <span className="block text-danger">{errors.consent.message}</span>}
+            {errors.consent && <span className="text-danger block">{errors.consent.message}</span>}
           </span>
         </label>
         {serverError && (
-          <p role="alert" className="text-sm text-danger">
+          <p role="alert" className="text-danger text-sm">
             {serverError}
           </p>
         )}

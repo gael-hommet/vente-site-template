@@ -38,7 +38,9 @@ export function ShaderGradientBackground({
         style={{
           background: `radial-gradient(40% 40% at 25% 30%, ${c1}66, transparent 70%), radial-gradient(45% 45% at 75% 35%, ${c2}55, transparent 70%), radial-gradient(50% 50% at 55% 80%, ${c3}55, transparent 70%)`,
           filter: "blur(40px) saturate(1.3)",
-          animation: reduced ? undefined : `vse-mesh-drift ${speed}s ease-in-out infinite alternate`,
+          animation: reduced
+            ? undefined
+            : `vse-mesh-drift ${speed}s ease-in-out infinite alternate`,
         }}
       />
       <style>{`@keyframes vse-mesh-drift{0%{transform:translate3d(-3%,-2%,0) scale(1.05)}50%{transform:translate3d(2%,3%,0) scale(1.12)}100%{transform:translate3d(3%,-1%,0) scale(1.06)}}`}</style>

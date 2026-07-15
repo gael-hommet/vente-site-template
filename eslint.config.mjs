@@ -26,6 +26,14 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // Node utility scripts (asset pipeline, audits): CLI conventions differ from
+    // app code — concise ternary-as-statement reporting is intentional here.
+    files: ["scripts/**/*.mjs"],
+    rules: {
+      "@typescript-eslint/no-unused-expressions": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

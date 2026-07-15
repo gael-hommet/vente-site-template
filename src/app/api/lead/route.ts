@@ -33,7 +33,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  const kind = (typeof body === "object" && body && "kind" in body ? (body as { kind: string }).kind : "") as FormKind;
+  const kind = (
+    typeof body === "object" && body && "kind" in body ? (body as { kind: string }).kind : ""
+  ) as FormKind;
   const schema = schemaByKind[kind];
   if (!schema) {
     return NextResponse.json({ ok: false, error: "unknown_form" }, { status: 400 });

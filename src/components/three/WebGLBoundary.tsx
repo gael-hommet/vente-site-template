@@ -21,7 +21,6 @@ class SceneErrorBoundary extends React.Component<
 
   componentDidCatch(error: unknown) {
     if (process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
       console.warn("[WebGLBoundary] scene error, showing fallback:", error);
     }
   }
@@ -45,12 +44,15 @@ export interface WebGLBoundaryProps {
  * 3. Otherwise renders the scene wrapped in an error boundary.
  */
 export function WebGLBoundary({ fallback, forceFallback = false, children }: WebGLBoundaryProps) {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-
-  const fallbackEl = (
-    <WebGLFallback alt={fallback?.alt ?? "Aperçu visuel"} {...fallback} />
+  // Hydration-safe client detection without a setState-in-effect: false on the
+  // server and first render, true once mounted on the client.
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
   );
+
+  const fallbackEl = <WebGLFallback alt={fallback?.alt ?? "Aperçu visuel"} {...fallback} />;
 
   if (!mounted || forceFallback || !detectWebGL()) {
     return fallbackEl;

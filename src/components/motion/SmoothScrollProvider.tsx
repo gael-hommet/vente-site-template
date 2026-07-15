@@ -6,12 +6,13 @@ import { registerGsap, ScrollTrigger } from "@/lib/animation/gsap";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface SmoothScrollContextValue {
-  lenis: Lenis | null;
+  /** Read the live Lenis instance (null under reduced motion / before init). */
+  getLenis: () => Lenis | null;
   scrollTo: (target: string | number | HTMLElement, opts?: { offset?: number }) => void;
 }
 
 const SmoothScrollContext = React.createContext<SmoothScrollContextValue>({
-  lenis: null,
+  getLenis: () => null,
   scrollTo: () => {},
 });
 
@@ -26,7 +27,6 @@ const SmoothScrollContext = React.createContext<SmoothScrollContextValue>({
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const reducedMotion = useReducedMotion();
   const lenisRef = React.useRef<Lenis | null>(null);
-  const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
     // Respect reduced motion: no smooth scroll at all.
@@ -40,7 +40,6 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       touchMultiplier: 1.5,
     });
     lenisRef.current = lenis;
-    setReady(true);
 
     lenis.on("scroll", ScrollTrigger.update);
 
@@ -52,7 +51,6 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       gsap.ticker.remove(onTick);
       lenis.destroy();
       lenisRef.current = null;
-      setReady(false);
     };
   }, [reducedMotion]);
 
@@ -71,9 +69,9 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     }
   }, []);
 
-  const value = React.useMemo(
-    () => ({ lenis: ready ? lenisRef.current : null, scrollTo }),
-    [ready, scrollTo],
+  const value = React.useMemo<SmoothScrollContextValue>(
+    () => ({ getLenis: () => lenisRef.current, scrollTo }),
+    [scrollTo],
   );
 
   return <SmoothScrollContext.Provider value={value}>{children}</SmoothScrollContext.Provider>;

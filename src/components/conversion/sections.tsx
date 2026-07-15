@@ -24,14 +24,17 @@ export function ReviewCard({ review, className }: { review: Review; className?: 
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
-              className={cn("size-4", i < review.rating! ? "fill-warning text-warning" : "text-border")}
+              className={cn(
+                "size-4",
+                i < review.rating! ? "fill-warning text-warning" : "text-border",
+              )}
               aria-hidden
             />
           ))}
         </div>
       )}
-      <blockquote className="text-sm leading-relaxed text-foreground">“{review.text}”</blockquote>
-      <figcaption className="mt-auto text-xs text-muted">
+      <blockquote className="text-foreground text-sm leading-relaxed">“{review.text}”</blockquote>
+      <figcaption className="text-muted mt-auto text-xs">
         — {review.author}
         {review.source ? ` · ${review.source}` : ""}
       </figcaption>
@@ -52,10 +55,10 @@ export function ProofSection({ items, className }: { items: ProofItem[]; classNa
         <div key={i} className="text-center">
           <dt className="sr-only">{it.label}</dt>
           <dd>
-            <span className="block font-[family-name:var(--font-display)] text-3xl font-bold text-brand sm:text-4xl">
+            <span className="text-brand block font-[family-name:var(--font-display)] text-3xl font-bold sm:text-4xl">
               {it.value}
             </span>
-            <span className="mt-1 block text-sm text-muted">{it.label}</span>
+            <span className="text-muted mt-1 block text-sm">{it.label}</span>
           </dd>
         </div>
       ))}
@@ -85,7 +88,9 @@ export function OfferSection({ offers, className }: { offers: Offer[]; className
           <Text tone="muted" size="sm">
             {offer.description}
           </Text>
-          {offer.price && <p className="mt-auto text-lg font-semibold text-foreground">{offer.price}</p>}
+          {offer.price && (
+            <p className="text-foreground mt-auto text-lg font-semibold">{offer.price}</p>
+          )}
         </Card>
       ))}
     </div>
