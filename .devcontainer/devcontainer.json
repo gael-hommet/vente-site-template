@@ -1,8 +1,8 @@
 {
   "name": "Vente Site Engine",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
-  "features": {
-    "ghcr.io/devcontainers/features/ffmpeg-apt-get:1": {}
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
   },
   "forwardPorts": [3000],
   "portsAttributes": {
@@ -11,8 +11,8 @@
       "onAutoForward": "notify"
     }
   },
-  "onCreateCommand": "corepack enable",
   "postCreateCommand": "bash scripts/post-create.sh",
+  "waitFor": "postCreateCommand",
   "customizations": {
     "vscode": {
       "extensions": [
