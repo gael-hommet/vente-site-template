@@ -1,9 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import {
-  REDUCED_MOTION_QUERY,
-  prefersReducedMotion,
-} from "@/lib/accessibility/reduced-motion";
+import { REDUCED_MOTION_QUERY, prefersReducedMotion } from "@/lib/accessibility/reduced-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
