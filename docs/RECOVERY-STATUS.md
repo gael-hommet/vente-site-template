@@ -19,17 +19,17 @@ pas sur un rapport antérieur non vérifié.
 - Remote : `origin` = `https://github.com/gael-hommet/vente-site-template`
   (aucun push effectué pendant la reprise).
 - Dernier commit disponible : `90ed6d2 checkpoint: Vente Site Engine
-  partiellement construit avant reprise` (précédé de `2022944 Initial commit`).
+partiellement construit avant reprise` (précédé de `2022944 Initial commit`).
 
 ## 2. Environnement observé (⚠️ substitut, pas le dev container cible)
 
-| Élément | Attendu (devcontainer.json) | Observé à la reprise |
-| --- | --- | --- |
-| OS | Debian (`typescript-node:22`) | **Alpine Linux 3.23 (musl)** |
-| Node | 22.x fourni par l'image | **absent** → installé Node **24.17.0** (apk) |
-| pnpm | corepack (`pnpm@10.32.1`) | **absent** → activé **10.32.1** (corepack) |
-| ffmpeg | feature `ffmpeg-apt-get` | **absent** → installé **8.0.1** (apk) |
-| Claude Code | installé par post-create | non vérifiable ici (CLI hôte) |
+| Élément     | Attendu (devcontainer.json)   | Observé à la reprise                         |
+| ----------- | ----------------------------- | -------------------------------------------- |
+| OS          | Debian (`typescript-node:22`) | **Alpine Linux 3.23 (musl)**                 |
+| Node        | 22.x fourni par l'image       | **absent** → installé Node **24.17.0** (apk) |
+| pnpm        | corepack (`pnpm@10.32.1`)     | **absent** → activé **10.32.1** (corepack)   |
+| ffmpeg      | feature `ffmpeg-apt-get`      | **absent** → installé **8.0.1** (apk)        |
+| Claude Code | installé par post-create      | non vérifiable ici (CLI hôte)                |
 
 > Conséquence : l'environnement de reprise **n'est pas** le dev container décrit
 > par `.devcontainer/devcontainer.json`. Les binaires glibc précompilés de
@@ -58,6 +58,7 @@ tests/              unit/setup.ts (+ suite unitaire écrite pendant la reprise)
 ## 4. Phases — état réel
 
 **Terminées et vérifiées** :
+
 - Fondations Next 16 / React 19.2 / TS strict / Tailwind v4 — **build OK**.
 - Design system, Motion, GSAP/Lenis, 3D (R3F + boundary/fallback), média
   (image-sequence / scroll-video), photo 2.5D, maps (MapLibre), conversion
@@ -66,11 +67,13 @@ tests/              unit/setup.ts (+ suite unitaire écrite pendant la reprise)
 - Règles `.claude/rules/*`, agents, skills, `settings.json` — présents et valides.
 
 **Corrigées pendant la reprise** :
+
 - **Lint** : 8 erreurs + 16 warnings → **0/0** (voir §7).
 - **post-create.sh** : **manquant** alors que `devcontainer.json` l'appelle →
   créé (idempotent, PATH persistant pour `claude`).
 
 **Complétées pendant la reprise** :
+
 - **Tests unitaires** : `tests/` ne contenait que `setup.ts` → **7 fichiers,
   47 tests Vitest + RTL** (schemas de formulaire succès/erreur + honeypot,
   reduced-motion, fallback WebGL, CTA `tel:`/directions, SEO/JSON-LD, formulaire
@@ -106,19 +109,20 @@ tests/              unit/setup.ts (+ suite unitaire écrite pendant la reprise)
 
 ## 7. Commandes — ce qui passe / échoue
 
-| Commande | Avant reprise | Après corrections |
-| --- | --- | --- |
-| `pnpm install` | — | ✅ OK |
-| `pnpm typecheck` | ✅ OK | ✅ OK |
-| `pnpm lint` | ❌ 8 erreurs, 16 warnings | ✅ 0 erreur, 0 warning |
-| `pnpm build` | ✅ OK (9 routes) | ✅ OK |
-| `pnpm test` | ❌ « No test files found » | ✅ 7 fichiers, 47 tests |
-| `pnpm check` | ❌ (bloqué par lint + test) | ✅ **vert** (lint+typecheck+test+build) |
-| `pnpm audit:site` | — | ✅ 9 OK, 1 warning (`<img>` panorama), 0 échec |
-| `pnpm assets:audit` | — | ✅ OK (0 asset, budget respecté) |
-| Smoke `/`, `/lab`, `/api/lead` | — | ✅ 200 ; form local ok/422/honeypot |
+| Commande                       | Avant reprise               | Après corrections                              |
+| ------------------------------ | --------------------------- | ---------------------------------------------- |
+| `pnpm install`                 | —                           | ✅ OK                                          |
+| `pnpm typecheck`               | ✅ OK                       | ✅ OK                                          |
+| `pnpm lint`                    | ❌ 8 erreurs, 16 warnings   | ✅ 0 erreur, 0 warning                         |
+| `pnpm build`                   | ✅ OK (9 routes)            | ✅ OK                                          |
+| `pnpm test`                    | ❌ « No test files found »  | ✅ 7 fichiers, 47 tests                        |
+| `pnpm check`                   | ❌ (bloqué par lint + test) | ✅ **vert** (lint+typecheck+test+build)        |
+| `pnpm audit:site`              | —                           | ✅ 9 OK, 1 warning (`<img>` panorama), 0 échec |
+| `pnpm assets:audit`            | —                           | ✅ OK (0 asset, budget respecté)               |
+| Smoke `/`, `/lab`, `/api/lead` | —                           | ✅ 200 ; form local ok/422/honeypot            |
 
 **Causes des échecs lint** (Next 16 embarque `eslint-plugin-react-hooks` durci) :
+
 - `react-hooks/set-state-in-effect` : setState synchrone dans un effet →
   corrigé via `useSyncExternalStore` (useMediaQuery, ThemeProvider, WebGL client
   detection) et report du setState hors du corps synchrone (BusinessMap async
