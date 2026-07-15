@@ -50,6 +50,26 @@ Problèmes fréquents et corrections. Rappel : gestionnaire **pnpm 10.32 uniquem
 - Correction : réaligner sur **19.2.4**, `react` et `react-dom` identiques. **Ne pas** masquer avec `--force`/`--legacy-peer-deps`.
 - Vérifier les intégrations optionnelles qui exigeraient un React plus récent ou embarqueraient leur propre `three` (`pnpm why three`, `pnpm why react`).
 
+## `claude` introuvable après reconstruction du Codespace
+
+- Le dev container relance `scripts/post-create.sh` (idempotent) qui installe
+  Claude Code et l'ajoute à un **PATH persistant** (`~/.local/bin`, écrit dans
+  `~/.bashrc` / `~/.profile`).
+- Si `claude` manque malgré tout : ouvrir un **nouveau terminal** (PATH
+  rechargé), ou relancer `bash scripts/post-create.sh`.
+- Réinstallation manuelle : `curl -fsSL https://claude.ai/install.sh | bash`
+  (repli : `npm install -g @anthropic-ai/claude-code`).
+- Pour reprendre le travail sans la conversation perdue : lire
+  `docs/RECOVERY-STATUS.md` puis `pnpm install && pnpm check`. La reprise se
+  fonde sur le dépôt + Git, jamais sur l'historique de conversation.
+
+## Avertissement Git LFS au commit
+
+- Message : « This repository is configured for Git LFS but 'git-lfs' was not
+  found ». **Bénin** : aucun asset LFS n'est requis, le commit aboutit.
+- Pour le supprimer : installer `git-lfs`, ou retirer le hook
+  `post-commit` du dépôt si LFS n'est pas utilisé.
+
 ## Une classe Tailwind v4 ne s'applique pas
 
 - Tailwind v4 est **CSS-first** : les tokens sont des **variables CSS**, pas un `tailwind.config.js` classique.
