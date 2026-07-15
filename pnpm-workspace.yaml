@@ -1,0 +1,7 @@
+# Single-package repo (not a monorepo). This file only configures pnpm's
+# build-script approval list. Native packages allowed to run install scripts:
+onlyBuiltDependencies:
+  - sharp
+  - unrs-resolver
+  - esbuild
+  - '@tailwindcss/oxide'

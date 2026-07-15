@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm build)",
+      "Bash(pnpm start:*)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm test)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm check)",
+      "Bash(pnpm format)",
+      "Bash(pnpm format:*)",
+      "Bash(pnpm audit:site)",
+      "Bash(pnpm assets:*)",
+      "Bash(pnpm exec playwright:*)",
+      "Bash(node scripts/*)",
+      "Read(//workspaces/vente-site-template/**)"
+    ],
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(:* --force:*)",
+      "Bash(:* --legacy-peer-deps:*)",
+      "Bash(rm -rf /:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)"
+    ]
+  }
+}
