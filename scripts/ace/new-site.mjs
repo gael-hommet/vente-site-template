@@ -89,6 +89,22 @@ execFileSync("tar", ["-xf", tarPath, "-C", extracted]);
 console.log("✓ export des fichiers trackés (git archive)");
 
 // ---------------------------------------------------------------------------
+// Prune engine-internal documents — planning/audit notes of the TEMPLATE repo
+// (they reference other clients and engine history; a client site never
+// ships them).
+// ---------------------------------------------------------------------------
+const ENGINE_ONLY = [
+  "docs/audits",
+  "docs/IMPLEMENTATION-PLAN.md",
+  "docs/ACE-ARCHITECTURE-DECISION.md",
+  "docs/RECOVERY-STATUS.md",
+];
+for (const rel of ENGINE_ONLY) {
+  rmSync(path.join(extracted, rel), { recursive: true, force: true });
+}
+console.log(`✓ élagage des documents internes du moteur (${ENGINE_ONLY.length} entrées)`);
+
+// ---------------------------------------------------------------------------
 // Stamp the generated site
 // ---------------------------------------------------------------------------
 const pkgPath = path.join(extracted, "package.json");
@@ -130,6 +146,9 @@ const SECRET_PATTERNS = [
   /AKIA[0-9A-Z]{16}/, // AWS access key
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/,
 ];
+// Identities of OTHER clients must never ship in a generated site. Extend
+// this list whenever a new client site is built from the engine.
+const FOREIGN_IDENTITY_PATTERNS = [/in[ -]?quarto/i];
 const MAX_FILE_BYTES = 500 * 1024;
 
 const problems = [];
@@ -155,6 +174,11 @@ const walk = (dir) => {
       for (const re of SECRET_PATTERNS) {
         if (re.test(text)) {
           problems.push(`motif de secret détecté dans ${path.relative(extracted, full)}`);
+        }
+      }
+      for (const re of FOREIGN_IDENTITY_PATTERNS) {
+        if (re.test(text)) {
+          problems.push(`identité client étrangère dans ${path.relative(extracted, full)}`);
         }
       }
     }
