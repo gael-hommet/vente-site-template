@@ -67,6 +67,19 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# 3b. Navigateurs Playwright (e2e/a11y) — best-effort, jamais bloquant
+# ---------------------------------------------------------------------------
+if pnpm exec playwright --version >/dev/null 2>&1; then
+  say "Installation du navigateur Playwright (chromium)…"
+  if pnpm exec playwright install chromium --with-deps >/dev/null 2>&1; then
+    ok "Chromium Playwright installé (pnpm test:e2e / test:a11y prêts)."
+  else
+    warn "Navigateurs Playwright non installés (réseau/droits ?)."
+    warn "Relance plus tard : pnpm exec playwright install chromium --with-deps"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
 # 4. PATH persistant pour les binaires utilisateur (Claude Code y sera installé)
 # ---------------------------------------------------------------------------
 LOCAL_BIN="$HOME/.local/bin"

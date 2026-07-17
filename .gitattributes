@@ -1,0 +1,26 @@
+# Git LFS — heavy SOURCE assets only. The optimized outputs under public/ are
+# produced by the assets pipeline (pnpm assets:*) and stay small by contract,
+# so they remain regular git objects.
+
+# Client source assets (input/ is the untouched-sources zone)
+input/assets/**/*.psd filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.ai filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.tif filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.tiff filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.raw filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.mov filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.webm filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.mkv filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.wav filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.aiff filter=lfs diff=lfs merge=lfs -text
+input/assets/**/*.zip filter=lfs diff=lfs merge=lfs -text
+
+# 3D models & environment maps are heavy wherever they live
+*.glb filter=lfs diff=lfs merge=lfs -text
+*.gltf filter=lfs diff=lfs merge=lfs -text
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.hdr filter=lfs diff=lfs merge=lfs -text
+*.exr filter=lfs diff=lfs merge=lfs -text
+*.ktx2 filter=lfs diff=lfs merge=lfs -text

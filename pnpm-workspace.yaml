@@ -1,7 +1,14 @@
-# Single-package repo (not a monorepo). This file only configures pnpm's
-# build-script approval list. Native packages allowed to run install scripts:
+# Single-package repo (not a monorepo). This file configures pnpm itself.
+
+# Native packages allowed to run install scripts:
 onlyBuiltDependencies:
   - sharp
   - unrs-resolver
   - esbuild
   - "@tailwindcss/oxide"
+
+# React pinned < 19.3: React Three Fiber 9 breaks on 19.3+. pnpm 10 no longer
+# reads the "pnpm" field from package.json, so the overrides MUST live here.
+overrides:
+  react: 19.2.4
+  react-dom: 19.2.4
