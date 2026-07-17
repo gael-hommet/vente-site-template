@@ -10,7 +10,7 @@ export const atelierPreset: DesignLanguagePreset = {
   description: "Chaleur artisanale — accent terracotta cuivré, formes rondes, mouvement vif.",
   motionCharacter: "vif",
   light: {
-    brand: "oklch(0.6 0.14 45)",
+    brand: "oklch(0.54 0.14 45)",
     brandStrong: "oklch(0.5 0.15 40)",
     brandForeground: "oklch(0.98 0.01 45)",
     ring: "oklch(0.58 0.12 45)",

@@ -11,7 +11,7 @@ export const onyxPreset: DesignLanguagePreset = {
   motionCharacter: "cinematique",
   light: {
     brand: "oklch(0.68 0.11 85)",
-    brandStrong: "oklch(0.58 0.12 80)",
+    brandStrong: "oklch(0.54 0.11 80)",
     brandForeground: "oklch(0.18 0.02 80)",
     ring: "oklch(0.62 0.1 85)",
     shadowGlow: "0 0 40px oklch(0.68 0.11 85 / 0.3)",

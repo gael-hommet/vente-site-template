@@ -10,6 +10,15 @@ export {
   type BrandTokens,
 } from "./design-language";
 export { presetToCss, brandTokensToCssVars, type CssVarMap } from "./resolve";
+export {
+  parseOklch,
+  oklchToSrgb,
+  relativeLuminance,
+  contrastRatio,
+  contrastOklch,
+  compositeOver,
+  type Rgb,
+} from "./contrast";
 
 /** All shipped presets, schema-validated at module load (fail fast). */
 export const DESIGN_PRESETS: readonly DesignLanguagePreset[] = [

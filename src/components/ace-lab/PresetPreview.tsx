@@ -2,20 +2,22 @@
 
 import * as React from "react";
 import { DESIGN_PRESETS, presetToCss } from "@/ace/config";
+import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 /**
- * Live Design Language switcher. Injects the selected preset's CSS exactly as
- * <DesignLanguageStyle/> would in a generated site, so every token-driven
- * surface on this page retints instantly. Local to the lab session — nothing
- * is persisted.
+ * Live Design Language switcher. Starts on the SITE's active preset and
+ * injects the selected preset's CSS exactly as <DesignLanguageStyle/> would,
+ * so every token-driven surface retints instantly. It always emits the
+ * selected tokens (neutral included) so it can override a site-level preset
+ * in both directions. Local to the lab session — nothing is persisted.
  */
 export function PresetPreview() {
-  const [active, setActive] = React.useState("neutral");
+  const [active, setActive] = React.useState(siteConfig.acePreset);
   const preset = DESIGN_PRESETS.find((p) => p.id === active);
-  const css = active === "neutral" ? "" : preset ? presetToCss(preset) : "";
+  const css = preset ? presetToCss(preset) : "";
 
   return (
     <div className="flex flex-col gap-6">

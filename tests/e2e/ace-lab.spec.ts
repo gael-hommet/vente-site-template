@@ -37,8 +37,12 @@ test.describe("ACE Lab", () => {
     const brandBefore = await page.evaluate(() =>
       getComputedStyle(document.documentElement).getPropertyValue("--brand").trim(),
     );
-    await group.getByRole("button", { name: "Onyx" }).click();
-    await expect(group.getByRole("button", { name: "Onyx" })).toHaveAttribute(
+    // Pick a preset that is NOT currently active (a generated site may already
+    // run under onyx/atelier via NEXT_PUBLIC_ACE_PRESET).
+    const inactive = group.locator('button[aria-pressed="false"]').first();
+    const label = (await inactive.textContent()) ?? "";
+    await inactive.click();
+    await expect(group.getByRole("button", { name: label })).toHaveAttribute(
       "aria-pressed",
       "true",
     );

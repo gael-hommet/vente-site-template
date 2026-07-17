@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { DESIGN_PRESETS, designLanguageSchema, getDesignPreset, presetToCss } from "@/ace/config";
+import {
+  DESIGN_PRESETS,
+  designLanguageSchema,
+  getDesignPreset,
+  presetToCss,
+  oklchToSrgb,
+  contrastRatio,
+  compositeOver,
+} from "@/ace/config";
 
 describe("ace-config design language", () => {
   it("ships at least the neutral, onyx and atelier presets, all schema-valid", () => {
@@ -52,4 +60,43 @@ describe("ace-config design language", () => {
     expect(neutral.light.brand).toBe("oklch(0.54 0.19 265)");
     expect(neutral.dark.brand).toBe("oklch(0.72 0.17 265)");
   });
+});
+
+describe("Design Language — AA by construction", () => {
+  // Surfaces the presets sit on (mirrors globals.css).
+  const LIGHT_SURFACE = oklchToSrgb("oklch(1 0 0)");
+  const DARK_SURFACE = oklchToSrgb("oklch(0.2 0.018 265)");
+
+  for (const preset of DESIGN_PRESETS) {
+    describe(`preset "${preset.id}"`, () => {
+      it("keeps button text readable on the brand color (light)", () => {
+        const ratio = contrastRatio(
+          oklchToSrgb(preset.light.brandForeground),
+          oklchToSrgb(preset.light.brand),
+        );
+        expect(ratio).toBeGreaterThanOrEqual(4.5);
+      });
+
+      it("keeps brand-strong readable as text on light surfaces and tints", () => {
+        const strong = oklchToSrgb(preset.light.brandStrong);
+        expect(contrastRatio(strong, LIGHT_SURFACE)).toBeGreaterThanOrEqual(4.5);
+        // Badge case: brand-strong text on a 12% brand tint over white.
+        const tint = compositeOver(oklchToSrgb(preset.light.brand), 0.12, LIGHT_SURFACE);
+        expect(contrastRatio(strong, tint)).toBeGreaterThanOrEqual(4.5);
+      });
+
+      it("keeps button text readable on the brand color (dark)", () => {
+        const ratio = contrastRatio(
+          oklchToSrgb(preset.dark.brandForeground),
+          oklchToSrgb(preset.dark.brand),
+        );
+        expect(ratio).toBeGreaterThanOrEqual(4.5);
+      });
+
+      it("keeps brand-strong readable as text on dark surfaces", () => {
+        const strong = oklchToSrgb(preset.dark.brandStrong);
+        expect(contrastRatio(strong, DARK_SURFACE)).toBeGreaterThanOrEqual(4.5);
+      });
+    });
+  }
 });
