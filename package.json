@@ -20,6 +20,7 @@
     "check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "ace:new-site": "node scripts/ace/new-site.mjs",
     "audit:site": "node scripts/audit-site.mjs",
     "assets:audit": "node scripts/assets/audit.mjs",
     "assets:images": "node scripts/assets/images.mjs",
