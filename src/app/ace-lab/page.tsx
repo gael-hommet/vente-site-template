@@ -1,20 +1,27 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ACE_NAME, ACE_VERSION, ACE_MODULES } from "@/ace/core";
-import { DESIGN_PRESETS } from "@/ace/config";
 import { MOTION_RECIPES } from "@/ace/motion/registry";
 import { SCENES } from "@/ace/scenes/registry";
 import { QUALITY_BUDGETS } from "@/lib/performance/quality";
+import { PresetPreview } from "@/components/ace-lab/PresetPreview";
+import { TokensContrast } from "@/components/ace-lab/TokensContrast";
+import { MotionPlayground } from "@/components/ace-lab/MotionPlayground";
+import { SceneStudio } from "@/components/ace-lab/SceneStudio";
+import { ConversionShowcase } from "@/components/ace-lab/ConversionShowcase";
 
 export const metadata: Metadata = {
   title: "ACE Lab",
-  description: "Page interne de validation du moteur ACE : contrats, registres, presets.",
+  description: "Laboratoire interne du moteur ACE : registres, tokens, motion, scènes, états.",
   robots: { index: false, follow: false },
 };
 
 /**
- * ACE Lab — internal engine-validation surface. Everything here is read
- * directly from the live registries: if a contract or an id changes, this page
- * changes with it. Server-rendered, zero client JS, zero WebGL.
+ * ACE Lab — the engine's internal laboratory. Server part: the live registries
+ * and contracts (zero client JS). Client part: isolated interactive demos
+ * (presets, contrast meter, motion playground, scene studio, conversion).
+ * Never shipped on a client production site (noindex + excluded by the
+ * generator's checklist).
  */
 export default function AceLabPage() {
   return (
@@ -46,36 +53,20 @@ export default function AceLabPage() {
 
       <section aria-labelledby="ace-design" className="mb-12">
         <h2 id="ace-design" className="mb-4 text-xl font-semibold">
-          Design Language — presets
+          Design Language — presets (live)
         </h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {DESIGN_PRESETS.map((preset) => (
-            <article
-              key={preset.id}
-              className="border-border bg-surface rounded-[var(--radius-lg)] border p-4"
-            >
-              <div className="flex items-center gap-2">
-                {[preset.light.brand, preset.light.brandStrong, preset.dark.brand].map(
-                  (color, i) => (
-                    <span
-                      key={i}
-                      aria-hidden
-                      className="border-border inline-block size-6 rounded-full border"
-                      style={{ background: color }}
-                    />
-                  ),
-                )}
-              </div>
-              <h3 className="mt-3 font-semibold">
-                {preset.title} <span className="text-muted font-mono text-xs">({preset.id})</span>
-              </h3>
-              <p className="text-muted mt-1 text-sm">{preset.description}</p>
-              <p className="text-muted mt-2 text-xs">
-                Mouvement : <span className="font-medium">{preset.motionCharacter}</span>
-              </p>
-            </article>
-          ))}
-        </div>
+        <PresetPreview />
+      </section>
+
+      <section aria-labelledby="ace-tokens" className="mb-12">
+        <h2 id="ace-tokens" className="mb-4 text-xl font-semibold">
+          Tokens & contrastes mesurés
+        </h2>
+        <p className="text-muted mb-4 max-w-2xl text-sm">
+          Ratios WCAG calculés sur les couleurs réellement résolues par le navigateur (preset et
+          thème inclus) — remesurés au changement de thème.
+        </p>
+        <TokensContrast />
       </section>
 
       <section aria-labelledby="ace-motion" className="mb-12">
@@ -108,6 +99,10 @@ export default function AceLabPage() {
             </tbody>
           </table>
         </div>
+        <div className="mt-6">
+          <h3 className="mb-4 font-semibold">Aire de jeu motion</h3>
+          <MotionPlayground />
+        </div>
       </section>
 
       <section aria-labelledby="ace-scenes" className="mb-12">
@@ -138,10 +133,54 @@ export default function AceLabPage() {
             </tbody>
           </table>
         </div>
-        <p className="text-muted mt-2 text-sm">
-          Le rendu interactif des scènes reste sur la page <code>/lab</code> ; ici seule la
-          conformité des contrats est exposée (aucun WebGL monté).
+        <div className="mt-6">
+          <h3 className="mb-4 font-semibold">Scene Studio — tiers, fallback, perte de contexte</h3>
+          <SceneStudio />
+        </div>
+      </section>
+
+      <section aria-labelledby="ace-media" className="mb-12">
+        <h2 id="ace-media" className="mb-4 text-xl font-semibold">
+          Médias adaptatifs
+        </h2>
+        <p className="text-muted max-w-2xl text-sm">
+          Les démos scrub (séquence d&apos;images, vidéo contrôlée, carte cinématique) tournent sur{" "}
+          <Link href="/lab" className="text-brand-strong underline">
+            /lab
+          </Link>{" "}
+          — elles exigent de longues plages de scroll épinglées. Les contrats médias (dimensions,
+          poster et alt obligatoires, sous-titres si voix) sont validés par <code>ace-media</code>{" "}
+          et testés unitairement.
         </p>
+      </section>
+
+      <section aria-labelledby="ace-conversion-title" className="mb-12" id="ace-conversion">
+        <h2 id="ace-conversion-title" className="mb-4 text-xl font-semibold">
+          Conversion & états UI
+        </h2>
+        <ConversionShowcase />
+      </section>
+
+      <section aria-labelledby="ace-native" className="mb-12">
+        <h2 id="ace-native" className="mb-4 text-xl font-semibold">
+          Choix natifs assumés
+        </h2>
+        <ul className="text-muted grid gap-2 text-sm sm:grid-cols-3">
+          <li className="border-border rounded-[var(--radius-md)] border p-4">
+            <span className="text-foreground font-medium">Transitions de page</span> — navigation
+            App Router native ; une transition cinématique sera une décision de DA par site, pas un
+            défaut moteur.
+          </li>
+          <li className="border-border rounded-[var(--radius-md)] border p-4">
+            <span className="text-foreground font-medium">Curseur</span> — curseur système par
+            défaut (accessibilité, latence) ; un curseur custom éventuel restera optionnel et
+            désactivé au clavier/touch.
+          </li>
+          <li className="border-border rounded-[var(--radius-md)] border p-4">
+            <span className="text-foreground font-medium">Défilement natif</span> — Lenis ne capture
+            jamais les parcours clavier/ancres ; reduced-motion le coupe entièrement.
+          </li>
+        </ul>
       </section>
 
       <section aria-labelledby="ace-budgets">
