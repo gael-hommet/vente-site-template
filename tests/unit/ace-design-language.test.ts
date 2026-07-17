@@ -74,15 +74,15 @@ describe("Design Language — AA by construction", () => {
           oklchToSrgb(preset.light.brandForeground),
           oklchToSrgb(preset.light.brand),
         );
-        expect(ratio).toBeGreaterThanOrEqual(4.5);
+        expect(ratio).toBeGreaterThanOrEqual(4.7);
       });
 
       it("keeps brand-strong readable as text on light surfaces and tints", () => {
         const strong = oklchToSrgb(preset.light.brandStrong);
-        expect(contrastRatio(strong, LIGHT_SURFACE)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(strong, LIGHT_SURFACE)).toBeGreaterThanOrEqual(4.7);
         // Badge case: brand-strong text on a 12% brand tint over white.
         const tint = compositeOver(oklchToSrgb(preset.light.brand), 0.12, LIGHT_SURFACE);
-        expect(contrastRatio(strong, tint)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(strong, tint)).toBeGreaterThanOrEqual(4.7);
       });
 
       it("keeps button text readable on the brand color (dark)", () => {
@@ -90,12 +90,12 @@ describe("Design Language — AA by construction", () => {
           oklchToSrgb(preset.dark.brandForeground),
           oklchToSrgb(preset.dark.brand),
         );
-        expect(ratio).toBeGreaterThanOrEqual(4.5);
+        expect(ratio).toBeGreaterThanOrEqual(4.7);
       });
 
       it("keeps brand-strong readable as text on dark surfaces", () => {
         const strong = oklchToSrgb(preset.dark.brandStrong);
-        expect(contrastRatio(strong, DARK_SURFACE)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(strong, DARK_SURFACE)).toBeGreaterThanOrEqual(4.7);
       });
     });
   }
