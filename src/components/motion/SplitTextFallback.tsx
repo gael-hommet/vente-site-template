@@ -38,23 +38,33 @@ export function SplitTextFallback({
     return <Tag className={className}>{text}</Tag>;
   }
 
+  // The viewport observer MUST watch the (unclipped) container: each word
+  // starts translated fully outside its overflow-hidden clip box, so its own
+  // intersection ratio is 0 forever — observing words directly never fires.
   return (
     <Tag className={className}>
       <span className="sr-only">{text}</span>
-      <span aria-hidden className="inline">
+      <motion.span
+        aria-hidden
+        className="inline"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ staggerChildren: stagger, delayChildren: delay }}
+      >
         {pieces.map((piece, i) => {
           if (/^\s+$/.test(piece)) return <span key={i}>{piece}</span>;
           return (
             <span key={i} className="inline-block overflow-hidden align-bottom">
               <motion.span
                 className="inline-block"
-                initial={{ y: "110%", opacity: 0 }}
-                whileInView={{ y: "0%", opacity: 1 }}
-                viewport={{ once: true, amount: 0.6 }}
-                transition={{
-                  duration: DURATION.slow,
-                  ease: EASE.outSoft,
-                  delay: delay + i * stagger,
+                variants={{
+                  hidden: { y: "110%", opacity: 0 },
+                  show: {
+                    y: "0%",
+                    opacity: 1,
+                    transition: { duration: DURATION.slow, ease: EASE.outSoft },
+                  },
                 }}
               >
                 {piece}
@@ -62,7 +72,7 @@ export function SplitTextFallback({
             </span>
           );
         })}
-      </span>
+      </motion.span>
     </Tag>
   );
 }

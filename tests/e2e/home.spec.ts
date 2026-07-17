@@ -17,6 +17,20 @@ test.describe("Starter home", () => {
     await expect(h1).toBeVisible({ timeout: 20_000 });
     await expect(h1).toContainText("Votre promesse");
 
+    // The split-text words must become VISUALLY visible (regression guard:
+    // a clipped word observed by its own IntersectionObserver never fires).
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const words = document.querySelectorAll("h1 [aria-hidden] span span");
+            const first = words.item(0) as HTMLElement | null;
+            return first ? getComputedStyle(first).opacity : "missing";
+          }),
+        { timeout: 15_000 },
+      )
+      .toBe("1");
+
     // Unverified facts are visibly flagged — the starter never fakes claims.
     await expect(page.getByText("[À CONFIRMER]").first()).toBeVisible();
 
