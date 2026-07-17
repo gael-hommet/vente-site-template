@@ -95,6 +95,7 @@ console.log("✓ export des fichiers trackés (git archive)");
 // ---------------------------------------------------------------------------
 const ENGINE_ONLY = [
   "docs/audits",
+  "docs/captures",
   "docs/IMPLEMENTATION-PLAN.md",
   "docs/ACE-ARCHITECTURE-DECISION.md",
   "docs/RECOVERY-STATUS.md",

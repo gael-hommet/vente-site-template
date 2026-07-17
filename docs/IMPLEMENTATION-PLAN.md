@@ -26,17 +26,18 @@
 - Page interne `/ace-lab` (noindex, server-rendered) lisant les registres réels.
 - 25 tests unitaires ACE + spec e2e `ace-lab.spec.ts`. Aucun composant vert déplacé.
 
-## Phase 2 — Starter neutre
+## Phase 2 — Starter neutre ✅ faite le 2026-07-17
 
-- Transformer la home de démo en **starter neutre vendable** : structure narrative type (hero → preuve → offre → FAQ → conversion) branchée sur `business.ts`/presets, sans contenu inventé (`[À CONFIRMER]` sur tout placeholder).
+- `/` = starter (hero + scène du registre + preuve + offre + FAQ + conversion), routes `/offre`, `/realisations` (état vide designé), `/a-propos`, `/contact`, `/mentions-legales`, `loading`/`error`/`not-found` ; dashboard moteur déplacé sur `/engine` (noindex).
+- Faits typés `ContentValue` → `[À CONFIRMER]` visible et testé ; DA montée au layout via `NEXT_PUBLIC_ACE_PRESET` ; CTA sticky mobile ; 42/42 e2e desktop+mobile.
 
-## Phase 3 — `/ace-lab`
+## Phase 3 — `/ace-lab` interactif ✅ faite le 2026-07-17
 
-- Page de validation du moteur : tokens (swatches, type scale), motions nommés, scènes avec bascule de tier et fallbacks, états formulaires. Remplace/absorbe `/lab` actuel. Specs e2e dédiées (reduced-motion, LITE, clavier).
+- Serveur : registres/contrats/budgets. Client isolé : switcher de presets live, contrastes mesurés (zéro paire en échec exigé par l'e2e), aire de jeu motion (recettes + timeline GSAP scrubbable + statut Lenis/ScrollTrigger), Scene Studio (tiers, fallback forcé, perte de contexte WebGL réelle), vitrine conversion/états, choix natifs documentés.
 
-## Phase 4 — Générateur `ace:new-site`
+## Phase 4 — Générateur `ace:new-site` ✅ faite le 2026-07-17
 
-- Script pnpm (`scripts/ace/new-site.mjs`) : à partir de `input/CLIENT_BRIEF.md` + preset choisi, remplit `config/`, sélectionne le preset DA, stampe `ace.version`. S'intègre au skill `/build-site` existant.
+- `pnpm ace:new-site` : export `git archive` (fichiers trackés seulement), élagage des docs internes, stamp `ace.meta.json`, contrôle de fuite bloquant. Validé de bout en bout sur un site témoin onyx (check + e2e verts, captures) — voir `docs/ACE-GENERATOR.md` (écarts détectés/corrigés inclus).
 
 ## Phase 5 — Site pilote IN QUARTO
 
