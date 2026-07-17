@@ -27,7 +27,8 @@ test.describe("Lab", () => {
   test("the local lead form is present and keyboard reachable", async ({ page }) => {
     await page.goto("/lab");
     const form = page.locator("form").first();
-    await expect(form).toBeVisible();
+    // /lab is deliberately heavy (scenes, map) — allow cold-start settling.
+    await expect(form).toBeVisible({ timeout: 20_000 });
     // Fields are labelled (accessible names come from <label>).
     await expect(page.getByLabel(/Nom/i).first()).toBeVisible();
     await expect(page.getByLabel(/Email/i).first()).toBeVisible();

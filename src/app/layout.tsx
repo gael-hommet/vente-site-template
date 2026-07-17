@@ -11,6 +11,10 @@ import { SmoothScrollProvider } from "@/components/motion/SmoothScrollProvider";
 import { Analytics } from "@/components/analytics/Analytics";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { websiteJsonLd } from "@/lib/seo/jsonld";
+import { DesignLanguageStyle } from "@/ace/config/DesignLanguageStyle";
+import { StickyMobileCTA } from "@/components/conversion/ctas";
+import { siteConfig } from "@/config/site";
+import { businessConfig } from "@/config/business";
 
 const sans = Geist({ variable: "--font-sans", subsets: ["latin"], display: "swap" });
 const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"], display: "swap" });
@@ -41,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="flex min-h-full flex-col">
         <ThemeScript />
+        <DesignLanguageStyle preset={siteConfig.acePreset} />
         <JsonLd data={websiteJsonLd()} />
         <SkipLink targetId="main" />
         <ThemeProvider>
@@ -51,6 +56,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {children}
               </main>
               <SiteFooter />
+              <StickyMobileCTA
+                phone={businessConfig.telephone}
+                primaryLabel="Demander un devis"
+                primaryHref="/contact"
+              />
             </SmoothScrollProvider>
           </DeviceQualityProvider>
         </ThemeProvider>

@@ -8,6 +8,9 @@ import AxeBuilder from "@axe-core/playwright";
 async function audit(page: import("@playwright/test").Page, url: string) {
   await page.goto(url);
   await page.getByRole("heading", { level: 1 }).first().waitFor();
+  // Let entrance animations (Reveal/SplitText, ~1s with stagger) finish:
+  // axe sampling mid-transition blends opacities and reports false contrast.
+  await page.waitForTimeout(1500);
   return new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
 }
 

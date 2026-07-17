@@ -18,9 +18,13 @@ const useDev = process.env.PW_DEV === "1";
 export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 30_000,
-  expect: { timeout: 5_000 },
-  fullyParallel: false, // 2-core host: keep workers modest.
-  workers: process.env.CI ? 1 : 2,
+  // 15s: first hit on a cold `next start` streams route chunks lazily; on the
+  // 2-core host this regularly exceeds 5s without being a product defect.
+  expect: { timeout: 15_000 },
+  // Serial on the 2-core host: heavy /lab specs (MapLibre on software GL)
+  // starve a second worker and make unrelated specs time out.
+  fullyParallel: false,
+  workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
@@ -29,8 +33,17 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] } },
-    { name: "chromium-mobile", use: { ...devices["Pixel 7"] } },
+    // forms.spec exercises /lab's MapLibre on software GL — brutal enough to
+    // degrade the shared browser process for tests that follow it. It runs in
+    // its own project so every other spec gets a fresh browser.
+    { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] }, testIgnore: /forms\.spec/ },
+    {
+      name: "chromium-desktop-forms",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: /forms\.spec/,
+    },
+    { name: "chromium-mobile", use: { ...devices["Pixel 7"] }, testIgnore: /forms\.spec/ },
+    { name: "chromium-mobile-forms", use: { ...devices["Pixel 7"] }, testMatch: /forms\.spec/ },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],

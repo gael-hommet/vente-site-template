@@ -13,6 +13,8 @@ export const siteConfig = {
   locale: "fr_FR",
   /** Default social/OG image path (under /public). Replaced per client. */
   ogImage: "/assets/og-default.svg",
+  /** ACE Design Language preset id (see src/ace/config). Set per client site. */
+  acePreset: process.env.NEXT_PUBLIC_ACE_PRESET ?? "neutral",
 } as const;
 
 export type SiteConfig = typeof siteConfig;

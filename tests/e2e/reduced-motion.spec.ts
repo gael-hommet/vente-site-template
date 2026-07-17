@@ -13,9 +13,9 @@ test.describe("Reduced motion", () => {
   test("home stays readable and scrollable under reduced motion", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    // Scroll is never blocked: the page can move.
+    // Scroll is never blocked: the page can move and CTAs stay reachable.
     await page.mouse.wheel(0, 600);
-    await expect(page.getByRole("link", { name: /Ouvrir le laboratoire/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Demander un devis/i }).first()).toBeVisible();
   });
 
   test("lab reports reduced motion as active", async ({ page }) => {

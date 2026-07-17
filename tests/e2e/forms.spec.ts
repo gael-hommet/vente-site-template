@@ -5,6 +5,10 @@ import { test, expect } from "@playwright/test";
  * submission via the local simulated endpoint (no third-party service in dev).
  */
 test.describe("Local lead form", () => {
+  // /lab is deliberately heavy (scenes, MapLibre on software GL in headless):
+  // hydration + interaction need generous budgets on the 2-core host.
+  test.describe.configure({ timeout: 120_000 });
+
   test("shows validation errors on empty submit", async ({ page }) => {
     await page.goto("/lab");
     const form = page.locator("form").first();
@@ -16,9 +20,6 @@ test.describe("Local lead form", () => {
   });
 
   test("submits successfully through the local endpoint", async ({ page }) => {
-    // Reaching the form crosses the map section; MapLibre on software GL
-    // (headless) can block the main thread for seconds while it boots.
-    test.setTimeout(120_000);
     await page.goto("/lab");
     const form = page.locator("form").first();
     // Required labels render as "Nom *" — anchor on the label start.

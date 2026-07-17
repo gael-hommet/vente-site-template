@@ -3,8 +3,12 @@ export interface NavItem {
   href: string;
 }
 
-/** Primary navigation. A client site replaces these with its real sections. */
+/** Primary navigation — the starter's standard premium-site routes. A client
+ * site renames/reorders these to match its real sections. */
 export const primaryNav: NavItem[] = [
   { label: "Accueil", href: "/" },
-  { label: "Laboratoire", href: "/lab" },
+  { label: "Offre", href: "/offre" },
+  { label: "Réalisations", href: "/realisations" },
+  { label: "À propos", href: "/a-propos" },
+  { label: "Contact", href: "/contact" },
 ];
