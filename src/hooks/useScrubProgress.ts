@@ -9,6 +9,13 @@ export interface ScrubOptions {
   end?: string;
   /** Pin the trigger element while scrubbing (auto-disabled under reduced motion). */
   pin?: boolean;
+  /**
+   * Reserve scroll room for the pin. Defaults to true: ScrollTrigger silently
+   * turns pinSpacing off when the pinned element's parent is flex/grid, which
+   * leaves the pinned scene overlapping the content below it (CTA blocked).
+   * Set false only for deliberate overlay effects.
+   */
+  pinSpacing?: boolean;
   /** Smoothing seconds, or true for instant tie-to-scroll. */
   scrub?: number | boolean;
   onProgress?: (progress: number) => void;
@@ -28,7 +35,17 @@ export interface ScrubOptions {
 export function useScrubProgress<T extends HTMLElement = HTMLDivElement>(opts: ScrubOptions = {}) {
   const ref = React.useRef<T | null>(null);
   const progress = React.useRef(0);
-  const { start, end, pin, scrub, onProgress, onEnter, onLeave, enabled = true } = opts;
+  const {
+    start,
+    end,
+    pin,
+    pinSpacing = true,
+    scrub,
+    onProgress,
+    onEnter,
+    onLeave,
+    enabled = true,
+  } = opts;
 
   React.useEffect(() => {
     const el = ref.current;
@@ -42,6 +59,7 @@ export function useScrubProgress<T extends HTMLElement = HTMLDivElement>(opts: S
       start: start ?? "top top",
       end: end ?? "+=100%",
       pin: reduced ? false : (pin ?? false),
+      pinSpacing,
       scrub: scrub ?? true,
       onUpdate: (self) => {
         progress.current = self.progress;
@@ -55,7 +73,7 @@ export function useScrubProgress<T extends HTMLElement = HTMLDivElement>(opts: S
       trigger.kill();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, start, end, pin, scrub]);
+  }, [enabled, start, end, pin, pinSpacing, scrub]);
 
   return { ref, progress };
 }

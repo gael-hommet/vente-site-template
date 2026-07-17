@@ -7,7 +7,8 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        brand: "bg-brand/12 text-brand ring-1 ring-inset ring-brand/25",
+        // text-brand-strong: brand itself misses 4.5:1 on the 12% tint (axe).
+        brand: "bg-brand/12 text-brand-strong ring-1 ring-inset ring-brand/25",
         neutral: "bg-surface-2 text-muted ring-1 ring-inset ring-border",
         success: "bg-success/12 text-success ring-1 ring-inset ring-success/25",
         outline: "border border-border text-foreground",

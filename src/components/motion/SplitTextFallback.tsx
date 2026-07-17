@@ -18,7 +18,8 @@ export interface SplitTextProps {
 /**
  * Dependency-free animated text reveal — replaces GSAP's premium SplitText.
  * Splits into words/chars and staggers them in. Accessible: the full string is
- * exposed to assistive tech via aria-label while the visual pieces are hidden.
+ * exposed to assistive tech via a visually-hidden node (aria-label is
+ * prohibited on role-less elements) while the visual pieces are aria-hidden.
  * Renders statically under reduced motion.
  */
 export function SplitTextFallback({
@@ -38,7 +39,8 @@ export function SplitTextFallback({
   }
 
   return (
-    <Tag className={className} aria-label={text}>
+    <Tag className={className}>
+      <span className="sr-only">{text}</span>
       <span aria-hidden className="inline">
         {pieces.map((piece, i) => {
           if (/^\s+$/.test(piece)) return <span key={i}>{piece}</span>;

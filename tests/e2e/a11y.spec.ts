@@ -28,6 +28,8 @@ test.describe("Accessibility (axe)", () => {
   });
 
   test("lab has no serious or critical violations", async ({ page }) => {
+    // /lab mounts WebGL canvases; axe's color sampling needs extra time there.
+    test.setTimeout(120_000);
     const results = await audit(page, "/lab");
     const serious = results.violations.filter((v) =>
       ["serious", "critical"].includes(v.impact ?? ""),

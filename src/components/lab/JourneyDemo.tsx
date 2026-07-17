@@ -53,7 +53,7 @@ export function JourneyDemo() {
         <div className="pointer-events-none absolute top-1/2 left-6 -translate-y-1/2">
           <ChapterTimeline chapters={CHAPTERS} activeIndex={active} />
         </div>
-        <p className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-4 py-1.5 text-xs text-white backdrop-blur-sm">
+        <p className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/70 px-4 py-1.5 text-xs text-white backdrop-blur-sm">
           Faites défiler pour piloter la caméra
         </p>
       </div>

@@ -16,10 +16,14 @@ test.describe("Local lead form", () => {
   });
 
   test("submits successfully through the local endpoint", async ({ page }) => {
+    // Reaching the form crosses the map section; MapLibre on software GL
+    // (headless) can block the main thread for seconds while it boots.
+    test.setTimeout(120_000);
     await page.goto("/lab");
     const form = page.locator("form").first();
-    await form.getByLabel("Nom", { exact: true }).fill("Jean Dupont");
-    await form.getByLabel("Email", { exact: true }).fill("jean.dupont@example.com");
+    // Required labels render as "Nom *" — anchor on the label start.
+    await form.getByLabel(/^Nom\b/).fill("Jean Dupont");
+    await form.getByLabel(/^Email\b/).fill("jean.dupont@example.com");
     await form.getByRole("checkbox").check();
     await form.getByRole("button", { name: /Envoyer ma demande/i }).click();
     await expect(page.getByText(/votre demande est bien reçue/i)).toBeVisible();

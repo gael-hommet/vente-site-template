@@ -14,8 +14,8 @@ test.describe("Lab", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Laboratoire" })).toBeVisible();
 
     // ULTRA / BALANCED / LITE selector is reachable and readable.
-    await expect(page.getByText("ULTRA", { exact: false })).toBeVisible();
-    await expect(page.getByText("LITE", { exact: false })).toBeVisible();
+    await expect(page.getByRole("button", { name: "ULTRA" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "LITE" })).toBeVisible();
 
     // Representative sections render as text (no Canvas needed to read them).
     await expect(page.getByRole("heading", { name: /Design system/i })).toBeVisible();

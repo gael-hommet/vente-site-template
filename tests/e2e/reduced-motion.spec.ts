@@ -20,6 +20,7 @@ test.describe("Reduced motion", () => {
 
   test("lab reports reduced motion as active", async ({ page }) => {
     await page.goto("/lab");
-    await expect(page.getByText("ACTIF", { exact: false })).toBeVisible();
+    // Exact match: the default (substring, case-insensitive) also hits "inactif".
+    await expect(page.getByText("ACTIF", { exact: true })).toBeVisible();
   });
 });
