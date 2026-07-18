@@ -10,6 +10,28 @@ export {
   type BrandTokens,
 } from "./design-language";
 export { presetToCss, brandTokensToCssVars, type CssVarMap } from "./resolve";
+
+// Contrat client universel (Phase 2) : schéma typé, features, loader.
+export { clientConfigSchema } from "./client-schema";
+export type { ClientConfig, ClientConfigInput } from "./client-schema";
+export {
+  INDUSTRIES,
+  MOTION_INTENSITIES,
+  WEBGL_INTENSITIES,
+  DENSITIES,
+  CONVERSIONS,
+  COLLECTION_KINDS,
+  ANALYTICS_PROVIDERS,
+} from "./client-schema";
+export { resolveFeatures, findFeatureConflicts } from "./features";
+export type { ResolvedFeatures, FeatureConflict } from "./features";
+export {
+  loadClientConfig,
+  inspectClientConfig,
+  ClientConfigError,
+  type LoadedClientConfig,
+} from "./client-loader";
+export { neutralClientConfig } from "./client-defaults";
 export {
   parseOklch,
   oklchToSrgb,
