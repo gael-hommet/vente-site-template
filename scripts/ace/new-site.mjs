@@ -99,6 +99,7 @@ const ENGINE_ONLY = [
   "docs/IMPLEMENTATION-PLAN.md",
   "docs/ACE-ARCHITECTURE-DECISION.md",
   "docs/ACE-GENERATOR.md",
+  "docs/REINTEGRATION-AUDIT.md",
   "docs/RECOVERY-STATUS.md",
 ];
 for (const rel of ENGINE_ONLY) {
