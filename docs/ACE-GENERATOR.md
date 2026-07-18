@@ -33,7 +33,7 @@ Captures de référence du starter neutre : `docs/captures/template-*`.
 
 | Écart | Correction |
 | --- | --- |
-| Les docs internes (mentionnant IN QUARTO) partaient dans les sites générés | Élagage `ENGINE_ONLY` + motif d'identité étrangère bloquant dans le contrôle de fuite |
+| Les docs internes (mentionnant des clients réels) partaient dans les sites générés | Élagage `ENGINE_ONLY` + motifs d'identités étrangères bloquants dans le contrôle de fuite (le nom du site généré est exclu de ces motifs : la propre identité du client n'est pas une fuite) |
 | Palettes onyx/atelier sous le seuil AA (détecté par axe sur le témoin : badge 3,77:1) | Maths de contraste dans le moteur (`src/ace/config/contrast.ts`) + tests « AA par construction » sur chaque preset, seuil 4,7:1 (marge navigateur : Chrome mesurait 4,46 là où la référence donnait 4,51) |
 | Le switcher de presets du Lab supposait un site en neutral | Initialisation sur le preset du site + émission systématique des tokens (retour à neutral possible par-dessus un preset global) |
 | Titres SplitText jamais révélés visuellement (observer sur mot clippé → ratio 0) | Observer déplacé sur le conteneur + stagger par variants ; garde-fou e2e sur l'opacité calculée |

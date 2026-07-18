@@ -98,6 +98,7 @@ const ENGINE_ONLY = [
   "docs/captures",
   "docs/IMPLEMENTATION-PLAN.md",
   "docs/ACE-ARCHITECTURE-DECISION.md",
+  "docs/ACE-GENERATOR.md",
   "docs/RECOVERY-STATUS.md",
 ];
 for (const rel of ENGINE_ONLY) {
@@ -148,8 +149,11 @@ const SECRET_PATTERNS = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/,
 ];
 // Identities of OTHER clients must never ship in a generated site. Extend
-// this list whenever a new client site is built from the engine.
-const FOREIGN_IDENTITY_PATTERNS = [/in[ -]?quarto/i];
+// this list whenever a new client site is built from the engine. Patterns
+// matching the *requested* site name are the client's own identity, not a
+// leak — they are excluded for this generation.
+const KNOWN_CLIENT_IDENTITY_PATTERNS = [/in[ -]?quarto/i];
+const FOREIGN_IDENTITY_PATTERNS = KNOWN_CLIENT_IDENTITY_PATTERNS.filter((re) => !re.test(name));
 const MAX_FILE_BYTES = 500 * 1024;
 
 const problems = [];
