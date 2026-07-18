@@ -52,3 +52,34 @@ jetables** du moteur, pas des clients à perfectionner.
 **Phase 2 en premier** (contrat client universel) : sans lui, ni recipes ni
 générateur config-aware ne peuvent exister. Puis l'**infrastructure de recipes**
 (Phase 3) avec au moins une famille réelle prouvant la composition/variation.
+
+## Statut d'avancement (honnête)
+
+| Phase | Statut |
+| --- | --- |
+| 1 — Audit + roadmap | ✅ fait (ces 3 docs) |
+| 2 — Contrat client universel | ✅ **fait et testé** (`src/ace/config/client-*.ts`, `features.ts`, `types.ts`, 9 tests). Keystone livré. |
+| 3 — Recipes | 🟡 **infrastructure + famille heroes faites et testées** (`src/ace/recipes/`, 3 recettes distinctes, 5 tests). Familles navigation/projects/storytelling/conversion : **à construire** (mêmes patterns). |
+| 4 — DA élargie | ⏳ à faire (axes typo/densité/grille/matières) |
+| 5 — Générateur config-aware (`--config/--brief/--assets`, activation features/routes, quality gates) | ⏳ à faire |
+| 6 — Studio (bancs d'essai recipes) + test d'absence Lab/Engine en client | ⏳ à faire |
+| 7 — Deux validations opposées (editorial / immersive) | ⏳ à faire (dépend de 3-complet + 5) |
+| 8 — Preuve anti-template | ⏳ à faire (dépend de 7) |
+| 9 — Quality gates finaux + `ACE-FINAL-REPORT.md` | ⏳ à faire |
+
+`pnpm check` moteur **vert** à ce jalon (lint + typecheck + 102 tests + build).
+Aucune identité IN QUARTO dans le moteur. Aucun push.
+
+## Procédure « prochain client » (état actuel)
+
+1. Écrire une `client.config.ts` conforme au contrat (`loadClientConfig` valide
+   et résout les features, échoue proprement sur incohérence).
+2. Choisir des recipes par famille (`recipes.hero = "media-first"`…) — heroes
+   disponibles ; les autres familles restent à câbler.
+3. `pnpm ace:new-site …` (aujourd'hui : `--name/--out/--preset` ; l'ingestion
+   `--config/--brief/--assets` est la Phase 5).
+4. Habiller via un preset Design Language + fontes propres au client.
+
+Ce qui manque pour une génération 100 % pilotée par config : compléter les
+familles de recipes (3), câbler le générateur sur le contrat (5), et prouver la
+variabilité par deux validations opposées (7–8).
