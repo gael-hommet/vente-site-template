@@ -51,12 +51,22 @@ export function LabeledField({
   );
 }
 
-/** Success panel shown after a submission. */
+/**
+ * Success panel shown after a submission. On mount it takes focus so keyboard
+ * users don't land on <body> (the submitted form is unmounted) and screen
+ * readers reliably announce the confirmation (role="status" + moved focus).
+ */
 export function FormSuccess({ title, description }: { title: string; description?: string }) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    ref.current?.focus();
+  }, []);
   return (
     <div
+      ref={ref}
       role="status"
-      className="border-success/30 bg-success/10 flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border p-8 text-center"
+      tabIndex={-1}
+      className="border-success/30 bg-success/10 flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border p-8 text-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
     >
       <CheckCircle2 className="text-success size-8" aria-hidden />
       <p className="text-foreground text-lg font-semibold">{title}</p>

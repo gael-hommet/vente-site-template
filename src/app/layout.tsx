@@ -43,7 +43,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${sans.variable} ${mono.variable} ${display.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">
+      {/* pb mobile : réserve la hauteur de la StickyMobileCTA fixe (+ safe-area
+          iOS) pour qu'elle ne recouvre jamais le bas du footer. */}
+      <body className="flex min-h-full flex-col pb-[calc(env(safe-area-inset-bottom)+5.5rem)] md:pb-0">
         <ThemeScript />
         <DesignLanguageStyle preset={siteConfig.acePreset} />
         <JsonLd data={websiteJsonLd()} />

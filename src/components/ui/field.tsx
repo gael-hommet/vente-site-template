@@ -8,8 +8,10 @@ export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLab
   return <label className={cn("text-foreground text-sm font-medium", className)} {...props} />;
 }
 
+// text-base (16px) sous sm : évite le zoom automatique d'iOS Safari au focus
+// (déclenché sous 16px) ; text-sm à partir de sm.
 const controlBase =
-  "w-full rounded-[var(--radius-md)] border border-border bg-surface px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--ring)] disabled:opacity-50 aria-[invalid=true]:border-danger aria-[invalid=true]:outline-[var(--danger)]";
+  "w-full rounded-[var(--radius-md)] border border-border bg-surface px-3.5 py-2.5 text-base sm:text-sm text-foreground placeholder:text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--ring)] disabled:opacity-50 aria-[invalid=true]:border-danger aria-[invalid=true]:outline-[var(--danger)]";
 
 export const Input = React.forwardRef<
   HTMLInputElement,

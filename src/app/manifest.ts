@@ -9,8 +9,10 @@ export default function manifest(): MetadataRoute.Manifest {
     description: siteConfig.description,
     start_url: "/",
     display: "standalone",
-    background_color: "#0a0a0a",
-    theme_color: "#0a0a0a",
+    // Défaut neutre clair (le thème par défaut est clair) ; un site client
+    // l'aligne sur sa palette. Jamais un noir froid par défaut.
+    background_color: "#fafafa",
+    theme_color: "#fafafa",
     icons: [],
   };
 }

@@ -20,7 +20,12 @@ export function CallCTA({
 }) {
   return (
     <Button asChild variant={variant} className={className}>
-      <a href={`tel:${phone.replace(/\s/g, "")}`} onClick={() => track("phone_clicked", { phone })}>
+      <a
+        href={`tel:${phone.replace(/\s/g, "")}`}
+        // Variante icône seule (label vide) : garantir un nom accessible.
+        aria-label={label || "Appeler"}
+        onClick={() => track("phone_clicked", { phone })}
+      >
         <Phone className="size-4" /> {label}
       </a>
     </Button>

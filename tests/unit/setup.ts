@@ -34,3 +34,12 @@ class MockObserver {
 const g = globalThis as unknown as Record<string, unknown>;
 g.ResizeObserver ||= MockObserver;
 g.IntersectionObserver ||= MockObserver;
+
+// jsdom lacks the SVG geometry API used by dash-offset draw-on animations.
+// Real browsers always provide it; stub it so component tests can mount SVG
+// draw-in animations without a "Not implemented" crash.
+type SvgGeom = { getTotalLength?: () => number };
+const svgProto = (globalThis as { SVGElement?: { prototype: SvgGeom } }).SVGElement?.prototype;
+if (svgProto && typeof svgProto.getTotalLength !== "function") {
+  svgProto.getTotalLength = () => 100;
+}

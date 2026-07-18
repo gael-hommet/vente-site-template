@@ -1,10 +1,32 @@
 "use client";
 
 import * as React from "react";
-import { Canvas, type CanvasProps } from "@react-three/fiber";
+import { Canvas, type CanvasProps, useThree } from "@react-three/fiber";
 import { AdaptiveDpr, AdaptiveEvents, Preload } from "@react-three/drei";
 import { useQuality } from "@/hooks/useQuality";
 import { PerformanceController } from "./PerformanceController";
+
+/**
+ * Garde de perte de contexte WebGL. `preventDefault()` sur `webglcontextlost`
+ * est INDISPENSABLE : sans lui le navigateur ne restaure jamais le contexte
+ * (scène figée en boîte vide). `webglcontextrestored` relance un rendu.
+ */
+function ContextLossGuard() {
+  const gl = useThree((s) => s.gl);
+  const invalidate = useThree((s) => s.invalidate);
+  React.useEffect(() => {
+    const canvas = gl.domElement;
+    const onLost = (e: Event) => e.preventDefault();
+    const onRestored = () => invalidate();
+    canvas.addEventListener("webglcontextlost", onLost, false);
+    canvas.addEventListener("webglcontextrestored", onRestored, false);
+    return () => {
+      canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
+    };
+  }, [gl, invalidate]);
+  return null;
+}
 
 export interface ThreeCanvasProps extends Omit<CanvasProps, "children"> {
   children: React.ReactNode;
@@ -42,6 +64,7 @@ export function ThreeCanvas({
       }}
       {...props}
     >
+      <ContextLossGuard />
       {!noPerfGuard && <PerformanceController />}
       {children}
       <AdaptiveDpr pixelated />

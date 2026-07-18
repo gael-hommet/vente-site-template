@@ -15,11 +15,20 @@ export function detectWebGL(): boolean {
       canvas.getContext("webgl2") ||
       canvas.getContext("webgl") ||
       canvas.getContext("experimental-webgl");
-    cached = Boolean(gl);
+    // Cache POSITIVES only. A negative can be transient — the GPU process may
+    // not be ready at first paint (cold start, backgrounded tab) — so caching a
+    // `false` would strand the whole session in LITE even once WebGL is live.
+    // Re-detection (DeviceQualityProvider re-runs detect()) then recovers the
+    // real capability; scenes reserve their aspect ratio, so a later
+    // fallback→canvas swap is CLS-neutral.
+    if (gl) {
+      cached = true;
+      return true;
+    }
+    return false;
   } catch {
-    cached = false;
+    return false;
   }
-  return cached;
 }
 
 /** Force a value (used by tests / the WebGL-fallback E2E scenario). */
