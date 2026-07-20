@@ -57,7 +57,9 @@ describe("ConfiguredHeader (navigation config-driven)", () => {
     // (Le libellé accessible peut inclure un numéro de folio selon la recipe,
     // donc on cible le href, pas le texte exact.)
     const firstLink = siteContent.nav[0];
-    const links = screen.getAllByRole("link").filter((el) => el.getAttribute("href") === firstLink.href);
+    const links = screen
+      .getAllByRole("link")
+      .filter((el) => el.getAttribute("href") === firstLink.href);
     expect(links.length).toBeGreaterThanOrEqual(1);
   });
 });
