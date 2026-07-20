@@ -53,8 +53,11 @@ describe("ConfiguredHeader (navigation config-driven)", () => {
         <ConfiguredHeader />
       </ThemeProvider>,
     );
-    // Les liens de nav sont présents (au moins le premier).
+    // Un lien pointant vers la destination du premier lien de nav est présent.
+    // (Le libellé accessible peut inclure un numéro de folio selon la recipe,
+    // donc on cible le href, pas le texte exact.)
     const firstLink = siteContent.nav[0];
-    expect(screen.getAllByRole("link", { name: firstLink.label }).length).toBeGreaterThanOrEqual(1);
+    const links = screen.getAllByRole("link").filter((el) => el.getAttribute("href") === firstLink.href);
+    expect(links.length).toBeGreaterThanOrEqual(1);
   });
 });
