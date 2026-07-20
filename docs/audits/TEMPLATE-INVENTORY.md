@@ -23,25 +23,25 @@ Pas de monorepo. Un dépôt = un site client (loi CLAUDE.md).
 
 ## 2. `src/` — détail
 
-| Zone | Contenu | Fichiers |
-| --- | --- | --- |
-| `app/` | `layout.tsx`, `page.tsx`, `lab/page.tsx`, `api/lead/route.ts`, `sitemap.ts`, `robots.ts`, `manifest.ts`, `globals.css` | 9 |
-| `components/ui/` | button, glass-button, badge, card, container, dialog, drawer, field, section, states, typography + index | 12 |
-| `components/layout/` | site-header, site-footer, navigation, skip-link, theme (Provider+Script) | 5 |
-| `components/motion/` | SmoothScrollProvider (Lenis+GSAP), Reveal, ScrollScene, PinnedSequence, ParallaxLayer, MagneticButton, ScrollProgress, ChapterTimeline, SplitTextFallback | 9 |
-| `components/three/` | AdaptiveCanvas, ThreeCanvas, WebGLBoundary, WebGLFallback, DeviceQualityProvider, PerformanceController, SceneLoader, ScrollCamera, CameraRig, EnvironmentRig, PostFX, Model, Hotspot, stages | 15 |
-| `components/media/` | ScrollVideo, ScrollImageSequence, ImageSequencePlayer, MediaFallback | 4 |
-| `components/photo/` | BeforeAfter, DepthParallax, InteractiveHotspots, InteriorGallery, KenBurnsScene, LayeredPhoto, MaskReveal, PanoramaAdapter | 8 |
-| `components/maps/` | BusinessMap (maplibre), AnimatedMapCamera, LocationMarker, RouteReveal, SceneToMapTransition, MapFallback | 6 |
-| `components/conversion/` | ContactForm, LeadForm, QuoteRequest, FAQ, ctas, sections, form-parts, ConversionFooter | 9 |
-| `components/effects/` | GlassSurface, GlassNavigation, LiquidMetalLogo + adaptateurs optionnels (Rive, Spline, ShaderGradient) | 6 |
-| `components/analytics/` + `seo/` | Analytics (env-gated), JsonLd | 2 |
-| `components/lab/` | LabShell, LabSection, canvases, demos (Journey, ImageSequence, Map, SceneToMap), QualitySelector | 7 |
-| `scenes/` | vehicle-journey, product-reveal, logo-reveal (scènes R3F de démonstration) | 3 |
-| `lib/` | animation/gsap, three/{webgl,scene-store}, performance/{quality,store}, seo/{metadata,jsonld}, forms/{schemas,submit,deliver}, accessibility/reduced-motion, analytics/track, optional/load, utils (cn) | 15 |
-| `config/` | site.ts (env-driven), business.ts (source de vérité, placeholder honnête), navigation.ts, motion.ts | 4 |
-| `hooks/` | useQuality, useReducedMotion, useMediaQuery, useScrubProgress | 4 |
-| `types/` | index.ts (BusinessConfig, DeviceProfile, QualityTier…) | 1 |
+| Zone                             | Contenu                                                                                                                                                                                                 | Fichiers |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `app/`                           | `layout.tsx`, `page.tsx`, `lab/page.tsx`, `api/lead/route.ts`, `sitemap.ts`, `robots.ts`, `manifest.ts`, `globals.css`                                                                                  | 9        |
+| `components/ui/`                 | button, glass-button, badge, card, container, dialog, drawer, field, section, states, typography + index                                                                                                | 12       |
+| `components/layout/`             | site-header, site-footer, navigation, skip-link, theme (Provider+Script)                                                                                                                                | 5        |
+| `components/motion/`             | SmoothScrollProvider (Lenis+GSAP), Reveal, ScrollScene, PinnedSequence, ParallaxLayer, MagneticButton, ScrollProgress, ChapterTimeline, SplitTextFallback                                               | 9        |
+| `components/three/`              | AdaptiveCanvas, ThreeCanvas, WebGLBoundary, WebGLFallback, DeviceQualityProvider, PerformanceController, SceneLoader, ScrollCamera, CameraRig, EnvironmentRig, PostFX, Model, Hotspot, stages           | 15       |
+| `components/media/`              | ScrollVideo, ScrollImageSequence, ImageSequencePlayer, MediaFallback                                                                                                                                    | 4        |
+| `components/photo/`              | BeforeAfter, DepthParallax, InteractiveHotspots, InteriorGallery, KenBurnsScene, LayeredPhoto, MaskReveal, PanoramaAdapter                                                                              | 8        |
+| `components/maps/`               | BusinessMap (maplibre), AnimatedMapCamera, LocationMarker, RouteReveal, SceneToMapTransition, MapFallback                                                                                               | 6        |
+| `components/conversion/`         | ContactForm, LeadForm, QuoteRequest, FAQ, ctas, sections, form-parts, ConversionFooter                                                                                                                  | 9        |
+| `components/effects/`            | GlassSurface, GlassNavigation, LiquidMetalLogo + adaptateurs optionnels (Rive, Spline, ShaderGradient)                                                                                                  | 6        |
+| `components/analytics/` + `seo/` | Analytics (env-gated), JsonLd                                                                                                                                                                           | 2        |
+| `components/lab/`                | LabShell, LabSection, canvases, demos (Journey, ImageSequence, Map, SceneToMap), QualitySelector                                                                                                        | 7        |
+| `scenes/`                        | vehicle-journey, product-reveal, logo-reveal (scènes R3F de démonstration)                                                                                                                              | 3        |
+| `lib/`                           | animation/gsap, three/{webgl,scene-store}, performance/{quality,store}, seo/{metadata,jsonld}, forms/{schemas,submit,deliver}, accessibility/reduced-motion, analytics/track, optional/load, utils (cn) | 15       |
+| `config/`                        | site.ts (env-driven), business.ts (source de vérité, placeholder honnête), navigation.ts, motion.ts                                                                                                     | 4        |
+| `hooks/`                         | useQuality, useReducedMotion, useMediaQuery, useScrubProgress                                                                                                                                           | 4        |
+| `types/`                         | index.ts (BusinessConfig, DeviceProfile, QualityTier…)                                                                                                                                                  | 1        |
 
 ## 3. Tests
 

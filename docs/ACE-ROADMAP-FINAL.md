@@ -6,28 +6,28 @@
 
 ## Audit par sous-système
 
-| Sous-système | État | Existe | Lacune réelle |
-| --- | --- | --- | --- |
-| **core** | ✅ | `createRegistry`, contrats (AnimationEngine, ReducedMotionPolicy, TierAware, Skippable, RequiresFallback, LazyComponent), version | — |
-| **config (DA)** | 🟡 | design-language Zod, presets neutral/onyx/atelier, contrast AA, resolve→CSS | DA n'agit que sur brand/radius/glow ; pas d'axes typo/densité/grille/matières |
-| **config (client)** | ❌ | `src/config/*` ad-hoc, non validé | **Contrat client universel typé (Zod) absent** — keystone |
-| **features** | ❌ | — | Pas de feature flags déclaratifs |
-| **layout** | 🟡 | header/footer/nav/theme starter | Non piloté par recipe (une seule variante) |
-| **ui** | ✅ | button, field, card, dialog, drawer, section, typography, states… | — |
-| **motion** | 🟡 | registry 9 recettes, SmoothScroll, séparation typée | Pas de recipes de composition (seulement micro-briques) |
-| **scenes** | ✅ | registry, AdaptiveCanvas, tiers, fallback obligatoire, context-loss | Bibliothèque de scènes procédurales à élargir (optionnel) |
-| **media** | 🟡 | contrats image/vidéo (poster+dim+captions imposés) | Composants de galerie/média recipes absents |
-| **content** | 🟡 | `ContentValue` verified/to-confirm | Pas de modèle de collections générique typé |
-| **seo** | ✅ | metadata, JSON-LD (LocalBusiness/FAQ/Breadcrumb), sitemap, robots, OG | Générateur JSON-LD sectoriel à étendre (optionnel) |
-| **forms** | ✅ | RHF+zod, adaptateurs env-gated, honeypot+throttle, a11y | Champs pilotés par config (optionnel) |
-| **analytics** | ✅ | events typés, env-gated | — |
-| **performance** | ✅ | tiers, budgets, AdaptiveDpr, lazy imports | — |
-| **accessibility** | ✅ | skip link, focus, reduced-motion, axe e2e | — |
-| **testing** | ✅ | Vitest+RTL, Playwright+axe, helpers, polyfills | — |
-| **audit** | 🟡 | `audit-site.mjs` | À étendre (quality gates générateur) |
-| **generator** | 🟡 | git archive, prune, stamp, leak check | N'ingère pas config/brief/assets ; n'active pas features/routes |
-| **recipes** | ❌ | — | **Système de recipes absent** — keystone créatif |
-| **Studio/Lab** | 🟡 | `/ace-lab` (presets, contrastes, motion, scene studio) | À étendre en banc d'essai de recipes ; exclusion prouvée par test |
+| Sous-système        | État | Existe                                                                                                                            | Lacune réelle                                                                 |
+| ------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **core**            | ✅   | `createRegistry`, contrats (AnimationEngine, ReducedMotionPolicy, TierAware, Skippable, RequiresFallback, LazyComponent), version | —                                                                             |
+| **config (DA)**     | 🟡   | design-language Zod, presets neutral/onyx/atelier, contrast AA, resolve→CSS                                                       | DA n'agit que sur brand/radius/glow ; pas d'axes typo/densité/grille/matières |
+| **config (client)** | ❌   | `src/config/*` ad-hoc, non validé                                                                                                 | **Contrat client universel typé (Zod) absent** — keystone                     |
+| **features**        | ❌   | —                                                                                                                                 | Pas de feature flags déclaratifs                                              |
+| **layout**          | 🟡   | header/footer/nav/theme starter                                                                                                   | Non piloté par recipe (une seule variante)                                    |
+| **ui**              | ✅   | button, field, card, dialog, drawer, section, typography, states…                                                                 | —                                                                             |
+| **motion**          | 🟡   | registry 9 recettes, SmoothScroll, séparation typée                                                                               | Pas de recipes de composition (seulement micro-briques)                       |
+| **scenes**          | ✅   | registry, AdaptiveCanvas, tiers, fallback obligatoire, context-loss                                                               | Bibliothèque de scènes procédurales à élargir (optionnel)                     |
+| **media**           | 🟡   | contrats image/vidéo (poster+dim+captions imposés)                                                                                | Composants de galerie/média recipes absents                                   |
+| **content**         | 🟡   | `ContentValue` verified/to-confirm                                                                                                | Pas de modèle de collections générique typé                                   |
+| **seo**             | ✅   | metadata, JSON-LD (LocalBusiness/FAQ/Breadcrumb), sitemap, robots, OG                                                             | Générateur JSON-LD sectoriel à étendre (optionnel)                            |
+| **forms**           | ✅   | RHF+zod, adaptateurs env-gated, honeypot+throttle, a11y                                                                           | Champs pilotés par config (optionnel)                                         |
+| **analytics**       | ✅   | events typés, env-gated                                                                                                           | —                                                                             |
+| **performance**     | ✅   | tiers, budgets, AdaptiveDpr, lazy imports                                                                                         | —                                                                             |
+| **accessibility**   | ✅   | skip link, focus, reduced-motion, axe e2e                                                                                         | —                                                                             |
+| **testing**         | ✅   | Vitest+RTL, Playwright+axe, helpers, polyfills                                                                                    | —                                                                             |
+| **audit**           | 🟡   | `audit-site.mjs`                                                                                                                  | À étendre (quality gates générateur)                                          |
+| **generator**       | 🟡   | git archive, prune, stamp, leak check                                                                                             | N'ingère pas config/brief/assets ; n'active pas features/routes               |
+| **recipes**         | ❌   | —                                                                                                                                 | **Système de recipes absent** — keystone créatif                              |
+| **Studio/Lab**      | 🟡   | `/ace-lab` (presets, contrastes, motion, scene studio)                                                                            | À étendre en banc d'essai de recipes ; exclusion prouvée par test             |
 
 ## Séquence (dépendances)
 
@@ -55,17 +55,17 @@ générateur config-aware ne peuvent exister. Puis l'**infrastructure de recipes
 
 ## Statut d'avancement (honnête)
 
-| Phase | Statut |
-| --- | --- |
-| 1 — Audit + roadmap | ✅ fait (ces 3 docs) |
-| 2 — Contrat client universel | ✅ **fait et testé** (`src/ace/config/client-*.ts`, `features.ts`, `types.ts`, 9 tests). Keystone livré. |
-| 3 — Recipes | 🟡 **infrastructure + famille heroes faites et testées** (`src/ace/recipes/`, 3 recettes distinctes, 5 tests). Familles navigation/projects/storytelling/conversion : **à construire** (mêmes patterns). |
-| 4 — DA élargie | ⏳ à faire (axes typo/densité/grille/matières) |
-| 5 — Générateur config-aware (`--config/--brief/--assets`, activation features/routes, quality gates) | ⏳ à faire |
-| 6 — Studio (bancs d'essai recipes) + test d'absence Lab/Engine en client | ⏳ à faire |
-| 7 — Deux validations opposées (editorial / immersive) | ⏳ à faire (dépend de 3-complet + 5) |
-| 8 — Preuve anti-template | ⏳ à faire (dépend de 7) |
-| 9 — Quality gates finaux + `ACE-FINAL-REPORT.md` | ⏳ à faire |
+| Phase                                                                                                | Statut                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 — Audit + roadmap                                                                                  | ✅ fait (ces 3 docs)                                                                                                                                                                                     |
+| 2 — Contrat client universel                                                                         | ✅ **fait et testé** (`src/ace/config/client-*.ts`, `features.ts`, `types.ts`, 9 tests). Keystone livré.                                                                                                 |
+| 3 — Recipes                                                                                          | 🟡 **infrastructure + famille heroes faites et testées** (`src/ace/recipes/`, 3 recettes distinctes, 5 tests). Familles navigation/projects/storytelling/conversion : **à construire** (mêmes patterns). |
+| 4 — DA élargie                                                                                       | ⏳ à faire (axes typo/densité/grille/matières)                                                                                                                                                           |
+| 5 — Générateur config-aware (`--config/--brief/--assets`, activation features/routes, quality gates) | ⏳ à faire                                                                                                                                                                                               |
+| 6 — Studio (bancs d'essai recipes) + test d'absence Lab/Engine en client                             | ⏳ à faire                                                                                                                                                                                               |
+| 7 — Deux validations opposées (editorial / immersive)                                                | ⏳ à faire (dépend de 3-complet + 5)                                                                                                                                                                     |
+| 8 — Preuve anti-template                                                                             | ⏳ à faire (dépend de 7)                                                                                                                                                                                 |
+| 9 — Quality gates finaux + `ACE-FINAL-REPORT.md`                                                     | ⏳ à faire                                                                                                                                                                                               |
 
 `pnpm check` moteur **vert** à ce jalon (lint + typecheck + 102 tests + build).
 Aucune identité IN QUARTO dans le moteur. Aucun push.

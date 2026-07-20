@@ -30,12 +30,12 @@ Validation : `pnpm check` re-exécuté après ces trois changements.
 
 ## 4. REPORTER (décision explicite)
 
-| Sujet | Pourquoi reporté | Ré-examen |
-| --- | --- | --- |
+| Sujet                                    | Pourquoi reporté                                                                                                        | Ré-examen                                                                                                        |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Option A (monorepo pnpm apps/+packages/) | Loi « un dépôt = un site client » ; skills et scripts supposent l'app unique ; migration risquée sans bénéfice immédiat | Quand ≥2 sites réels auront prouvé le besoin de versionner le moteur séparément — voir ACE-ARCHITECTURE-DECISION |
-| CI GitHub Actions | « Ne jamais pousser sans ordre explicite » ; inutile tant que le flux est Codespace-local | À la demande de l'utilisateur |
-| Budgets perf exécutoires / Lighthouse | Mieux placés dans l'ACE Score (étape 15) que comme script isolé | Étape 15 |
-| Firefox/WebKit Playwright | Chromium suffit pour la boucle courante ; les projets skippent proprement | Avant une livraison client réelle |
+| CI GitHub Actions                        | « Ne jamais pousser sans ordre explicite » ; inutile tant que le flux est Codespace-local                               | À la demande de l'utilisateur                                                                                    |
+| Budgets perf exécutoires / Lighthouse    | Mieux placés dans l'ACE Score (étape 15) que comme script isolé                                                         | Étape 15                                                                                                         |
+| Firefox/WebKit Playwright                | Chromium suffit pour la boucle courante ; les projets skippent proprement                                               | Avant une livraison client réelle                                                                                |
 
 ## 5. INTERDITS RECONDUITS
 

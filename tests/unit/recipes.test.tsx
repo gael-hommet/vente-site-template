@@ -1,11 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import {
-  HERO_RECIPES,
-  getHeroRecipe,
-  hasHeroRecipe,
-  type HeroProps,
-} from "@/ace/recipes";
+import { HERO_RECIPES, getHeroRecipe, hasHeroRecipe, type HeroProps } from "@/ace/recipes";
 import { createRegistry } from "@/ace/core";
 
 const base: HeroProps = {

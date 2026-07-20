@@ -13,15 +13,23 @@ export function LinearSections({ chapters, className }: StorytellingProps) {
       {chapters.map((c, i) => (
         <section key={i}>
           {c.eyebrow ? (
-            <p className="mb-3 font-mono text-[0.75rem] tracking-[0.12em] text-muted uppercase">{c.eyebrow}</p>
+            <p className="text-muted mb-3 font-mono text-[0.75rem] tracking-[0.12em] uppercase">
+              {c.eyebrow}
+            </p>
           ) : null}
-          <h2 className="text-balance font-display text-[clamp(1.75rem,3.5vw,2.75rem)] leading-tight font-light">
+          <h2 className="font-display text-[clamp(1.75rem,3.5vw,2.75rem)] leading-tight font-light text-balance">
             {c.title}
           </h2>
-          <p className="mt-5 leading-relaxed text-muted">{c.body}</p>
+          <p className="text-muted mt-5 leading-relaxed">{c.body}</p>
           {c.media ? (
-            <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[var(--radius-md)] border border-border">
-              <Image src={c.media.src} alt={c.media.alt} fill sizes="(min-width:768px) 48rem, 100vw" className="object-cover" />
+            <div className="border-border relative mt-8 aspect-[16/9] overflow-hidden rounded-[var(--radius-md)] border">
+              <Image
+                src={c.media.src}
+                alt={c.media.alt}
+                fill
+                sizes="(min-width:768px) 48rem, 100vw"
+                className="object-cover"
+              />
             </div>
           ) : null}
         </section>

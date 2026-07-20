@@ -13,8 +13,11 @@ export function VisualGrid({ items, className }: ProjectsProps) {
     <ul className={cn("grid gap-6 sm:grid-cols-2 lg:grid-cols-3", className)}>
       {items.map((item) => (
         <li key={item.href} className="group">
-          <Link href={item.href} className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-md)] border border-border">
+          <Link
+            href={item.href}
+            className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+          >
+            <div className="border-border relative aspect-[4/3] overflow-hidden rounded-[var(--radius-md)] border">
               {item.media ? (
                 <Image
                   src={item.media.src}
@@ -27,13 +30,16 @@ export function VisualGrid({ items, className }: ProjectsProps) {
                 <div
                   aria-hidden
                   className="absolute inset-0"
-                  style={{ background: "linear-gradient(150deg, color-mix(in oklch, var(--brand) 26%, var(--surface-2)), var(--surface-3))" }}
+                  style={{
+                    background:
+                      "linear-gradient(150deg, color-mix(in oklch, var(--brand) 26%, var(--surface-2)), var(--surface-3))",
+                  }}
                 />
               )}
             </div>
             <h3 className="mt-4 text-lg font-medium">{item.title}</h3>
             {item.meta?.length ? (
-              <p className="mt-1 font-mono text-[0.75rem] tracking-[0.06em] text-muted uppercase tabular-nums">
+              <p className="text-muted mt-1 font-mono text-[0.75rem] tracking-[0.06em] uppercase tabular-nums">
                 {item.meta.join(" · ")}
               </p>
             ) : null}

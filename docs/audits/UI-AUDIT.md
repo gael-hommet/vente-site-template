@@ -19,11 +19,11 @@ section, states (loading/empty/error), typography. Composition via `cn()`
 
 ## 3. Écarts pour ACE
 
-| Constat | Conséquence | Recommandation |
-| --- | --- | --- |
+| Constat                              | Conséquence                               | Recommandation                                                                                                      |
+| ------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Un seul « thème » de marque (neutre) | Chaque client repart des variables brutes | Design Language ACE : presets de DA = fichiers de tokens (`--brand-*`, fonts, radius, densité) versionnés et nommés |
-| Pas de page de référence des tokens | La DA se lit dans le CSS | `/ace-lab` doit exposer une section tokens (swatches, type scale, motions) |
-| Typo display unique (Space Grotesk) | Identité uniforme entre sites | Le preset de DA doit piloter le choix `next/font` |
+| Pas de page de référence des tokens  | La DA se lit dans le CSS                  | `/ace-lab` doit exposer une section tokens (swatches, type scale, motions)                                          |
+| Typo display unique (Space Grotesk)  | Identité uniforme entre sites             | Le preset de DA doit piloter le choix `next/font`                                                                   |
 
 ## 4. Verdict
 

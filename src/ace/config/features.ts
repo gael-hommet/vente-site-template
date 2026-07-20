@@ -63,7 +63,7 @@ export function findFeatureConflicts(cfg: ClientConfig): FeatureConflict[] {
   if (f.webgl === true && cfg.design.webglIntensity === "none") {
     out.push({
       feature: "webgl",
-      message: "features.webgl=true mais webglIntensity=\"none\" (rien à rendre en 3D).",
+      message: 'features.webgl=true mais webglIntensity="none" (rien à rendre en 3D).',
     });
   }
   if (f.i18n === true && localesCount < 2) {
@@ -75,7 +75,7 @@ export function findFeatureConflicts(cfg: ClientConfig): FeatureConflict[] {
   if (f.analytics === true && cfg.analytics.provider === "none") {
     out.push({
       feature: "analytics",
-      message: "features.analytics=true mais analytics.provider=\"none\".",
+      message: 'features.analytics=true mais analytics.provider="none".',
     });
   }
   if (f.collections === true && collectionsCount === 0) {

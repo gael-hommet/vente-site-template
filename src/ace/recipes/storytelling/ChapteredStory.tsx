@@ -12,17 +12,24 @@ export function ChapteredStory({ chapters, className }: StorytellingProps) {
       {chapters.map((c, i) => (
         <section
           key={i}
-          className="grid gap-4 border-t border-border py-12 sm:grid-cols-[6rem_1fr] sm:gap-10 sm:py-16"
+          className="border-border grid gap-4 border-t py-12 sm:grid-cols-[6rem_1fr] sm:gap-10 sm:py-16"
         >
-          <p aria-hidden className="font-display text-[clamp(2.5rem,6vw,4rem)] leading-none font-light text-brand/70">
+          <p
+            aria-hidden
+            className="font-display text-brand/70 text-[clamp(2.5rem,6vw,4rem)] leading-none font-light"
+          >
             {String(i + 1).padStart(2, "0")}
           </p>
           <div>
             {c.eyebrow ? (
-              <p className="mb-2 font-mono text-[0.75rem] tracking-[0.12em] text-muted uppercase">{c.eyebrow}</p>
+              <p className="text-muted mb-2 font-mono text-[0.75rem] tracking-[0.12em] uppercase">
+                {c.eyebrow}
+              </p>
             ) : null}
-            <h2 className="text-balance font-display text-[clamp(1.5rem,3vw,2.5rem)] leading-tight font-light">{c.title}</h2>
-            <p className="mt-4 max-w-prose leading-relaxed text-muted">{c.body}</p>
+            <h2 className="font-display text-[clamp(1.5rem,3vw,2.5rem)] leading-tight font-light text-balance">
+              {c.title}
+            </h2>
+            <p className="text-muted mt-4 max-w-prose leading-relaxed">{c.body}</p>
           </div>
         </section>
       ))}

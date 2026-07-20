@@ -1,14 +1,18 @@
+import { resolvedFeatures } from "./features.generated";
+
 export interface NavItem {
   label: string;
   href: string;
 }
 
 /** Primary navigation — the starter's standard premium-site routes. A client
- * site renames/reorders these to match its real sections. */
+ * site renames/reorders these to match its real sections. The collection
+ * link only exists when `features.collections` is active — the generator
+ * prunes `src/app/realisations` otherwise (see new-site.mjs). */
 export const primaryNav: NavItem[] = [
   { label: "Accueil", href: "/" },
   { label: "Offre", href: "/offre" },
-  { label: "Réalisations", href: "/realisations" },
+  ...(resolvedFeatures.collections ? [{ label: "Réalisations", href: "/realisations" }] : []),
   { label: "À propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
 ];

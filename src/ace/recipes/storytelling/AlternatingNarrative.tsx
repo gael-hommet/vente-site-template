@@ -14,19 +14,41 @@ export function AlternatingNarrative({ chapters, className }: StorytellingProps)
         const reversed = i % 2 === 1;
         return (
           <section key={i} className="grid items-center gap-8 md:grid-cols-2 md:gap-16">
-            <div className={cn("relative aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border border-border", reversed && "md:order-2")}>
+            <div
+              className={cn(
+                "border-border relative aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] border",
+                reversed && "md:order-2",
+              )}
+            >
               {c.media ? (
-                <Image src={c.media.src} alt={c.media.alt} fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover" />
+                <Image
+                  src={c.media.src}
+                  alt={c.media.alt}
+                  fill
+                  sizes="(min-width:768px) 50vw, 100vw"
+                  className="object-cover"
+                />
               ) : (
-                <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(150deg, color-mix(in oklch, var(--brand) 26%, var(--surface-2)), var(--surface-3))" }} />
+                <div
+                  aria-hidden
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(150deg, color-mix(in oklch, var(--brand) 26%, var(--surface-2)), var(--surface-3))",
+                  }}
+                />
               )}
             </div>
             <div className={cn(reversed && "md:order-1")}>
               {c.eyebrow ? (
-                <p className="mb-3 font-mono text-[0.75rem] tracking-[0.12em] text-muted uppercase">{c.eyebrow}</p>
+                <p className="text-muted mb-3 font-mono text-[0.75rem] tracking-[0.12em] uppercase">
+                  {c.eyebrow}
+                </p>
               ) : null}
-              <h2 className="text-balance font-display text-[clamp(1.75rem,3.5vw,3rem)] leading-tight font-light">{c.title}</h2>
-              <p className="mt-5 max-w-prose leading-relaxed text-muted">{c.body}</p>
+              <h2 className="font-display text-[clamp(1.75rem,3.5vw,3rem)] leading-tight font-light text-balance">
+                {c.title}
+              </h2>
+              <p className="text-muted mt-5 max-w-prose leading-relaxed">{c.body}</p>
             </div>
           </section>
         );

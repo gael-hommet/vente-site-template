@@ -13,17 +13,20 @@ import { cn } from "@/lib/utils";
 export function TraditionalPremium({ brand, links, cta, className }: NavProps) {
   const [open, setOpen] = React.useState(false);
   return (
-    <header className={cn("sticky top-0 z-40 border-b border-border bg-surface", className)}>
+    <header className={cn("border-border bg-surface sticky top-0 z-40 border-b", className)}>
       <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6">
         <Link href="/" className="justify-self-start font-semibold tracking-tight">
           {brand}
         </Link>
-        <nav className="hidden items-center gap-8 justify-self-center md:flex" aria-label="Principale">
+        <nav
+          className="hidden items-center gap-8 justify-self-center md:flex"
+          aria-label="Principale"
+        >
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className="relative text-sm text-foreground/80 transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-brand after:transition-all after:duration-300 hover:after:w-full"
+              className="text-foreground/80 hover:text-foreground after:bg-brand relative text-sm transition-colors after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:transition-all after:duration-300 hover:after:w-full"
             >
               {l.label}
             </Link>
@@ -33,7 +36,7 @@ export function TraditionalPremium({ brand, links, cta, className }: NavProps) {
           {cta ? (
             <Link
               href={cta.href}
-              className="hidden h-10 items-center rounded-[var(--radius-md)] border border-brand px-5 text-sm font-medium text-brand transition-colors hover:bg-brand hover:text-brand-foreground md:inline-flex"
+              className="border-brand text-brand hover:bg-brand hover:text-brand-foreground hidden h-10 items-center rounded-[var(--radius-md)] border px-5 text-sm font-medium transition-colors md:inline-flex"
             >
               {cta.label}
             </Link>
@@ -50,7 +53,10 @@ export function TraditionalPremium({ brand, links, cta, className }: NavProps) {
         </div>
       </div>
       {open ? (
-        <nav className="border-t border-border bg-surface px-6 py-4 text-center md:hidden" aria-label="Principale (mobile)">
+        <nav
+          className="border-border bg-surface border-t px-6 py-4 text-center md:hidden"
+          aria-label="Principale (mobile)"
+        >
           <ul className="flex flex-col gap-3">
             {links.map((l) => (
               <li key={l.href}>
@@ -63,7 +69,7 @@ export function TraditionalPremium({ brand, links, cta, className }: NavProps) {
               <li className="pt-2">
                 <Link
                   href={cta.href}
-                  className="inline-flex h-10 items-center rounded-[var(--radius-md)] border border-brand px-5 text-sm font-medium text-brand"
+                  className="border-brand text-brand inline-flex h-10 items-center rounded-[var(--radius-md)] border px-5 text-sm font-medium"
                   onClick={() => setOpen(false)}
                 >
                   {cta.label}

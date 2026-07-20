@@ -1,8 +1,4 @@
-import type {
-  BrandTokens,
-  DesignLanguagePreset,
-  SurfaceTokens,
-} from "./design-language";
+import type { BrandTokens, DesignLanguagePreset, SurfaceTokens } from "./design-language";
 
 /**
  * Turns a Design Language preset into the CSS custom-property overrides that

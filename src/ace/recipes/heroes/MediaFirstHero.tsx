@@ -33,7 +33,7 @@ export function MediaFirstHero({
       ) : (
         <div
           aria-hidden
-          className="-z-10 absolute inset-0"
+          className="absolute inset-0 -z-10"
           style={{
             background:
               "linear-gradient(135deg, var(--surface-3), color-mix(in oklch, var(--brand) 22%, var(--surface-2)))",
@@ -44,7 +44,10 @@ export function MediaFirstHero({
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
-        style={{ background: "linear-gradient(to top, oklch(0 0 0 / 0.62), oklch(0 0 0 / 0.1) 55%, transparent)" }}
+        style={{
+          background:
+            "linear-gradient(to top, oklch(0 0 0 / 0.62), oklch(0 0 0 / 0.1) 55%, transparent)",
+        }}
       />
       <div className="mx-auto w-full max-w-6xl px-6 pt-24 pb-16 text-white">
         {eyebrow ? (
@@ -52,7 +55,7 @@ export function MediaFirstHero({
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="max-w-4xl text-balance font-display text-[clamp(2.5rem,7vw,6rem)] leading-[1.04] font-medium">
+        <h1 className="font-display max-w-4xl text-[clamp(2.5rem,7vw,6rem)] leading-[1.04] font-medium text-balance">
           {title}
         </h1>
         {subtitle ? (
@@ -63,7 +66,7 @@ export function MediaFirstHero({
             {primaryCta ? (
               <Link
                 href={primaryCta.href}
-                className="inline-flex h-12 items-center rounded-[var(--radius-md)] bg-brand px-7 text-base font-medium text-brand-foreground transition-colors hover:bg-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="bg-brand text-brand-foreground hover:bg-brand-strong inline-flex h-12 items-center rounded-[var(--radius-md)] px-7 text-base font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 {primaryCta.label}
               </Link>

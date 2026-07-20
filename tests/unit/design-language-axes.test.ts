@@ -41,11 +41,23 @@ describe("Design Language — axes profonds & profils de validation", () => {
     for (const p of VALIDATION_PRESETS) {
       const s = p.surfaces!;
       // Texte principal sur fond : très lisible (≥ 7:1).
-      expect(contrastRatio(oklchToSrgb(s.light.foreground), oklchToSrgb(s.light.background)), `${p.id} light fg/bg`).toBeGreaterThanOrEqual(7);
-      expect(contrastRatio(oklchToSrgb(s.dark.foreground), oklchToSrgb(s.dark.background)), `${p.id} dark fg/bg`).toBeGreaterThanOrEqual(7);
+      expect(
+        contrastRatio(oklchToSrgb(s.light.foreground), oklchToSrgb(s.light.background)),
+        `${p.id} light fg/bg`,
+      ).toBeGreaterThanOrEqual(7);
+      expect(
+        contrastRatio(oklchToSrgb(s.dark.foreground), oklchToSrgb(s.dark.background)),
+        `${p.id} dark fg/bg`,
+      ).toBeGreaterThanOrEqual(7);
       // Texte secondaire (muted) sur surface-2 : AA (≥ 4.5:1).
-      expect(contrastRatio(oklchToSrgb(s.light.muted), oklchToSrgb(s.light.surface2)), `${p.id} light muted`).toBeGreaterThanOrEqual(4.5);
-      expect(contrastRatio(oklchToSrgb(s.dark.muted), oklchToSrgb(s.dark.surface2)), `${p.id} dark muted`).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrastRatio(oklchToSrgb(s.light.muted), oklchToSrgb(s.light.surface2)),
+        `${p.id} light muted`,
+      ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrastRatio(oklchToSrgb(s.dark.muted), oklchToSrgb(s.dark.surface2)),
+        `${p.id} dark muted`,
+      ).toBeGreaterThanOrEqual(4.5);
     }
   });
 });

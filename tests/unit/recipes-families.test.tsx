@@ -15,10 +15,17 @@ import {
 } from "@/ace/recipes";
 import { RECIPE_IDS } from "@/ace/recipes/catalog";
 
-const heroProps: HeroProps = { title: "Titre", primaryCta: { label: "OK", href: "/x" }, media: null };
+const heroProps: HeroProps = {
+  title: "Titre",
+  primaryCta: { label: "OK", href: "/x" },
+  media: null,
+};
 const navProps: NavProps = {
   brand: "Marque",
-  links: [{ label: "Un", href: "/un" }, { label: "Deux", href: "/deux" }],
+  links: [
+    { label: "Un", href: "/un" },
+    { label: "Deux", href: "/deux" },
+  ],
   cta: { label: "OK", href: "/x" },
 };
 const projProps: ProjectsProps = {
@@ -33,8 +40,16 @@ const storyProps: StorytellingProps = {
     { eyebrow: "02", title: "Ch. 2", body: "Corps deux." },
   ],
 };
-const convProps: ConversionProps = { title: "Contact", primaryCta: { label: "OK", href: "/x" }, phone: "01" };
-const layoutProps: LayoutProps = { header: <header>H</header>, children: <section>C</section>, footer: <footer>F</footer> };
+const convProps: ConversionProps = {
+  title: "Contact",
+  primaryCta: { label: "OK", href: "/x" },
+  phone: "01",
+};
+const layoutProps: LayoutProps = {
+  header: <header>H</header>,
+  children: <section>C</section>,
+  footer: <footer>F</footer>,
+};
 
 function propsFor(family: string): unknown {
   switch (family) {
@@ -88,7 +103,11 @@ describe("ACE recipes — toutes les familles", () => {
 
   it("validateRecipeSelection accepte une sélection valide et refuse un id inconnu", () => {
     expect(
-      validateRecipeSelection({ hero: "typographic", navigation: "immersive-overlay", projects: "visual-grid" }),
+      validateRecipeSelection({
+        hero: "typographic",
+        navigation: "immersive-overlay",
+        projects: "visual-grid",
+      }),
     ).toEqual([]);
     const bad = validateRecipeSelection({ hero: "nope", conversion: "premium-inquiry" });
     expect(bad).toHaveLength(1);

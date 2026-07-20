@@ -1,45 +1,134 @@
-# ace:new-site — générateur de sites clients
+# ACE — Générateur de sites clients (`pnpm ace:new-site`)
 
-> 2026-07-17 · Validé de bout en bout sur un site témoin (voir §3).
+Document **interne au moteur** (élagué à la génération). Guide pratique du
+générateur config-aware. Pour le contrat d'entrée/sortie détaillé, voir
+`docs/ACE-GENERATION-CONTRACT.md` ; pour les quality gates,
+`docs/ACE-GENERATOR-QUALITY-GATES.md`.
 
-## Usage
+## Commande
 
 ```bash
-pnpm ace:new-site --name "Nom du site" --out ../mon-site [--preset onyx] [--url https://…]
+pnpm ace:new-site \
+  --name "Nom du client" \
+  --slug nom-client \
+  --brief input/CLIENT_BRIEF.md \
+  --config input/client.config.ts \
+  --assets input/assets \
+  --out /workspaces/nom-client \
+  [--url https://nom-client.example] \
+  [--force] [--skip-install] [--skip-check]
 ```
 
-Presets : `neutral` (défaut) · `onyx` · `atelier` — tous **AA par construction**
-(testés unitairement à ≥ 4,7:1 pour absorber la variance de rendu navigateur).
+`--name` et `--out` sont les seuls arguments obligatoires — tous les autres
+ont un défaut sain (voir `pnpm ace:new-site --help`).
 
-## Garanties
+## Exemple minimal
 
-1. **Export `git archive HEAD`** : seuls les fichiers *trackés* partent — `.env*`, caches, node_modules, rapports de test ne peuvent pas fuir, par construction.
-2. **Élagage des documents internes** du moteur (`docs/audits`, `docs/captures`, plans, RECOVERY) : un site client ne transporte ni l'historique du moteur ni les références à d'autres clients.
-3. **Stamp** : `ace.meta.json` (version moteur + commit source + preset + date) → base des mises à jour par diff de template ; `package.json:name` slugifié ; identité runtime dans `.env.local` (aucun secret).
-4. **Contrôle de fuite bloquant** : motifs de secrets (clés API, clés privées), identités d'autres clients (liste `FOREIGN_IDENTITY_PATTERNS` à étendre à chaque nouveau client), fichiers interdits, médias > 500 Ko → la génération échoue.
+```bash
+pnpm ace:new-site --name "Atelier Nord" --out ../atelier-nord
+```
 
-## 3. Validation bout en bout (site témoin)
+Utilise `input/client.config.ts` et `input/CLIENT_BRIEF.md` du moteur par
+défaut (les gabarits neutres livrés avec ACE), sans assets. Suffisant pour un
+premier témoin jetable.
 
-`Site Témoin ACE` généré avec `--preset onyx` dans `/workspaces/ace-temoin` :
+## Exemple complet
 
-- `pnpm install --frozen-lockfile` : ~5 s (store pnpm partagé) ;
-- `pnpm check` : **vert** (lint + typecheck + 89 tests + build, 14 routes) ;
-- e2e chromium desktop + mobile (starter, ACE Lab, axe a11y, reduced-motion) : **verts** ;
-- vérification visuelle desktop/mobile + captures : `docs/captures/temoin-onyx-*` (l'accent doré onyx s'applique via `NEXT_PUBLIC_ACE_PRESET`, le nom du site via `NEXT_PUBLIC_SITE_NAME`).
+```bash
+pnpm ace:new-site \
+  --name "Atelier Nord — Architecture" \
+  --slug atelier-nord \
+  --brief input/CLIENT_BRIEF.md \
+  --config input/client.config.ts \
+  --assets input/assets \
+  --out /workspaces/atelier-nord \
+  --url https://atelier-nord.example
+```
 
-Captures de référence du starter neutre : `docs/captures/template-*`.
+## Exemple de `client.config.ts`
 
-## 4. Écarts détectés par cette validation (et corrigés)
+```ts
+import type { ClientConfigInput } from "@/ace/config";
 
-| Écart | Correction |
-| --- | --- |
-| Les docs internes (mentionnant des clients réels) partaient dans les sites générés | Élagage `ENGINE_ONLY` + motifs d'identités étrangères bloquants dans le contrôle de fuite (le nom du site généré est exclu de ces motifs : la propre identité du client n'est pas une fuite) |
-| Palettes onyx/atelier sous le seuil AA (détecté par axe sur le témoin : badge 3,77:1) | Maths de contraste dans le moteur (`src/ace/config/contrast.ts`) + tests « AA par construction » sur chaque preset, seuil 4,7:1 (marge navigateur : Chrome mesurait 4,46 là où la référence donnait 4,51) |
-| Le switcher de presets du Lab supposait un site en neutral | Initialisation sur le preset du site + émission systématique des tokens (retour à neutral possible par-dessus un preset global) |
-| Titres SplitText jamais révélés visuellement (observer sur mot clippé → ratio 0) | Observer déplacé sur le conteneur + stagger par variants ; garde-fou e2e sur l'opacité calculée |
+const config: ClientConfigInput = {
+  identity: { name: "Atelier Nord", tagline: "Architecture bioclimatique", locale: "fr-FR" },
+  industry: "architecture",
+  goals: { primaryConversion: "quote" },
+  design: {
+    preset: "onyx",
+    motionIntensity: "cinematic",
+    webglIntensity: "accent",
+    density: "spacious",
+  },
+  features: { collections: true, stickyMobileCta: true },
+  recipes: {
+    hero: "media-first",
+    navigation: "editorial-folio",
+    projects: "case-study-sequence",
+    storytelling: "alternating-narrative",
+    conversion: "premium-inquiry",
+    layout: "editorial-layout",
+  },
+  collections: [{ id: "projets", label: "Projets", itemLabel: "projet", kind: "projects" }],
+};
 
-## 5. Limites connues (environnement de test)
+export default config;
+```
 
-MapLibre sur GL logiciel (headless) sature un hôte 2 cœurs : specs `/lab`
-isolées dans leur propre projet Playwright, workers en série, budgets de temps
-élargis. Aucun impact sur appareils réels (GPU matériel).
+Référence complète des champs : `src/ace/config/client-schema.ts`. Ids de
+recipes disponibles : `src/ace/recipes/catalog.ts`.
+
+## Erreurs courantes
+
+| Erreur                                              | Cause                                            | Correction                                                                   |
+| --------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `Configuration client invalide`                     | champ requis manquant/type incorrect             | corriger `client.config.ts` selon le message (chemin + raison)               |
+| `Recipe(s) inconnue(s)`                             | id de recipe absent des registres                | choisir un id existant (`src/ace/recipes/catalog.ts`) ou l'ajouter au moteur |
+| `Combinaisons de features incompatibles`            | ex. `webgl=false` + `webglIntensity≠"none"`      | aligner `features.*` et `design.*Intensity`                                  |
+| `le dossier cible existe et n'est pas vide`         | `--out` déjà occupé                              | choisir un autre dossier ou `--force` (écrase)                               |
+| `fichier de configuration/brief/assets introuvable` | chemin invalide passé en argument                | vérifier le chemin (relatif au cwd d'exécution)                              |
+| `Contrôle de fuite ÉCHOUÉ`                          | secret/route interne/identité étrangère détectés | ne jamais contourner — corriger la source (voir le message détaillé)         |
+| une étape de quality gate en rouge                  | régression dans le moteur lui-même               | corriger dans le moteur, jamais dans le site généré ; relancer               |
+
+## Procédure de reprise après échec
+
+1. Le dossier `--out` n'est créé qu'après le contrôle anti-fuite — un échec de
+   validation/anti-fuite ne laisse **aucun** dossier partiel.
+2. Un échec de quality gate (§ install/format/lint/typecheck/test/build)
+   laisse le site généré sur disque, **non validé** — ne pas le livrer tel
+   quel. Corriger la cause dans le moteur (voir
+   `docs/ACE-GENERATOR-QUALITY-GATES.md#6-en-cas-déchec`), puis régénérer avec
+   `--force`.
+3. Ne jamais éditer directement les fichiers d'un site déjà généré pour
+   contourner un gate — toute correction pérenne doit vivre dans le moteur
+   (sinon elle est perdue à la prochaine régénération).
+
+## Prochain client — checklist courte
+
+1. Remplir un `client.config.ts` et un `CLIENT_BRIEF.md` à partir de faits
+   vérifiés (jamais inventés — voir `.claude/rules/security.md`).
+2. Déposer les assets sources dans un dossier dédié, journalisés dans
+   `input/ASSET_SOURCES.md` (origine, licence, auteur, date).
+3. `pnpm ace:new-site --name … --config … --brief … --assets … --out …`
+4. Lire `docs/ACE-GENERATION-REPORT.md` du site généré : recipes retenues,
+   features résolues, placeholders `[À CONFIRMER]` restants.
+5. Remplacer les faits placeholder par les faits vérifiés du brief.
+6. `pnpm check` (déjà vert à la génération, sauf `--skip-check`).
+7. Ne jamais pousser/déployer sans ordre explicite (voir
+   `.claude/rules/security.md`).
+
+## Apprentissages historiques (site témoin `onyx`, 2026-07-17)
+
+Conservés pour mémoire — corrections déjà intégrées au moteur, ne pas les
+re-découvrir :
+
+| Écart détecté                                                                      | Correction déjà intégrée                                                                                                                     |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Les docs internes (mentionnant des clients réels) partaient dans les sites générés | Élagage `ENGINE_ONLY` + motifs d'identités étrangères bloquants dans le contrôle de fuite (le nom du site généré est exclu de ces motifs)    |
+| Palettes onyx/atelier sous le seuil AA (badge mesuré à 3,77:1 par axe)             | Maths de contraste (`src/ace/config/contrast.ts`) + tests « AA par construction » sur chaque preset, seuil 4,7:1 (marge de rendu navigateur) |
+| Le switcher de presets du Lab supposait un site en neutral                         | Initialisation sur le preset du site + émission systématique des tokens                                                                      |
+| Titres SplitText jamais révélés visuellement (observer sur mot clippé → ratio 0)   | Observer déplacé sur le conteneur + stagger par variants ; garde-fou e2e sur l'opacité calculée                                              |
+
+MapLibre sur GL logiciel (headless) sature un hôte 2 cœurs : les specs `/lab`
+restent isolées dans leur propre projet Playwright, workers en série, budgets
+de temps élargis. Aucun impact sur appareils réels (GPU matériel).

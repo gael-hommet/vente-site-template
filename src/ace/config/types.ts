@@ -2,10 +2,7 @@
  * Types publics du contrat client ACE. Point d'import unique pour le moteur, le
  * générateur et les recipes.
  */
-export type {
-  ClientConfig,
-  ClientConfigInput,
-} from "./client-schema";
+export type { ClientConfig, ClientConfigInput } from "./client-schema";
 export type { ResolvedFeatures, FeatureConflict } from "./features";
 
 export {

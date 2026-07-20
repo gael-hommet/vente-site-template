@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/container";
 import { Navigation } from "./navigation";
 import { ThemeToggle } from "./theme";
 import { siteConfig } from "@/config/site";
+import { resolvedFeatures } from "@/config/features.generated";
 
 /** Sticky, glassy site header shell used by the template pages. */
 export function SiteHeader() {
@@ -23,7 +24,8 @@ export function SiteHeader() {
             </Link>
             <div className="flex items-center gap-1">
               <Navigation />
-              <ThemeToggle />
+              {/* darkMode=false : aucun contrôle de thème inutile (features résolues à la génération). */}
+              {resolvedFeatures.darkMode && <ThemeToggle />}
             </div>
           </div>
         </Container>

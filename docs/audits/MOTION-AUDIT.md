@@ -17,11 +17,11 @@
 
 ## 3. Écarts pour ACE
 
-| Constat | Recommandation |
-| --- | --- |
+| Constat                                                                                                        | Recommandation                                                                                                                         |
+| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Pas de « Motion Library » nommée : les recettes (durées, easings, choreographies) vivent dans chaque composant | Étape 12 : catalogue de motions nommés (ex. `reveal.soft`, `pin.chapter`) construit sur les tokens `--duration-*`/`--ease-*` existants |
-| `config/motion.ts` existe mais reste minimal | L'étoffer comme point d'entrée unique des réglages motion par site |
-| Pas de garde-fou automatisé anti scroll-jacking (règle projet : CTA toujours atteignable) | Spec e2e dédiée « CTA atteignable pendant les pins » à ajouter avec les premières vraies séquences |
+| `config/motion.ts` existe mais reste minimal                                                                   | L'étoffer comme point d'entrée unique des réglages motion par site                                                                     |
+| Pas de garde-fou automatisé anti scroll-jacking (règle projet : CTA toujours atteignable)                      | Spec e2e dédiée « CTA atteignable pendant les pins » à ajouter avec les premières vraies séquences                                     |
 
 ## 4. Verdict
 

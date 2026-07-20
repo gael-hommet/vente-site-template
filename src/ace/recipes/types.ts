@@ -13,12 +13,7 @@ import type { ComponentType, ReactNode } from "react";
  */
 
 export type RecipeFamily =
-  | "hero"
-  | "navigation"
-  | "projects"
-  | "storytelling"
-  | "conversion"
-  | "layout";
+  "hero" | "navigation" | "projects" | "storytelling" | "conversion" | "layout";
 
 export interface RecipeMeta {
   id: string;

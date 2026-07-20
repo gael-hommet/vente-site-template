@@ -15,6 +15,7 @@ import { DesignLanguageStyle } from "@/ace/config/DesignLanguageStyle";
 import { StickyMobileCTA } from "@/components/conversion/ctas";
 import { siteConfig } from "@/config/site";
 import { businessConfig } from "@/config/business";
+import { resolvedFeatures } from "@/config/features.generated";
 
 const sans = Geist({ variable: "--font-sans", subsets: ["latin"], display: "swap" });
 const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"], display: "swap" });
@@ -44,8 +45,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       {/* pb mobile : réserve la hauteur de la StickyMobileCTA fixe (+ safe-area
-          iOS) pour qu'elle ne recouvre jamais le bas du footer. */}
-      <body className="flex min-h-full flex-col pb-[calc(env(safe-area-inset-bottom)+5.5rem)] md:pb-0">
+          iOS) pour qu'elle ne recouvre jamais le bas du footer — seulement si
+          elle est effectivement montée (features.stickyMobileCta). */}
+      <body
+        className={
+          resolvedFeatures.stickyMobileCta
+            ? "flex min-h-full flex-col pb-[calc(env(safe-area-inset-bottom)+5.5rem)] md:pb-0"
+            : "flex min-h-full flex-col"
+        }
+      >
         <ThemeScript />
         <DesignLanguageStyle preset={siteConfig.acePreset} />
         <JsonLd data={websiteJsonLd()} />
@@ -58,11 +66,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {children}
               </main>
               <SiteFooter />
-              <StickyMobileCTA
-                phone={businessConfig.telephone}
-                primaryLabel="Demander un devis"
-                primaryHref="/contact"
-              />
+              {resolvedFeatures.stickyMobileCta && businessConfig.telephone && (
+                <StickyMobileCTA
+                  phone={businessConfig.telephone}
+                  primaryLabel="Demander un devis"
+                  primaryHref="/contact"
+                />
+              )}
             </SmoothScrollProvider>
           </DeviceQualityProvider>
         </ThemeProvider>

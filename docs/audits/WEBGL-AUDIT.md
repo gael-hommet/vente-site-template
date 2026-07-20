@@ -19,11 +19,11 @@ ne contient que des placeholders légers).
 
 ## 3. Écarts pour ACE
 
-| Constat | Recommandation |
-| --- | --- |
-| `frameloop="demand"` / pause hors-viewport à vérifier scène par scène quand de vraies scènes clients arriveront | En faire un critère de la checklist Scene Library (étape 13) |
-| Pas de bibliothèque de scènes paramétrables — 3 démos ad hoc | Étape 13 : scènes nommées avec contrat (props, assets requis, fallback, budget par tier) |
-| Compression KTX2/Draco outillée (`assets:models` via gltf-transform) mais non exercée (aucun modèle réel) | Valider le pipeline sur le premier vrai modèle client |
+| Constat                                                                                                         | Recommandation                                                                           |
+| --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `frameloop="demand"` / pause hors-viewport à vérifier scène par scène quand de vraies scènes clients arriveront | En faire un critère de la checklist Scene Library (étape 13)                             |
+| Pas de bibliothèque de scènes paramétrables — 3 démos ad hoc                                                    | Étape 13 : scènes nommées avec contrat (props, assets requis, fallback, budget par tier) |
+| Compression KTX2/Draco outillée (`assets:models` via gltf-transform) mais non exercée (aucun modèle réel)       | Valider le pipeline sur le premier vrai modèle client                                    |
 
 ## 4. Verdict
 

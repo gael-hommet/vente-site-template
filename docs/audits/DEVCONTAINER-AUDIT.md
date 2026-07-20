@@ -16,11 +16,11 @@
 
 ## 3. Défauts détectés
 
-| # | Défaut | Gravité | Correctif |
-| --- | --- | --- | --- |
-| 1 | **Playwright browsers non installés au post-create** → e2e cassés sur tout Codespace neuf jusqu'à install manuelle (~1 min + deps apt) | Moyenne | Ajouter une étape best-effort `pnpm exec playwright install chromium --with-deps` dans post-create.sh (warn, jamais bloquant) — fait en stabilisation |
-| 2 | **`.gitattributes` absent** alors que git-lfs est préinstallé : LFS installé mais non configuré | Moyenne | Créer `.gitattributes` couvrant les sources lourdes (`input/assets/**` binaires, `*.glb/.gltf/.hdr/.exr/.ktx2`, masters vidéo) — fait en stabilisation. Les sorties optimisées `public/**` restent en git normal (petites par contrat de pipeline) |
-| 3 | `pnpm.overrides` ignoré (pnpm 10) — voir DEPENDENCY-AUDIT P1 | Moyenne | Déplacer vers `pnpm-workspace.yaml` — fait en stabilisation |
+| #   | Défaut                                                                                                                                 | Gravité | Correctif                                                                                                                                                                                                                                          |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Playwright browsers non installés au post-create** → e2e cassés sur tout Codespace neuf jusqu'à install manuelle (~1 min + deps apt) | Moyenne | Ajouter une étape best-effort `pnpm exec playwright install chromium --with-deps` dans post-create.sh (warn, jamais bloquant) — fait en stabilisation                                                                                              |
+| 2   | **`.gitattributes` absent** alors que git-lfs est préinstallé : LFS installé mais non configuré                                        | Moyenne | Créer `.gitattributes` couvrant les sources lourdes (`input/assets/**` binaires, `*.glb/.gltf/.hdr/.exr/.ktx2`, masters vidéo) — fait en stabilisation. Les sorties optimisées `public/**` restent en git normal (petites par contrat de pipeline) |
+| 3   | `pnpm.overrides` ignoré (pnpm 10) — voir DEPENDENCY-AUDIT P1                                                                           | Moyenne | Déplacer vers `pnpm-workspace.yaml` — fait en stabilisation                                                                                                                                                                                        |
 
 ## 4. Verdict
 

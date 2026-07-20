@@ -57,7 +57,9 @@ export const ANALYTICS_PROVIDERS = ["none", "plausible", "ga4"] as const;
 /* Fragments réutilisables                                                    */
 /* -------------------------------------------------------------------------- */
 
-const localeCode = z.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, "code locale invalide (ex. fr, en-US)");
+const localeCode = z
+  .string()
+  .regex(/^[a-z]{2}(-[A-Z]{2})?$/, "code locale invalide (ex. fr, en-US)");
 
 const postalAddress = z.object({
   streetAddress: z.string().optional(),
@@ -124,7 +126,11 @@ const design = z
     preset: z.string().default("neutral"),
     /** Recommandations de fontes (chargées à la génération, pas au runtime). */
     fonts: z
-      .object({ display: z.string().optional(), sans: z.string().optional(), mono: z.string().optional() })
+      .object({
+        display: z.string().optional(),
+        sans: z.string().optional(),
+        mono: z.string().optional(),
+      })
       .optional(),
     motionIntensity: z.enum(MOTION_INTENSITIES).default("subtle"),
     webglIntensity: z.enum(WEBGL_INTENSITIES).default("none"),

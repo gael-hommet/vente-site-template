@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { loadClientConfig, inspectClientConfig, ClientConfigError } from "@/ace/config/client-loader";
+import {
+  loadClientConfig,
+  inspectClientConfig,
+  ClientConfigError,
+} from "@/ace/config/client-loader";
 import { resolveFeatures, findFeatureConflicts } from "@/ace/config/features";
 import { neutralClientConfig } from "@/ace/config/client-defaults";
 import { clientConfigSchema, type ClientConfigInput } from "@/ace/config/client-schema";
@@ -27,17 +31,43 @@ describe("ACE client contract — validation & défauts", () => {
 
   it("accepte une configuration COMPLÈTE multi-sections", () => {
     const full: ClientConfigInput = {
-      identity: { name: "Hôtel Azur", url: "https://azur.example", locale: "fr-FR", locales: ["fr-FR", "en-US"] },
+      identity: {
+        name: "Hôtel Azur",
+        url: "https://azur.example",
+        locale: "fr-FR",
+        locales: ["fr-FR", "en-US"],
+      },
       industry: "hospitality",
       audience: { primary: "voyageurs premium", segments: ["couples", "affaires"] },
       goals: { primaryConversion: "booking", secondary: ["newsletter"] },
-      design: { preset: "onyx", motionIntensity: "cinematic", webglIntensity: "immersive", density: "spacious", darkMode: true },
+      design: {
+        preset: "onyx",
+        motionIntensity: "cinematic",
+        webglIntensity: "immersive",
+        density: "spacious",
+        darkMode: true,
+      },
       features: { contactForm: true, map: true, i18n: true },
-      recipes: { hero: "media-first", navigation: "immersive-overlay", conversion: "appointment-ready" },
+      recipes: {
+        hero: "media-first",
+        navigation: "immersive-overlay",
+        conversion: "appointment-ready",
+      },
       pages: [{ key: "home", path: "/", title: "Accueil", standard: "home" }],
-      collections: [{ id: "rooms", label: "Chambres", itemLabel: "chambre", kind: "rooms", basePath: "/chambres" }],
+      collections: [
+        {
+          id: "rooms",
+          label: "Chambres",
+          itemLabel: "chambre",
+          kind: "rooms",
+          basePath: "/chambres",
+        },
+      ],
       team: [{ name: "Directrice", role: "Direction" }],
-      form: { kind: "booking", fields: [{ name: "dates", label: "Dates", type: "text", required: true }] },
+      form: {
+        kind: "booking",
+        fields: [{ name: "dates", label: "Dates", type: "text", required: true }],
+      },
       seo: { titleTemplate: "%s · Hôtel Azur", noindex: false },
       analytics: { provider: "plausible", id: "azur.example" },
       privacy: { cookieBanner: true, policyPath: "/confidentialite" },
@@ -61,16 +91,19 @@ describe("ACE client contract — validation & défauts", () => {
     );
     // industrie hors énumération
     expect(() =>
-      loadClientConfig({ identity: { name: "X" }, industry: "aerospace" } as unknown as ClientConfigInput),
+      loadClientConfig({
+        identity: { name: "X" },
+        industry: "aerospace",
+      } as unknown as ClientConfigInput),
     ).toThrow(ClientConfigError);
     // url non-url
-    expect(() =>
-      loadClientConfig({ identity: { name: "X", url: "pas-une-url" } }),
-    ).toThrow(ClientConfigError);
+    expect(() => loadClientConfig({ identity: { name: "X", url: "pas-une-url" } })).toThrow(
+      ClientConfigError,
+    );
     // email invalide
-    expect(() =>
-      loadClientConfig({ identity: { name: "X" }, contact: { email: "nope" } }),
-    ).toThrow(ClientConfigError);
+    expect(() => loadClientConfig({ identity: { name: "X" }, contact: { email: "nope" } })).toThrow(
+      ClientConfigError,
+    );
     // id de collection non slug
     expect(() =>
       loadClientConfig({
@@ -87,12 +120,16 @@ describe("ACE client contract — validation & défauts", () => {
   });
 
   it("REJETTE une recipe inexistante et ACCEPTE des ids valides", () => {
-    expect(() =>
-      loadClientConfig({ identity: { name: "X" }, recipes: { hero: "nope" } }),
-    ).toThrow(ClientConfigError);
+    expect(() => loadClientConfig({ identity: { name: "X" }, recipes: { hero: "nope" } })).toThrow(
+      ClientConfigError,
+    );
     const { config } = loadClientConfig({
       identity: { name: "X" },
-      recipes: { hero: "media-first", navigation: "immersive-overlay", conversion: "premium-inquiry" },
+      recipes: {
+        hero: "media-first",
+        navigation: "immersive-overlay",
+        conversion: "premium-inquiry",
+      },
     });
     expect(config.recipes.hero).toBe("media-first");
   });
@@ -133,16 +170,20 @@ describe("ACE client contract — feature flags & incompatibilités", () => {
     });
     const conflicts = findFeatureConflicts(cfg);
     expect(conflicts.some((c) => c.feature === "webgl")).toBe(true);
-    expect(() => loadClientConfig({ identity: { name: "X" }, design: { webglIntensity: "immersive" }, features: { webgl: false } })).toThrow(
-      ClientConfigError,
-    );
+    expect(() =>
+      loadClientConfig({
+        identity: { name: "X" },
+        design: { webglIntensity: "immersive" },
+        features: { webgl: false },
+      }),
+    ).toThrow(ClientConfigError);
   });
 
   it("détecte i18n=true sans 2 locales, et analytics sans id", () => {
     expect(
-      findFeatureConflicts(clientConfigSchema.parse({ identity: { name: "X" }, features: { i18n: true } })).some(
-        (c) => c.feature === "i18n",
-      ),
+      findFeatureConflicts(
+        clientConfigSchema.parse({ identity: { name: "X" }, features: { i18n: true } }),
+      ).some((c) => c.feature === "i18n"),
     ).toBe(true);
     expect(
       findFeatureConflicts(

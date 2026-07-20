@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 export function EditorialFolio({ brand, links, cta, className }: NavProps) {
   const [open, setOpen] = React.useState(false);
   return (
-    <header className={cn("border-b border-border", className)}>
+    <header className={cn("border-border border-b", className)}>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-6">
         <Link href="/" className="font-display text-xl font-light tracking-tight">
           {brand}
@@ -21,12 +21,19 @@ export function EditorialFolio({ brand, links, cta, className }: NavProps) {
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principale">
           {links.map((l, i) => (
             <Link key={l.href} href={l.href} className="group flex items-baseline gap-1.5 text-sm">
-              <span className="font-mono text-[0.625rem] text-muted">{String(i + 1).padStart(2, "0")}</span>
-              <span className="text-foreground/80 transition-colors group-hover:text-brand">{l.label}</span>
+              <span className="text-muted font-mono text-[0.625rem]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="text-foreground/80 group-hover:text-brand transition-colors">
+                {l.label}
+              </span>
             </Link>
           ))}
           {cta ? (
-            <Link href={cta.href} className="text-sm font-medium text-brand underline-offset-4 hover:underline">
+            <Link
+              href={cta.href}
+              className="text-brand text-sm font-medium underline-offset-4 hover:underline"
+            >
               {cta.label} →
             </Link>
           ) : null}
@@ -42,19 +49,32 @@ export function EditorialFolio({ brand, links, cta, className }: NavProps) {
         </button>
       </div>
       {open ? (
-        <nav className="border-t border-border px-6 py-6 md:hidden" aria-label="Principale (mobile)">
+        <nav
+          className="border-border border-t px-6 py-6 md:hidden"
+          aria-label="Principale (mobile)"
+        >
           <ul className="flex flex-col gap-4">
             {links.map((l, i) => (
               <li key={l.href} className="flex items-baseline gap-2">
-                <span className="font-mono text-[0.625rem] text-muted">{String(i + 1).padStart(2, "0")}</span>
-                <Link href={l.href} className="font-display text-2xl font-light" onClick={() => setOpen(false)}>
+                <span className="text-muted font-mono text-[0.625rem]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <Link
+                  href={l.href}
+                  className="font-display text-2xl font-light"
+                  onClick={() => setOpen(false)}
+                >
                   {l.label}
                 </Link>
               </li>
             ))}
             {cta ? (
               <li className="mt-2">
-                <Link href={cta.href} className="text-brand underline underline-offset-4" onClick={() => setOpen(false)}>
+                <Link
+                  href={cta.href}
+                  className="text-brand underline underline-offset-4"
+                  onClick={() => setOpen(false)}
+                >
                   {cta.label} →
                 </Link>
               </li>

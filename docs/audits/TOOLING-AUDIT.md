@@ -8,14 +8,14 @@
 (ESLint clean, tsc clean, 47/47 tests, build Turbopack — 9 routes dont
 `/api/lead` dynamique).
 
-| Outil | Config | État |
-| --- | --- | --- |
-| TypeScript | `strict: true`, paths `@/*`, moduleResolution bundler | OK |
-| ESLint 9 (flat) | next/core-web-vitals + next/typescript + ignores ciblés + règle unused-vars `^_` | OK |
-| Prettier 3 | + prettier-plugin-tailwindcss ; `format` / `format:check` | OK (non inclus dans `check` — voir §3) |
-| Vitest 4 | jsdom, globals, setup RTL, unit only (e2e exclus) | OK |
+| Outil           | Config                                                                                          | État                                                                |
+| --------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| TypeScript      | `strict: true`, paths `@/*`, moduleResolution bundler                                           | OK                                                                  |
+| ESLint 9 (flat) | next/core-web-vitals + next/typescript + ignores ciblés + règle unused-vars `^_`                | OK                                                                  |
+| Prettier 3      | + prettier-plugin-tailwindcss ; `format` / `format:check`                                       | OK (non inclus dans `check` — voir §3)                              |
+| Vitest 4        | jsdom, globals, setup RTL, unit only (e2e exclus)                                               | OK                                                                  |
 | Playwright 1.61 | 4 projets (chromium desktop/mobile, firefox, webkit), webServer `pnpm start`, PW_DEV=1 pour dev | Chromium installé ; firefox/webkit absents (skip toléré par design) |
-| axe-core | via @axe-core/playwright dans a11y.spec | OK |
+| axe-core        | via @axe-core/playwright dans a11y.spec                                                         | OK                                                                  |
 
 ## 2. Scripts maison
 

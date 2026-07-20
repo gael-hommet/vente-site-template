@@ -44,7 +44,7 @@ export function ImmersiveOverlay({ brand, links, cta, className }: NavProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          className="fixed inset-0 z-50 flex flex-col bg-background"
+          className="bg-background fixed inset-0 z-50 flex flex-col"
         >
           <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6">
             <span className="font-semibold tracking-tight">{brand}</span>
@@ -58,13 +58,16 @@ export function ImmersiveOverlay({ brand, links, cta, className }: NavProps) {
               Fermer ✕
             </button>
           </div>
-          <nav className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-2 px-6 pb-16" aria-label="Principale">
+          <nav
+            className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-2 px-6 pb-16"
+            aria-label="Principale"
+          >
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="font-display text-[clamp(2rem,7vw,4.5rem)] leading-tight font-light text-foreground/85 transition-colors hover:text-brand"
+                className="font-display text-foreground/85 hover:text-brand text-[clamp(2rem,7vw,4.5rem)] leading-tight font-light transition-colors"
               >
                 {l.label}
               </Link>
@@ -73,7 +76,7 @@ export function ImmersiveOverlay({ brand, links, cta, className }: NavProps) {
               <Link
                 href={cta.href}
                 onClick={() => setOpen(false)}
-                className="mt-6 inline-flex h-12 w-fit items-center rounded-[var(--radius-md)] bg-brand px-7 text-base font-medium text-brand-foreground"
+                className="bg-brand text-brand-foreground mt-6 inline-flex h-12 w-fit items-center rounded-[var(--radius-md)] px-7 text-base font-medium"
               >
                 {cta.label}
               </Link>

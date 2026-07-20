@@ -1,9 +1,13 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
+import { resolvedFeatures } from "@/config/features.generated";
 
 /**
  * Sitemap — the starter's public routes. Internal pages (/lab, /ace-lab,
  * /engine) and noindex pages (mentions légales) are intentionally excluded.
+ * The collection route only exists when `features.collections` is active —
+ * the generator prunes `src/app/realisations` otherwise (see new-site.mjs),
+ * so this list must stay in sync with resolved features, not hardcoded.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -16,7 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     route("/", 1),
     route("/offre", 0.9),
-    route("/realisations", 0.7),
+    ...(resolvedFeatures.collections ? [route("/realisations", 0.7)] : []),
     route("/a-propos", 0.6),
     route("/contact", 0.8),
   ];

@@ -59,9 +59,9 @@ export function loadClientConfig(input: ClientConfigInput): LoadedClientConfig {
 }
 
 /** Validation « douce » : renvoie le résultat sans lever (pour un rapport/UI). */
-export function inspectClientConfig(input: ClientConfigInput):
-  | { ok: true; loaded: LoadedClientConfig }
-  | { ok: false; issues: string[] } {
+export function inspectClientConfig(
+  input: ClientConfigInput,
+): { ok: true; loaded: LoadedClientConfig } | { ok: false; issues: string[] } {
   try {
     return { ok: true, loaded: loadClientConfig(input) };
   } catch (e) {

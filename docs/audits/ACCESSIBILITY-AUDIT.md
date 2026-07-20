@@ -15,11 +15,11 @@
 
 ## 2. Points de vigilance pour la suite
 
-| Constat | Recommandation |
-| --- | --- |
-| Pas encore d'intro cinématique réelle → le bouton « Passer l'intro » n'existe que comme règle | L'imposer dans le contrat de la Motion/Scene Library : toute séquence > durée seuil expose un skip |
-| CTA-atteignable-pendant-pin non testé automatiquement | Spec e2e à ajouter dès les premières sections épinglées réelles |
-| Sous-titres/transcription vidéo : outillé (règles + pipeline) mais aucun média parlant à ce jour | Vérifier au premier asset vidéo client |
+| Constat                                                                                          | Recommandation                                                                                     |
+| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Pas encore d'intro cinématique réelle → le bouton « Passer l'intro » n'existe que comme règle    | L'imposer dans le contrat de la Motion/Scene Library : toute séquence > durée seuil expose un skip |
+| CTA-atteignable-pendant-pin non testé automatiquement                                            | Spec e2e à ajouter dès les premières sections épinglées réelles                                    |
+| Sous-titres/transcription vidéo : outillé (règles + pipeline) mais aucun média parlant à ce jour | Vérifier au premier asset vidéo client                                                             |
 
 ## 3. Verdict
 

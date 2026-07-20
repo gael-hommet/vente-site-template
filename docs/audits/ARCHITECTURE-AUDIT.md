@@ -21,12 +21,12 @@ Application unique App Router. Séparation nette en couches :
 
 ## 3. Écarts vis-à-vis de la cible ACE
 
-| Manque | Impact | Phase |
-| --- | --- | --- |
+| Manque                                                                                                                      | Impact                                                                                                           | Phase          |
+| --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------- |
 | Pas de couche « moteur » nommée (`src/ace/` ou packages/) — le moteur et le site de démo cohabitent dans les mêmes dossiers | La frontière engine/site n'est pas explicite ; la mise à jour du moteur sur un site client existant est manuelle | Fondations ACE |
-| Pas de générateur `ace:new-site` | Créer un site client = cloner + éditer à la main | Étape 8 |
-| Pas de presets de direction artistique (Design Language) ni de bibliothèque de motions/scènes nommées | Chaque site repart des composants bruts | Étapes 11–13 |
-| Pas d'ACE Score / Review Board | La qualité repose sur `pnpm check` + audits manuels | Étape 15 |
+| Pas de générateur `ace:new-site`                                                                                            | Créer un site client = cloner + éditer à la main                                                                 | Étape 8        |
+| Pas de presets de direction artistique (Design Language) ni de bibliothèque de motions/scènes nommées                       | Chaque site repart des composants bruts                                                                          | Étapes 11–13   |
+| Pas d'ACE Score / Review Board                                                                                              | La qualité repose sur `pnpm check` + audits manuels                                                              | Étape 15       |
 
 ## 4. Décision Option A vs Option B
 

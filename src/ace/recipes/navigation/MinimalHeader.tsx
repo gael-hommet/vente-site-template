@@ -13,14 +13,23 @@ import { cn } from "@/lib/utils";
 export function MinimalHeader({ brand, links, cta, className }: NavProps) {
   const [open, setOpen] = React.useState(false);
   return (
-    <header className={cn("sticky top-0 z-40 border-b border-border/60 bg-surface/80 backdrop-blur", className)}>
+    <header
+      className={cn(
+        "border-border/60 bg-surface/80 sticky top-0 z-40 border-b backdrop-blur",
+        className,
+      )}
+    >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-6">
         <Link href="/" className="font-semibold tracking-tight">
           {brand}
         </Link>
         <nav className="hidden items-center gap-6 md:flex" aria-label="Principale">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="text-sm text-muted transition-colors hover:text-foreground">
+            <Link
+              key={l.href}
+              href={l.href}
+              className="text-muted hover:text-foreground text-sm transition-colors"
+            >
               {l.label}
             </Link>
           ))}
@@ -29,7 +38,7 @@ export function MinimalHeader({ brand, links, cta, className }: NavProps) {
           {cta ? (
             <Link
               href={cta.href}
-              className="hidden h-9 items-center rounded-[var(--radius-sm)] bg-brand px-4 text-sm font-medium text-brand-foreground hover:bg-brand-strong md:inline-flex"
+              className="bg-brand text-brand-foreground hover:bg-brand-strong hidden h-9 items-center rounded-[var(--radius-sm)] px-4 text-sm font-medium md:inline-flex"
             >
               {cta.label}
             </Link>
@@ -39,18 +48,25 @@ export function MinimalHeader({ brand, links, cta, className }: NavProps) {
             aria-expanded={open}
             aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex size-9 items-center justify-center rounded-[var(--radius-sm)] border border-border md:hidden"
+            className="border-border inline-flex size-9 items-center justify-center rounded-[var(--radius-sm)] border md:hidden"
           >
             <span aria-hidden>{open ? "✕" : "≡"}</span>
           </button>
         </div>
       </div>
       {open ? (
-        <nav className="border-t border-border/60 bg-surface px-6 py-4 md:hidden" aria-label="Principale (mobile)">
+        <nav
+          className="border-border/60 bg-surface border-t px-6 py-4 md:hidden"
+          aria-label="Principale (mobile)"
+        >
           <ul className="flex flex-col gap-3">
             {links.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="text-base text-foreground" onClick={() => setOpen(false)}>
+                <Link
+                  href={l.href}
+                  className="text-foreground text-base"
+                  onClick={() => setOpen(false)}
+                >
                   {l.label}
                 </Link>
               </li>
@@ -59,7 +75,7 @@ export function MinimalHeader({ brand, links, cta, className }: NavProps) {
               <li>
                 <Link
                   href={cta.href}
-                  className="inline-flex h-10 items-center rounded-[var(--radius-sm)] bg-brand px-4 text-sm font-medium text-brand-foreground"
+                  className="bg-brand text-brand-foreground inline-flex h-10 items-center rounded-[var(--radius-sm)] px-4 text-sm font-medium"
                   onClick={() => setOpen(false)}
                 >
                   {cta.label}

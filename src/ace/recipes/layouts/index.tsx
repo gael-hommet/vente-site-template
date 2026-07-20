@@ -7,7 +7,13 @@ import { cn } from "@/lib/utils";
  * vertical). Le contenu (recipes de page) est passé en `children`.
  */
 
-function Shell({ header, children, footer, className, mainClass }: LayoutProps & { mainClass: string }) {
+function Shell({
+  header,
+  children,
+  footer,
+  className,
+  mainClass,
+}: LayoutProps & { mainClass: string }) {
   return (
     <div className={cn("flex min-h-full flex-col", className)}>
       {header}

@@ -15,11 +15,11 @@
 
 ## 2. Limites actuelles
 
-| Constat | Impact | Recommandation |
-| --- | --- | --- |
+| Constat                                                                | Impact                                                              | Recommandation                                                                                                           |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Pas de mesure CWV automatisée (Lighthouse/bundle budget chiffré en CI) | Les budgets de `docs/PERFORMANCE-BUDGET.md` ne sont pas exécutoires | Intégrer une mesure dans l'ACE Score (étape 15) : audit Lighthouse local + taille de bundle par route comparée au budget |
-| `pnpm audit:site` existe mais ne mesure pas la perf runtime | idem | Étendre audit-site.mjs ou l'adosser à l'ACE Score |
-| Aucune vraie page riche encore (la home de démo est légère) | Les chiffres actuels ne prédisent pas un site client complet | Mesurer sur le starter neutre (étape 6) puis sur IN QUARTO |
+| `pnpm audit:site` existe mais ne mesure pas la perf runtime            | idem                                                                | Étendre audit-site.mjs ou l'adosser à l'ACE Score                                                                        |
+| Aucune vraie page riche encore (la home de démo est légère)            | Les chiffres actuels ne prédisent pas un site client complet        | Mesurer sur le starter neutre (étape 6) puis sur IN QUARTO                                                               |
 
 ## 3. Verdict
 
