@@ -418,4 +418,97 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(generated).not.toMatch(/"[a-zA-Z]+":\s/); // clés citées = style JSON.stringify, pas Prettier
     expect(generated).toMatch(/darkMode: (true|false),\n};\n$/); // virgule finale avant l'accolade
   });
+
+  it("câble la home et l'en-tête sur les recipes sélectionnées (rendu config-driven)", () => {
+    const out = tmpOut("config-driven");
+    const cfgPath = path.join(tmpdir(), `ace-cli-cfgdriven-${Date.now()}.config.ts`);
+    writeFileSync(
+      cfgPath,
+      `import type { ClientConfigInput } from "@/ace/config";\nconst config: ClientConfigInput = { identity: { name: "Driven" }, recipes: { hero: "media-first", navigation: "immersive-overlay", storytelling: "immersive-scroll", conversion: "premium-inquiry" } };\nexport default config;\n`,
+    );
+    try {
+      const res = runCli([
+        "--name",
+        "Driven",
+        "--out",
+        out,
+        "--config",
+        cfgPath,
+        "--skip-install",
+        "--skip-check",
+      ]);
+      expect(res.status).toBe(0);
+      // page.tsx délègue à ConfiguredHome.
+      const page = readFileSync(path.join(out, "src/app/page.tsx"), "utf8");
+      expect(page).toContain("ConfiguredHome");
+      // layout.tsx utilise ConfiguredHeader (plus SiteHeader).
+      const layout = readFileSync(path.join(out, "src/app/layout.tsx"), "utf8");
+      expect(layout).toContain("ConfiguredHeader");
+      expect(layout).not.toMatch(/<SiteHeader\s*\/>/);
+      // client.resolved.ts reflète la sélection.
+      const resolved = readFileSync(path.join(out, "src/config/client.resolved.ts"), "utf8");
+      expect(resolved).toMatch(/hero: "media-first"/);
+      expect(resolved).toMatch(/navigation: "immersive-overlay"/);
+      expect(resolved).toMatch(/storytelling: "immersive-scroll"/);
+      // site-content.ts existe.
+      expect(existsSync(path.join(out, "src/config/site-content.ts"))).toBe(true);
+    } finally {
+      rmSync(cfgPath, { force: true });
+    }
+  });
+
+  it("consomme un content.json fourni via --content", () => {
+    const out = tmpOut("content-json");
+    const cfgPath = path.join(tmpdir(), `ace-cli-content-${Date.now()}.config.ts`);
+    const contentDir = mkdtempSync(path.join(tmpdir(), "ace-cli-contentdir-"));
+    writeFileSync(
+      cfgPath,
+      `import type { ClientConfigInput } from "@/ace/config";\nconst config: ClientConfigInput = { identity: { name: "Contenu" } };\nexport default config;\n`,
+    );
+    writeFileSync(
+      path.join(contentDir, "content.json"),
+      JSON.stringify({
+        hero: {
+          eyebrow: "MARQUEUR-HERO-EYEBROW",
+          title: "Titre depuis content.json",
+          subtitle: "Sous-titre",
+          primaryCta: { label: "Agir", href: "/contact" },
+          secondaryCta: { label: "Voir", href: "#story" },
+          media: null,
+        },
+        story: {
+          heading: "Récit",
+          chapters: [{ eyebrow: "01", title: "Ch1", body: "Corps." }],
+        },
+        collection: { heading: "Coll", itemLabel: "item", items: [] },
+        conversion: {
+          title: "Conversion",
+          description: "Desc",
+          primaryCta: { label: "Agir", href: "/contact" },
+        },
+        nav: [{ label: "Accueil", href: "/" }],
+      }),
+    );
+    try {
+      const res = runCli([
+        "--name",
+        "Contenu",
+        "--out",
+        out,
+        "--config",
+        cfgPath,
+        "--content",
+        contentDir,
+        "--skip-install",
+        "--skip-check",
+      ]);
+      expect(res.status).toBe(0);
+      const siteContent = readFileSync(path.join(out, "src/config/site-content.ts"), "utf8");
+      expect(siteContent).toContain("Titre depuis content.json");
+      expect(siteContent).toContain("MARQUEUR-HERO-EYEBROW");
+    } finally {
+      rmSync(cfgPath, { force: true });
+      rmSync(contentDir, { recursive: true, force: true });
+    }
+  });
 });

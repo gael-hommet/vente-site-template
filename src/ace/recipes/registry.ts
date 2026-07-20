@@ -245,18 +245,23 @@ export const hasHeroRecipe = (id: string) => heroes.has(id);
 
 export const NAVIGATION_RECIPES = navigation.list();
 export const getNavigationRecipe = (id: string) => navigation.get(id);
+export const hasNavigationRecipe = (id: string) => navigation.has(id);
 
 export const PROJECTS_RECIPES = projects.list();
 export const getProjectsRecipe = (id: string) => projects.get(id);
+export const hasProjectsRecipe = (id: string) => projects.has(id);
 
 export const STORYTELLING_RECIPES = storytelling.list();
 export const getStorytellingRecipe = (id: string) => storytelling.get(id);
+export const hasStorytellingRecipe = (id: string) => storytelling.has(id);
 
 export const CONVERSION_RECIPES = conversion.list();
 export const getConversionRecipe = (id: string) => conversion.get(id);
+export const hasConversionRecipe = (id: string) => conversion.has(id);
 
 export const LAYOUT_RECIPES = layouts.list();
 export const getLayoutRecipe = (id: string) => layouts.get(id);
+export const hasLayoutRecipe = (id: string) => layouts.has(id);
 
 export const MOTION_PROFILE_LIST = motionProfiles.list();
 export const getMotionProfile = (id: string) => motionProfiles.get(id);

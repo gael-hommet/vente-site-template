@@ -68,6 +68,8 @@ Arguments :
   --config <chemin>     optionnel. Configuration client TS (défaut :
                          input/client.config.ts si présent).
   --assets <dossier>    optionnel. Dossier d'assets à copier + inventorier.
+  --content <dossier>   optionnel. Dossier contenant content.json (contenu
+                         éditorial). Défaut : <dossier du config>/content.
   --out <chemin>        requis. Dossier cible (doit être vide ou absent).
   --url <origine>       optionnel. Origine absolue (canonical/OG/sitemap).
   --force                écrase un dossier de sortie non vide.
@@ -85,6 +87,7 @@ const slugArg = opt("--slug");
 const briefArg = opt("--brief");
 const configArg = opt("--config") ?? "input/client.config.ts";
 const assetsArg = opt("--assets");
+const contentArg = opt("--content");
 const url = opt("--url");
 const force = flag("--force");
 const skipInstall = flag("--skip-install");
@@ -126,6 +129,10 @@ const briefPath = briefArg
   : path.join(ROOT, "input/CLIENT_BRIEF.md");
 if (!existsSync(briefPath)) {
   die(`brief introuvable : ${briefPath} (--brief)`);
+}
+
+if (contentArg && !existsSync(path.resolve(process.cwd(), contentArg))) {
+  die(`dossier de contenu introuvable : ${path.resolve(process.cwd(), contentArg)} (--content)`);
 }
 
 const assetsPath = assetsArg ? path.resolve(process.cwd(), assetsArg) : null;
@@ -387,6 +394,159 @@ writeFileSync(
   path.join(extracted, "src/config/client.resolved.json"),
   JSON.stringify(clientConfig, null, 2) + "\n",
 );
+
+/* -------------------------------------------------------------------------- */
+/* Sélection de recipes résolue (src/config/client.resolved.ts) — pilote la    */
+/* home config-driven (ConfiguredHome) et l'en-tête (ConfiguredHeader).        */
+/* -------------------------------------------------------------------------- */
+const resolvedSelection = {
+  hero: clientConfig.recipes.hero ?? "typographic",
+  navigation: clientConfig.recipes.navigation ?? "minimal-header",
+  projects: clientConfig.recipes.projects ?? "visual-grid",
+  storytelling: clientConfig.recipes.storytelling ?? "linear-sections",
+  conversion: clientConfig.recipes.conversion ?? "minimal-contact",
+  layout: clientConfig.recipes.layout ?? "editorial-layout",
+};
+const resolvedClientTs = `/**
+ * Sélection de recipes + Design Language RÉSOLUS — générés par ace:new-site
+ * depuis ${path.basename(configArg)}. Réécrit à chaque génération ; ne pas
+ * éditer à la main. Consommé par ConfiguredHome/ConfiguredHeader.
+ */
+import type { ResolvedClientMeta } from "./client.resolved.types";
+
+export const resolvedClient: ResolvedClientMeta = {
+  recipes: {
+    hero: ${JSON.stringify(resolvedSelection.hero)},
+    navigation: ${JSON.stringify(resolvedSelection.navigation)},
+    projects: ${JSON.stringify(resolvedSelection.projects)},
+    storytelling: ${JSON.stringify(resolvedSelection.storytelling)},
+    conversion: ${JSON.stringify(resolvedSelection.conversion)},
+    layout: ${JSON.stringify(resolvedSelection.layout)},
+  },
+  motionIntensity: ${JSON.stringify(clientConfig.design.motionIntensity)},
+  webglIntensity: ${JSON.stringify(clientConfig.design.webglIntensity)},
+  density: ${JSON.stringify(clientConfig.design.density)},
+};
+`;
+writeFileSync(path.join(extracted, "src/config/client.resolved.ts"), resolvedClientTs);
+
+/* -------------------------------------------------------------------------- */
+/* Contenu éditorial (src/config/site-content.ts). Source : --content/content  */
+/* .json si fourni, sinon un contenu neutre dérivé de l'identité + du contrat.  */
+/* -------------------------------------------------------------------------- */
+const contentDir = contentArg
+  ? path.resolve(process.cwd(), contentArg)
+  : path.join(path.dirname(configPath), "content");
+let siteContentData = null;
+const contentJsonPath = path.join(contentDir, "content.json");
+if (existsSync(contentJsonPath)) {
+  try {
+    siteContentData = JSON.parse(readFileSync(contentJsonPath, "utf8"));
+  } catch (e) {
+    die(
+      `content.json invalide (${contentJsonPath}) : ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
+  console.log(`✓ contenu éditorial chargé : ${path.relative(process.cwd(), contentJsonPath)}`);
+}
+if (!siteContentData) {
+  // Contenu NEUTRE dérivé du contrat — aucun fait inventé, marqueurs explicites.
+  const primaryCtaLabel =
+    {
+      contact: "Nous contacter",
+      quote: "Demander un devis",
+      booking: "Réserver",
+      inquiry: "Nous écrire",
+      subscribe: "S'abonner",
+      purchase: "Découvrir",
+    }[clientConfig.goals.primaryConversion] ?? "Nous contacter";
+  siteContentData = {
+    hero: {
+      eyebrow: clientConfig.identity.tagline ?? "[À CONFIRMER — accroche]",
+      title: clientConfig.identity.name,
+      subtitle: clientConfig.seo?.defaultDescription ?? "[À CONFIRMER — description]",
+      primaryCta: { label: primaryCtaLabel, href: "/contact" },
+      secondaryCta: { label: "Découvrir", href: "#story" },
+      media: null,
+    },
+    story: {
+      heading: "[À CONFIRMER — titre de section]",
+      intro: "[À CONFIRMER — introduction]",
+      chapters: [
+        { eyebrow: "01", title: "[À CONFIRMER]", body: "[À CONFIRMER — contenu du chapitre]" },
+        { eyebrow: "02", title: "[À CONFIRMER]", body: "[À CONFIRMER — contenu du chapitre]" },
+        { eyebrow: "03", title: "[À CONFIRMER]", body: "[À CONFIRMER — contenu du chapitre]" },
+      ],
+    },
+    collection: {
+      heading: "[À CONFIRMER — titre de collection]",
+      intro: "[À CONFIRMER]",
+      itemLabel: clientConfig.collections?.[0]?.itemLabel ?? "élément",
+      items: [
+        { title: "[À CONFIRMER]", href: "/realisations", meta: ["[À CONFIRMER]"], media: null },
+        { title: "[À CONFIRMER]", href: "/realisations", meta: ["[À CONFIRMER]"], media: null },
+      ],
+    },
+    conversion: {
+      title: "[À CONFIRMER — appel à l'action]",
+      description: "[À CONFIRMER]",
+      primaryCta: { label: primaryCtaLabel, href: "/contact" },
+    },
+    nav: (clientConfig.pages ?? [])
+      .filter((p) => p.enabled !== false)
+      .map((p) => ({ label: p.title, href: p.path })),
+  };
+  if (siteContentData.nav.length === 0) {
+    siteContentData.nav = [
+      { label: "Accueil", href: "/" },
+      { label: "Contact", href: "/contact" },
+    ];
+  }
+}
+const siteContentTs = `import type { SiteContent } from "./site-content.types";
+
+/**
+ * Contenu éditorial du site, généré par ace:new-site. Réécrit à chaque
+ * génération ; ne pas éditer à la main. Tout marqueur [À CONFIRMER] doit être
+ * remplacé par un fait vérifié avant publication.
+ */
+export const siteContent: SiteContent = ${JSON.stringify(siteContentData, null, 2)};
+`;
+writeFileSync(path.join(extracted, "src/config/site-content.ts"), siteContentTs);
+console.log("✓ recipes résolues + contenu éditorial générés");
+
+/* -------------------------------------------------------------------------- */
+/* Rewrite de la home et de l'en-tête vers le rendu config-driven.             */
+/* -------------------------------------------------------------------------- */
+const homePageTs = `import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo/metadata";
+import { ConfiguredHome } from "@/components/site/ConfiguredHome";
+import { siteContent } from "@/config/site-content";
+
+export const metadata: Metadata = buildMetadata({
+  title: "Accueil",
+  description: siteContent.hero.subtitle,
+  path: "/",
+});
+
+/** Home config-driven : monte les recipes sélectionnées (voir ConfiguredHome). */
+export default function HomePage() {
+  return <ConfiguredHome />;
+}
+`;
+writeFileSync(path.join(extracted, "src/app/page.tsx"), homePageTs);
+
+// layout.tsx : remplace SiteHeader par ConfiguredHeader (recipe de navigation).
+const layoutPath = path.join(extracted, "src/app/layout.tsx");
+let layoutSrc = readFileSync(layoutPath, "utf8");
+layoutSrc = layoutSrc
+  .replace(
+    'import { SiteHeader } from "@/components/layout/site-header";',
+    'import { ConfiguredHeader } from "@/components/site/ConfiguredHeader";',
+  )
+  .replace(/<SiteHeader\s*\/>/, "<ConfiguredHeader />");
+writeFileSync(layoutPath, layoutSrc);
+console.log("✓ home + en-tête câblés sur les recipes sélectionnées");
 
 // package.json : nom du site + retrait du script du générateur (scripts/ace
 // est élagué — la commande "ace:new-site" n'aurait plus de fichier à exécuter).
