@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
 
 /**
  * ACE — Contrat des RECIPES.
@@ -98,4 +98,48 @@ export interface ConversionProps {
   primaryCta: RecipeCta;
   phone?: string;
   className?: string;
+}
+
+export interface LayoutProps {
+  header: ReactNode;
+  children: ReactNode;
+  footer: ReactNode;
+  className?: string;
+}
+
+/**
+ * Profil Motion : orchestration de haut niveau (pas une réimplémentation de
+ * GSAP/Motion/Lenis). Décrit l'intensité et les réglages que les recettes lisent
+ * (durées, easings, reveal on scroll, smooth-scroll).
+ */
+export interface MotionProfile {
+  id: string;
+  title: string;
+  description: string;
+  /** Smooth-scroll (Lenis) actif. */
+  smoothScroll: boolean;
+  /** Reveal des sections au scroll. */
+  revealOnScroll: boolean;
+  /** Multiplicateur de durée global (0 = quasi-instantané). */
+  durationScale: number;
+  /** Easing d'entrée par défaut (token CSS). */
+  ease: "linear" | "out-soft" | "in-out-soft" | "emphasized";
+  /** Décalage de stagger (s) entre éléments d'un groupe. */
+  stagger: number;
+}
+
+/**
+ * Profil d'intégration de scène : COMMENT une scène s'insère (pas une nouvelle
+ * scène). Détermine si/où le WebGL apparaît et son intensité.
+ */
+export interface SceneProfile {
+  id: string;
+  title: string;
+  description: string;
+  /** Aucune scène = pur DOM/SVG. */
+  enabled: boolean;
+  /** Rôle de la scène dans la page. */
+  placement: "none" | "accent" | "focus" | "environment";
+  /** Tier minimal pour monter le Canvas. */
+  minTier: "LITE" | "BALANCED" | "ULTRA";
 }

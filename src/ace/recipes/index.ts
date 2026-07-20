@@ -15,15 +15,33 @@ export type {
   StorytellingProps,
   StoryChapter,
   ConversionProps,
+  LayoutProps,
+  MotionProfile,
+  SceneProfile,
 } from "./types";
 
 export {
   HERO_RECIPES,
   getHeroRecipe,
   hasHeroRecipe,
+  NAVIGATION_RECIPES,
+  getNavigationRecipe,
+  PROJECTS_RECIPES,
+  getProjectsRecipe,
+  STORYTELLING_RECIPES,
+  getStorytellingRecipe,
+  CONVERSION_RECIPES,
+  getConversionRecipe,
+  LAYOUT_RECIPES,
+  getLayoutRecipe,
+  MOTION_PROFILE_LIST,
+  getMotionProfile,
+  SCENE_PROFILE_LIST,
+  getSceneProfile,
   RECIPE_FAMILIES,
+  validateRecipeSelection,
+  type RecipeSelectionIssue,
 } from "./registry";
 
-export { TypographicHero } from "./heroes/TypographicHero";
-export { MediaFirstHero } from "./heroes/MediaFirstHero";
-export { SplitNarrativeHero } from "./heroes/SplitNarrativeHero";
+export { MOTION_PROFILES } from "./motion/profiles";
+export { SCENE_PROFILES } from "./scenes/profiles";

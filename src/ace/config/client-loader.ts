@@ -1,5 +1,6 @@
 import { clientConfigSchema, type ClientConfig, type ClientConfigInput } from "./client-schema";
 import { findFeatureConflicts, resolveFeatures, type ResolvedFeatures } from "./features";
+import { validateRecipeSelection } from "@/ace/recipes/catalog";
 
 /**
  * Charge et valide une configuration client. Applique les défauts (parsing Zod),
@@ -42,6 +43,15 @@ export function loadClientConfig(input: ClientConfigInput): LoadedClientConfig {
     throw new ClientConfigError(
       `Combinaisons de features incompatibles (${conflicts.length}).`,
       conflicts.map((c) => `${c.feature} : ${c.message}`),
+    );
+  }
+
+  // Les recipes sélectionnées doivent exister (sinon échec propre).
+  const recipeIssues = validateRecipeSelection(config.recipes);
+  if (recipeIssues.length > 0) {
+    throw new ClientConfigError(
+      `Recipe(s) inconnue(s) (${recipeIssues.length}).`,
+      recipeIssues.map((i) => `${i.family}="${i.id}" inconnu (dispo : ${i.available.join(", ")}).`),
     );
   }
 

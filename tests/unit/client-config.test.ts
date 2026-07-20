@@ -85,6 +85,17 @@ describe("ACE client contract — validation & défauts", () => {
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.issues.join(" ")).toMatch(/name/i);
   });
+
+  it("REJETTE une recipe inexistante et ACCEPTE des ids valides", () => {
+    expect(() =>
+      loadClientConfig({ identity: { name: "X" }, recipes: { hero: "nope" } }),
+    ).toThrow(ClientConfigError);
+    const { config } = loadClientConfig({
+      identity: { name: "X" },
+      recipes: { hero: "media-first", navigation: "immersive-overlay", conversion: "premium-inquiry" },
+    });
+    expect(config.recipes.hero).toBe("media-first");
+  });
 });
 
 describe("ACE client contract — feature flags & incompatibilités", () => {
