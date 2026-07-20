@@ -230,9 +230,17 @@ const STUDIO_ONLY_COMPONENTS = ["src/components/EngineStatus.tsx"];
 const ENGINE_ONLY_TESTS = [
   "tests/unit/engine-internal.test.tsx",
   "tests/unit/recipe-matrix.test.tsx",
+  // home-content teste la home STARTER du moteur (« Votre promesse », preuve,
+  // offre, FAQ). Un site généré remplace page.tsx par ConfiguredHome → ce test
+  // n'a plus de sens côté client (configured-home.test.tsx le remplace).
+  "tests/unit/home-content.test.tsx",
   "tests/e2e/lab.spec.ts",
   "tests/e2e/ace-lab.spec.ts",
   "tests/e2e/a11y-engine-internal.spec.ts",
+  // home-starter teste la home STARTER + les pages de démo /offre-/realisations
+  // et /engine — remplacées/absentes dans un site client (home.spec.ts couvre
+  // l'universel).
+  "tests/e2e/home-starter.spec.ts",
 ];
 // Le générateur lui-même : un site client ne régénère jamais de site depuis
 // lui-même (et `git archive HEAD` y échouerait de toute façon, le site
@@ -628,6 +636,34 @@ if (!resolvedFeatures.collections) {
 // features.contactForm=false : la route /contact reste (coordonnées), mais on
 // consigne l'état dans le rapport plutôt que de supprimer une fondation dont
 // la suppression casserait les mises à jour futures.
+
+/* -------------------------------------------------------------------------- */
+/* Formatage Prettier des fichiers TS générés (site-content, client.resolved,  */
+/* page.tsx, layout.tsx…). JSON.stringify produit un style non conforme ; on   */
+/* laisse Prettier normaliser pour que le gate format:check du site passe.      */
+/* -------------------------------------------------------------------------- */
+const GENERATED_TS_ABS = [
+  "src/config/site-content.ts",
+  "src/config/client.resolved.ts",
+  "src/config/features.generated.ts",
+  "src/app/page.tsx",
+  "src/app/layout.tsx",
+  "src/app/robots.ts",
+  "src/app/sitemap.ts",
+]
+  .map((rel) => path.join(extracted, rel))
+  .filter((abs) => existsSync(abs));
+try {
+  // Chemins ABSOLUS du staging : Prettier utilise le binaire + la config du
+  // moteur mais n'écrit QUE dans le staging (jamais dans le dépôt moteur).
+  execFileSync("pnpm", ["exec", "prettier", "--write", ...GENERATED_TS_ABS], {
+    cwd: ROOT,
+    stdio: "pipe",
+  });
+  console.log("✓ fichiers générés formatés (Prettier)");
+} catch (e) {
+  console.log(`⚠ formatage Prettier des fichiers générés ignoré : ${e.message ?? e}`);
+}
 
 /* -------------------------------------------------------------------------- */
 /* J. Contrôle anti-fuite                                                     */
