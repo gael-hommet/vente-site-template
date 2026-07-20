@@ -27,6 +27,21 @@ const brandTokensSchema = z.object({
   shadowGlow: z.string().optional(),
 });
 
+/**
+ * Palette de surfaces (fond, encre, surfaces, muted, bordure). Permet à une DA
+ * de changer PROFONDÉMENT l'ambiance (clair chaud vs sombre précis…) : les mêmes
+ * composants, pilotés par ces tokens, rendent alors très différemment.
+ */
+const surfaceTokensSchema = z.object({
+  background: oklchColor,
+  foreground: oklchColor,
+  surface: oklchColor,
+  surface2: oklchColor,
+  surface3: oklchColor,
+  muted: oklchColor,
+  border: oklchColor,
+});
+
 export const designLanguageSchema = z.object({
   id: z.string().regex(/^[a-z][a-z0-9-]*$/),
   title: z.string().min(2),
@@ -46,14 +61,44 @@ export const designLanguageSchema = z.object({
     })
     .partial()
     .optional(),
+  /** Palette de surfaces par thème (ambiance profonde). Optionnel. */
+  surfaces: z
+    .object({
+      light: surfaceTokensSchema,
+      dark: surfaceTokensSchema,
+    })
+    .optional(),
+  /** Ombres (élévation) : dures vs douces. Valeurs CSS complètes. Optionnel. */
+  shadows: z
+    .object({
+      sm: z.string(),
+      md: z.string(),
+      lg: z.string(),
+    })
+    .partial()
+    .optional(),
+  /**
+   * Densité de composition : largeur de contenu + rythme vertical de section.
+   * Émis en tokens `--content-width` / `--section-space` que les layouts et
+   * recipes peuvent adopter. Optionnel.
+   */
+  density: z
+    .object({
+      contentWidth: z.string().optional(),
+      sectionSpace: z.string().optional(),
+    })
+    .optional(),
   /** Generator-time recommendations (not applied at runtime). */
   recommends: z
     .object({
       displayFont: z.string().optional(),
       pairing: z.string().optional(),
+      /** Échelle typographique recommandée (appliquée à la génération). */
+      typeScale: z.string().optional(),
     })
     .optional(),
 });
 
 export type DesignLanguagePreset = z.infer<typeof designLanguageSchema>;
 export type BrandTokens = z.infer<typeof brandTokensSchema>;
+export type SurfaceTokens = z.infer<typeof surfaceTokensSchema>;

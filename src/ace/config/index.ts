@@ -3,6 +3,7 @@ import { designLanguageSchema, type DesignLanguagePreset } from "./design-langua
 import { neutralPreset } from "./presets/neutral";
 import { onyxPreset } from "./presets/onyx";
 import { atelierPreset } from "./presets/atelier";
+import { VALIDATION_PRESETS } from "./presets/validation";
 
 export {
   designLanguageSchema,
@@ -42,12 +43,17 @@ export {
   type Rgb,
 } from "./contrast";
 
-/** All shipped presets, schema-validated at module load (fail fast). */
+/** All shipped presets + validation profiles, schema-validated at load (fail fast). */
 export const DESIGN_PRESETS: readonly DesignLanguagePreset[] = [
   neutralPreset,
   onyxPreset,
   atelierPreset,
+  ...VALIDATION_PRESETS,
 ].map((p) => designLanguageSchema.parse(p));
+
+export { VALIDATION_PRESETS } from "./presets/validation";
+export type { SurfaceTokens } from "./design-language";
+export { surfaceTokensToCssVars } from "./resolve";
 
 const registry = createRegistry("design-language", DESIGN_PRESETS);
 

@@ -47,6 +47,10 @@
   --radius-xl: 1.5rem;
   --radius-2xl: 2rem;
 
+  /* Composition (Design Language : densité). Adoptés par les layouts/recipes. */
+  --content-width: 72rem;
+  --section-space: 6rem;
+
   /* Elevation / shadows */
   --shadow-sm: 0 1px 2px oklch(0.2 0.03 260 / 0.08);
   --shadow-md: 0 6px 20px oklch(0.2 0.03 260 / 0.1);

@@ -48,6 +48,19 @@ describe("ace-config design language", () => {
         "--radius-md",
         "--radius-lg",
         "--radius-xl",
+        // Axes profonds (surfaces / ombres / densité) — tous déclarés dans globals.css.
+        "--background",
+        "--foreground",
+        "--surface",
+        "--surface-2",
+        "--surface-3",
+        "--muted",
+        "--border",
+        "--shadow-sm",
+        "--shadow-md",
+        "--shadow-lg",
+        "--content-width",
+        "--section-space",
       ];
       for (const token of declared) {
         expect(allowed).toContain(token);
