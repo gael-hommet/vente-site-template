@@ -225,6 +225,10 @@ const ENGINE_ONLY_TESTS = [
   "tests/e2e/lab.spec.ts",
   "tests/e2e/ace-lab.spec.ts",
 ];
+// Le générateur lui-même : un site client ne régénère jamais de site depuis
+// lui-même (et `git archive HEAD` y échouerait de toute façon, le site
+// généré n'étant pas encore un dépôt git à l'étape "next steps").
+const GENERATOR_TOOLING = ["scripts/ace", "tests/unit/ace-generator-cli.test.ts"];
 
 const pruned = [
   ...ENGINE_ONLY_DOCS,
@@ -232,6 +236,7 @@ const pruned = [
   ...STUDIO_COMPONENT_DIRS,
   ...STUDIO_ONLY_COMPONENTS,
   ...ENGINE_ONLY_TESTS,
+  ...GENERATOR_TOOLING,
 ];
 for (const rel of pruned) {
   rmSync(path.join(extracted, rel), { recursive: true, force: true });
@@ -381,10 +386,12 @@ writeFileSync(
   JSON.stringify(clientConfig, null, 2) + "\n",
 );
 
-// package.json : nom du site.
+// package.json : nom du site + retrait du script du générateur (scripts/ace
+// est élagué — la commande "ace:new-site" n'aurait plus de fichier à exécuter).
 const pkgPath = path.join(extracted, "package.json");
 const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 pkg.name = slug;
+delete pkg.scripts?.["ace:new-site"];
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 
 // ace.meta.json : traçabilité moteur ↔ site (diff/upgrade futur).
