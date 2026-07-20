@@ -222,8 +222,10 @@ const STUDIO_ONLY_COMPONENTS = ["src/components/EngineStatus.tsx"];
 // (sinon : imports cassés → typecheck/build rouges dans le site généré).
 const ENGINE_ONLY_TESTS = [
   "tests/unit/engine-internal.test.tsx",
+  "tests/unit/recipe-matrix.test.tsx",
   "tests/e2e/lab.spec.ts",
   "tests/e2e/ace-lab.spec.ts",
+  "tests/e2e/a11y-engine-internal.spec.ts",
 ];
 // Le générateur lui-même : un site client ne régénère jamais de site depuis
 // lui-même (et `git archive HEAD` y échouerait de toute façon, le site

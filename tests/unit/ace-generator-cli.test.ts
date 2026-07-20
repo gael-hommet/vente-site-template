@@ -1,6 +1,6 @@
 import { describe, expect, it, afterEach } from "vitest";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -229,6 +229,64 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(existsSync(path.join(out, "src/app/engine"))).toBe(false);
     expect(existsSync(path.join(out, "src/components/lab"))).toBe(false);
     expect(existsSync(path.join(out, "src/components/ace-lab"))).toBe(false);
+  });
+
+  it("aucun test conservé dans le site généré n'importe un chemin élagué (Studio/Lab/Engine/générateur)", () => {
+    // Régression : un test resté dans le site généré mais important
+    // @/app/lab, @/app/ace-lab, @/app/engine, @/components/lab/*,
+    // @/components/ace-lab/*, @/components/EngineStatus ou scripts/ace/*
+    // casse le typecheck/tests du client — ces chemins n'existent plus une
+    // fois le générateur passé. Toute nouvelle recipe/test Studio doit soit
+    // rester générique (sans import interne), soit être ajoutée à
+    // ENGINE_ONLY_TESTS dans new-site.mjs.
+    const out = tmpOut("no-pruned-imports-in-tests");
+    const res = runCli([
+      "--name",
+      "Sans Imports Élagués",
+      "--out",
+      out,
+      "--skip-install",
+      "--skip-check",
+    ]);
+    expect(res.status).toBe(0);
+
+    const forbiddenImportPatterns = [
+      /@\/app\/lab(\/|["'`])/,
+      /@\/app\/ace-lab(\/|["'`])/,
+      /@\/app\/engine(\/|["'`])/,
+      /@\/components\/lab\//,
+      /@\/components\/ace-lab\//,
+      /@\/components\/EngineStatus/,
+      /scripts\/ace\//,
+    ];
+
+    const walkTestFiles = (dir: string): string[] => {
+      const files: string[] = [];
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (entry.name === "node_modules") continue;
+          files.push(...walkTestFiles(full));
+        } else if (/\.(test|spec)\.(ts|tsx)$/.test(entry.name)) {
+          files.push(full);
+        }
+      }
+      return files;
+    };
+
+    const testsDir = path.join(out, "tests");
+    const offenders: string[] = [];
+    if (existsSync(testsDir)) {
+      for (const file of walkTestFiles(testsDir)) {
+        const content = readFileSync(file, "utf8");
+        for (const pattern of forbiddenImportPatterns) {
+          if (pattern.test(content)) {
+            offenders.push(`${path.relative(out, file)} matches ${pattern}`);
+          }
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
   });
 
   it("n'expédie aucun document interne du moteur", () => {
