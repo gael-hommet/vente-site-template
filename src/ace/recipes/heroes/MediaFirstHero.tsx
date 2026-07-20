@@ -20,6 +20,21 @@ export function MediaFirstHero({
   return (
     <section
       className={cn("relative isolate flex min-h-[82vh] items-end overflow-hidden", className)}
+      // Sans média : fond posé DIRECTEMENT sur la section (ancêtre réel du
+      // texte), pas sur un calque frère positionné en absolute. Les outils
+      // d'audit de contraste automatisés (axe-core) remontent la chaîne
+      // d'ancêtres CSS pour résoudre le fond — un calque frère en
+      // position:absolute + z-index négatif n'en fait pas partie, même s'il
+      // est peint visuellement au même endroit à l'écran.
+      style={
+        media
+          ? undefined
+          : {
+              backgroundColor: "oklch(0.2 0.02 265)",
+              backgroundImage:
+                "linear-gradient(135deg, color-mix(in oklch, var(--foreground) 78%, black), color-mix(in oklch, var(--brand) 35%, color-mix(in oklch, var(--foreground) 70%, black))), linear-gradient(to top, oklch(0 0 0 / 0.3), oklch(0 0 0 / 0.3))",
+            }
+      }
     >
       {media ? (
         <Image
@@ -30,25 +45,20 @@ export function MediaFirstHero({
           sizes="100vw"
           className="-z-10 object-cover"
         />
-      ) : (
+      ) : null}
+      {/* Voile pour la lisibilité du texte clair (nécessaire sur média photo ;
+          sans média, le fond de la section ci-dessus intègre déjà le voile). */}
+      {media ? (
         <div
           aria-hidden
           className="absolute inset-0 -z-10"
           style={{
-            background:
-              "linear-gradient(135deg, var(--surface-3), color-mix(in oklch, var(--brand) 22%, var(--surface-2)))",
+            backgroundColor: "oklch(0 0 0 / 0.4)",
+            backgroundImage:
+              "linear-gradient(to top, oklch(0 0 0 / 0.62), oklch(0 0 0 / 0.1) 55%, transparent)",
           }}
         />
-      )}
-      {/* Voile pour la lisibilité du texte clair. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10"
-        style={{
-          background:
-            "linear-gradient(to top, oklch(0 0 0 / 0.62), oklch(0 0 0 / 0.1) 55%, transparent)",
-        }}
-      />
+      ) : null}
       <div className="mx-auto w-full max-w-6xl px-6 pt-24 pb-16 text-white">
         {eyebrow ? (
           <p className="mb-5 font-mono text-[0.8125rem] font-medium tracking-[0.12em] text-white/80 uppercase">

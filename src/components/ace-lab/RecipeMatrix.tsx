@@ -16,6 +16,27 @@ import { DESIGN_PRESETS, presetToCss } from "@/ace/config";
 import { cn } from "@/lib/utils";
 
 /**
+ * Réécrit le CSS `:root`-scopé de `presetToCss` pour qu'il s'applique
+ * uniquement sous `[data-recipe-matrix]`. La matrice affiche son PROPRE
+ * Design Language indépendamment du switcher global `PresetPreview` situé
+ * plus haut sur la même page — les deux ne doivent jamais se disputer les
+ * mêmes variables `:root` (le dernier `<style>` du DOM gagnerait la cascade,
+ * rendant le switcher précédent silencieusement inopérant).
+ *
+ * Le bloc `@media (prefers-color-scheme: dark)` est retiré : la bascule
+ * "Thème sombre" de la matrice doit rester déterministe (pilotée par
+ * `data-theme` sur le conteneur scopé), pas dépendante des préférences
+ * système de la machine qui exécute le Studio.
+ */
+function scopeCssToMatrix(css: string): string {
+  const withoutSystemDarkQuery = css.replace(
+    /@media \(prefers-color-scheme: dark\)\{[^}]*\{[^}]*\}\}/,
+    "",
+  );
+  return withoutSystemDarkQuery.replace(/:root(?![a-zA-Z-])/g, "[data-recipe-matrix]");
+}
+
+/**
  * Studio — matrice de comparaison recipes × Design Language. Contenu
  * totalement neutre (aucune identité client). Permet de vérifier que la
  * variation entre presets est profonde (surfaces/rayons/densité/ombres), pas
@@ -119,22 +140,11 @@ export function RecipeMatrix() {
   const [dark, setDark] = React.useState(false);
   const [reducedMotion, setReducedMotion] = React.useState(false);
 
-  // Le thème est piloté par `:root[data-theme]` (voir globals.css / ThemeProvider) —
-  // un attribut sur un wrapper local n'aurait aucun effet sur les tokens de
-  // surface. Restaure l'attribut précédent en quittant/décochant.
-  React.useEffect(() => {
-    if (!dark) return;
-    const root = document.documentElement;
-    const previous = root.getAttribute("data-theme");
-    root.setAttribute("data-theme", "dark");
-    return () => {
-      if (previous) root.setAttribute("data-theme", previous);
-      else root.removeAttribute("data-theme");
-    };
-  }, [dark]);
-
   const preset = DESIGN_PRESETS.find((p) => p.id === presetId) ?? DESIGN_PRESETS[0]!;
-  const css = presetToCss(preset);
+  // CSS scopée à [data-recipe-matrix] (jamais :root) : la matrice ne doit
+  // jamais entrer en concurrence avec le switcher global PresetPreview situé
+  // plus haut sur la même page /ace-lab.
+  const css = scopeCssToMatrix(presetToCss(preset));
   const recipes = RECIPE_FAMILIES[family];
   const viewportWidth = VIEWPORTS.find((v) => v.id === viewport)?.width ?? "100%";
 
@@ -221,11 +231,13 @@ export function RecipeMatrix() {
         </label>
       </div>
 
-      {/* Portée du preset : id unique par rendu pour éviter toute collision de <style>. */}
+      {/* CSS scopée à [data-recipe-matrix] — jamais :root (voir scopeCssToMatrix). */}
       <style data-ace-studio-preset={presetId}>{css}</style>
 
       <div className="mx-auto w-full transition-[max-width]" style={{ maxWidth: viewportWidth }}>
         <div
+          data-recipe-matrix=""
+          data-theme={dark ? "dark" : undefined}
           className={cn(
             "border-border bg-background flex flex-col gap-4 rounded-[var(--radius-lg)] border p-4",
             reducedMotion && "[&_*]:!animate-none [&_*]:!transition-none",

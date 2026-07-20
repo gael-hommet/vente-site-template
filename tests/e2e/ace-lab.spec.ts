@@ -16,8 +16,9 @@ test.describe("ACE Lab", () => {
 
     for (const name of [
       "Modules du moteur",
-      /Design Language/,
+      "Design Language — presets (live)",
       /Tokens & contrastes/,
+      /Matrice recipes/,
       /Motion Library/,
       /Scene Library/,
       /Médias adaptatifs/,
@@ -57,6 +58,54 @@ test.describe("ACE Lab", () => {
     // Every measured pair used for text must pass (the engine's own promise).
     await expect(page.getByText("✗ insuffisant")).toHaveCount(0);
     await expect(page.getByText("✓ conforme").first()).toBeVisible();
+  });
+
+  test("recipe matrix switches family/preset and stays reachable by keyboard", async ({ page }) => {
+    const pageErrors: string[] = [];
+    page.on("pageerror", (e) => pageErrors.push(e.message));
+
+    await page.goto("/ace-lab");
+    const section = page.locator("#ace-recipes").locator("..");
+    await section.scrollIntoViewIfNeeded();
+
+    // Default family renders the 3 hero recipes.
+    await expect(section.getByText("typographic")).toBeVisible();
+
+    // Switching family swaps the rendered recipes.
+    await section.getByRole("button", { name: /Navigation \(/ }).click();
+    await expect(section.getByText("minimal-header")).toBeVisible();
+    await expect(section.getByText("typographic")).toHaveCount(0);
+
+    // Switching the Design Language preset actually changes injected tokens —
+    // scoped to the matrix's own wrapper, never :root (it must not fight the
+    // page's global PresetPreview switcher above it).
+    const select = section.getByRole("combobox", { name: "Choix du preset Design Language" });
+    const scoped = page.locator("[data-recipe-matrix]");
+    const before = await scoped.evaluate((el) =>
+      getComputedStyle(el).getPropertyValue("--brand").trim(),
+    );
+    const rootBefore = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue("--brand").trim(),
+    );
+    await select.selectOption("precision-dark");
+    const after = await scoped.evaluate((el) =>
+      getComputedStyle(el).getPropertyValue("--brand").trim(),
+    );
+    const rootAfter = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue("--brand").trim(),
+    );
+    expect(after).not.toBe(before);
+    // The page's global :root brand token must be untouched by the matrix.
+    expect(rootAfter).toBe(rootBefore);
+
+    // Family buttons are reachable and activatable via keyboard.
+    const heroesButton = section.getByRole("button", { name: /Heroes \(/ });
+    await heroesButton.focus();
+    await expect(heroesButton).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(section.getByText("typographic")).toBeVisible();
+
+    expect(pageErrors, `Uncaught errors:\n${pageErrors.join("\n")}`).toHaveLength(0);
   });
 
   test("scene studio can force the fallback and reports the scene contract", async ({ page }) => {

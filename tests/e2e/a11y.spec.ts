@@ -46,4 +46,20 @@ test.describe("Accessibility (axe)", () => {
       ),
     ).toEqual([]);
   });
+
+  test("ace-lab (Studio) has no serious or critical violations", async ({ page }) => {
+    test.setTimeout(120_000);
+    const results = await audit(page, "/ace-lab");
+    const serious = results.violations.filter((v) =>
+      ["serious", "critical"].includes(v.impact ?? ""),
+    );
+    expect(
+      serious,
+      JSON.stringify(
+        serious.map((v) => v.id),
+        null,
+        2,
+      ),
+    ).toEqual([]);
+  });
 });
