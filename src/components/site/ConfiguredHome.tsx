@@ -1,7 +1,7 @@
 import { Section } from "@/components/ui/section";
 import { Heading, Text } from "@/components/ui/typography";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
-import { HeroScene } from "@/components/starter/HeroScene";
+import { SceneBand } from "@/components/site/SceneBand";
 import {
   getHeroRecipe,
   hasHeroRecipe,
@@ -64,11 +64,13 @@ export function ConfiguredHome() {
       />
 
       {/* Scène WebGL — montée seulement si features.webgl (dérivé de
-          webglIntensity). AdaptiveCanvas gère fallback/tier/lazy : LITE et SSR
-          n'affichent que le poster, three.js reste hors du bundle initial. */}
+          webglIntensity). SceneBand charge HeroScene via next/dynamic : sur un
+          site sans WebGL (features.webgl=false), cette branche n'est jamais
+          rendue et le chunk three.js n'est jamais téléchargé. AdaptiveCanvas
+          gère ensuite fallback/tier : LITE et SSR n'affichent que le poster. */}
       {resolvedFeatures.webgl && c.hero.sceneId ? (
         <Section spacing="md" aria-label="Démonstration interactive">
-          <HeroScene sceneId={c.hero.sceneId} />
+          <SceneBand sceneId={c.hero.sceneId} />
         </Section>
       ) : null}
 
