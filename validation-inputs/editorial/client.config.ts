@@ -5,7 +5,7 @@ import type { ClientConfigInput } from "@/ace/config";
  * entreprise réelle, aucun fait vérifiable inventé. Sert uniquement à prouver
  * que le moteur produit une expérience éditoriale (sobre, typographique, sans
  * WebGL) opposée à la validation immersive. Ne pas confondre avec un vrai
- * client. Aucun élément IN QUARTO.
+ * client. Aucun héritage du site témoin architectural existant.
  */
 const config: ClientConfigInput = {
   identity: {

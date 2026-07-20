@@ -2,7 +2,7 @@
 
 > ⚠️ Identité **fictive**. Aucun produit réel, aucun fait vérifiable inventé.
 > Ce brief sert uniquement à générer une validation immersive du moteur ACE,
-> opposée à la validation éditoriale. Aucun élément IN QUARTO.
+> opposée à la validation éditoriale. Aucun héritage du site témoin architectural existant.
 
 ## Identité fictive
 

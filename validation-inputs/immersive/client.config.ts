@@ -4,8 +4,8 @@ import type { ClientConfigInput } from "@/ace/config";
  * FIXTURE INTERNE ACE — validation IMMERSIVE. Identité fictive, aucun produit
  * réel, aucun fait vérifiable inventé. Sert uniquement à prouver que le moteur
  * produit une expérience immersive (sombre, plein cadre, WebGL réel + fallback,
- * mouvement cinématique) OPPOSÉE à la validation éditoriale. Aucun élément
- * IN QUARTO.
+ * mouvement cinématique) OPPOSÉE à la validation éditoriale. Aucun héritage du
+ * site témoin architectural existant.
  */
 const config: ClientConfigInput = {
   identity: {
