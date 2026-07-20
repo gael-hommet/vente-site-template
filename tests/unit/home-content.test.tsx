@@ -1,8 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import HomePage from "@/app/page";
-import EnginePage from "@/app/engine/page";
-import { EngineStatus } from "@/components/EngineStatus";
 import { TO_CONFIRM_MARK } from "@/ace/content";
 
 describe("Starter HomePage (readable without Canvas)", () => {
@@ -35,24 +33,5 @@ describe("Starter HomePage (readable without Canvas)", () => {
     const { container } = render(<HomePage />);
     // No euro amount or percentage appears anywhere in the starter home.
     expect(container.textContent).not.toMatch(/\d+\s?€|\d+\s?%|[45][.,]\d\/5/);
-  });
-});
-
-describe("EnginePage (internal dashboard moved to /engine)", () => {
-  it("renders the dashboard with commands", () => {
-    render(<EnginePage />);
-    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByText("/build-site")).toBeInTheDocument();
-    expect(screen.getByText("/audit-site")).toBeInTheDocument();
-  });
-});
-
-describe("EngineStatus", () => {
-  it("renders capability rows without requiring WebGL", () => {
-    render(<EngineStatus />);
-    expect(screen.getByText("WebGL")).toBeInTheDocument();
-    expect(screen.getByText("Reduced motion")).toBeInTheDocument();
-    // Default store state is undetected → LITE / fallback, never crashes.
-    expect(screen.getByText(/indisponible/)).toBeInTheDocument();
   });
 });

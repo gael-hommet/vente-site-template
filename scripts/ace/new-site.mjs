@@ -218,12 +218,20 @@ const ENGINE_ONLY_DOCS = [
 const STUDIO_ROUTES = ["src/app/lab", "src/app/ace-lab", "src/app/engine"];
 const STUDIO_COMPONENT_DIRS = ["src/components/lab", "src/components/ace-lab"];
 const STUDIO_ONLY_COMPONENTS = ["src/components/EngineStatus.tsx"];
+// Tests unitaires/e2e qui n'ont de sens que sur les routes internes ci-dessus
+// (sinon : imports cassés → typecheck/build rouges dans le site généré).
+const ENGINE_ONLY_TESTS = [
+  "tests/unit/engine-internal.test.tsx",
+  "tests/e2e/lab.spec.ts",
+  "tests/e2e/ace-lab.spec.ts",
+];
 
 const pruned = [
   ...ENGINE_ONLY_DOCS,
   ...STUDIO_ROUTES,
   ...STUDIO_COMPONENT_DIRS,
   ...STUDIO_ONLY_COMPONENTS,
+  ...ENGINE_ONLY_TESTS,
 ];
 for (const rel of pruned) {
   rmSync(path.join(extracted, rel), { recursive: true, force: true });
