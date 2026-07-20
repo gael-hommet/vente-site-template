@@ -9,10 +9,12 @@ import { TokensContrast } from "@/components/ace-lab/TokensContrast";
 import { MotionPlayground } from "@/components/ace-lab/MotionPlayground";
 import { SceneStudio } from "@/components/ace-lab/SceneStudio";
 import { ConversionShowcase } from "@/components/ace-lab/ConversionShowcase";
+import { RecipeMatrix } from "@/components/ace-lab/RecipeMatrix";
 
 export const metadata: Metadata = {
   title: "ACE Lab",
-  description: "Laboratoire interne du moteur ACE : registres, tokens, motion, scènes, états.",
+  description:
+    "Laboratoire interne du moteur ACE : registres, tokens, motion, scènes, recipes, états.",
   robots: { index: false, follow: false },
 };
 
@@ -25,15 +27,15 @@ export const metadata: Metadata = {
  */
 export default function AceLabPage() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
       <header className="mb-10">
         <p className="text-muted font-mono text-sm">
           {ACE_NAME} · v{ACE_VERSION}
         </p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">ACE Lab</h1>
         <p className="text-muted mt-2 max-w-2xl">
-          Validation interne du moteur : modules, Design Language, Motion Library, Scene Library et
-          budgets de performance — lus depuis les registres réels.
+          Validation interne du moteur : modules, Design Language, recipes, Motion Library, Scene
+          Library et budgets de performance — lus depuis les registres réels.
         </p>
       </header>
 
@@ -67,6 +69,18 @@ export default function AceLabPage() {
           thème inclus) — remesurés au changement de thème.
         </p>
         <TokensContrast />
+      </section>
+
+      <section aria-labelledby="ace-recipes" className="mb-12">
+        <h2 id="ace-recipes" className="mb-4 text-xl font-semibold">
+          Matrice recipes × Design Language
+        </h2>
+        <p className="text-muted mb-4 max-w-2xl text-sm">
+          Compare une même famille de recipes sous un Design Language donné (contenu neutre,
+          identique pour toutes) — vérifie que la variation est structurelle, pas seulement une
+          teinte, et que chaque recipe d&apos;une famille est visuellement distincte des autres.
+        </p>
+        <RecipeMatrix />
       </section>
 
       <section aria-labelledby="ace-motion" className="mb-12">
