@@ -1,0 +1,74 @@
+{
+  "hero": {
+    "eyebrow": "Série lumière",
+    "title": "Orbe",
+    "subtitle": "Un objet fictif qui fait de la lumière une matière. Contenu de démonstration, aucune identité réelle.",
+    "primaryCta": { "label": "Demander une présentation", "href": "/contact" },
+    "secondaryCta": { "label": "Explorer", "href": "#story" },
+    "media": null,
+    "sceneId": "demo.product-reveal"
+  },
+  "story": {
+    "heading": "L'objet, en trois plans",
+    "intro": "Un défilement immersif, pas une liste. Le mouvement porte le récit ; le fallback reste lisible sans WebGL.",
+    "chapters": [
+      {
+        "eyebrow": "Matière",
+        "title": "La lumière comme surface",
+        "body": "Récit fictif : une enveloppe qui capte et redistribue la lumière ambiante, sans jamais éblouir."
+      },
+      {
+        "eyebrow": "Geste",
+        "title": "Une seule commande",
+        "body": "Description imaginaire d'une interaction unique, tactile, où l'objet répond au geste plutôt qu'au bouton."
+      },
+      {
+        "eyebrow": "Présence",
+        "title": "Discret puis total",
+        "body": "Texte de démonstration sur un objet qui s'efface le jour et devient central le soir venu."
+      }
+    ]
+  },
+  "collection": {
+    "heading": "La série",
+    "intro": "Chapitres horizontaux — on fait défiler les objets, on ne les empile pas.",
+    "itemLabel": "objet",
+    "items": [
+      {
+        "title": "Orbe Halo",
+        "href": "/realisations",
+        "meta": ["Édition", "Lumière chaude"],
+        "media": null
+      },
+      {
+        "title": "Orbe Nadir",
+        "href": "/realisations",
+        "meta": ["Édition", "Lumière froide"],
+        "media": null
+      },
+      {
+        "title": "Orbe Éclipse",
+        "href": "/realisations",
+        "meta": ["Édition", "Bicolore"],
+        "media": null
+      },
+      {
+        "title": "Orbe Zénith",
+        "href": "/realisations",
+        "meta": ["Prototype", "Modulable"],
+        "media": null
+      }
+    ]
+  },
+  "conversion": {
+    "title": "Voir Orbe de près",
+    "description": "Présentation privée sur demande. Formulaire de démonstration — aucune donnée réelle collectée.",
+    "primaryCta": { "label": "Demander une présentation", "href": "/contact" }
+  },
+  "nav": [
+    { "label": "Orbe", "href": "/" },
+    { "label": "Objets", "href": "/realisations" },
+    { "label": "Le studio", "href": "/a-propos" },
+    { "label": "Demander", "href": "/contact" }
+  ]
+}

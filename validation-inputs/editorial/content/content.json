@@ -1,0 +1,73 @@
+{
+  "hero": {
+    "eyebrow": "Numéro 07 — Lignes de fuite",
+    "title": "Ce que le regard retient",
+    "subtitle": "Une revue fictive de pensée visuelle : essais, entretiens et relectures d'images. Contenu de démonstration, aucune identité réelle.",
+    "primaryCta": { "label": "S'abonner", "href": "/contact" },
+    "secondaryCta": { "label": "Lire le sommaire", "href": "#story" },
+    "media": null
+  },
+  "story": {
+    "heading": "Dans ce numéro",
+    "intro": "Trois entrées de lecture — un rythme de revue, pas de vitrine.",
+    "chapters": [
+      {
+        "eyebrow": "Essai",
+        "title": "La marge comme espace de pensée",
+        "body": "Un texte fictif sur le blanc tournant : comment le vide typographique oriente la lecture avant même les mots."
+      },
+      {
+        "eyebrow": "Entretien",
+        "title": "Composer sans décorer",
+        "body": "Conversation imaginaire autour de la retenue graphique et de ce qu'une page choisit de ne pas montrer."
+      },
+      {
+        "eyebrow": "Relecture",
+        "title": "Archives d'un regard",
+        "body": "Retour fictif sur des images anciennes relues à la lumière du présent, sans nostalgie ni certitude."
+      }
+    ]
+  },
+  "collection": {
+    "heading": "Nos numéros",
+    "intro": "Sommaire indexé — chaque numéro est un parcours, jamais une grille de vignettes.",
+    "itemLabel": "numéro",
+    "items": [
+      {
+        "title": "Lignes de fuite",
+        "href": "/realisations",
+        "meta": ["N° 07", "Automne"],
+        "media": null
+      },
+      {
+        "title": "Le grain du réel",
+        "href": "/realisations",
+        "meta": ["N° 06", "Été"],
+        "media": null
+      },
+      {
+        "title": "Contre-jour",
+        "href": "/realisations",
+        "meta": ["N° 05", "Printemps"],
+        "media": null
+      },
+      {
+        "title": "Silence typographique",
+        "href": "/realisations",
+        "meta": ["N° 04", "Hiver"],
+        "media": null
+      }
+    ]
+  },
+  "conversion": {
+    "title": "Recevoir la revue",
+    "description": "Un numéro par saison, sans bruit. Formulaire de démonstration — aucune donnée réelle collectée.",
+    "primaryCta": { "label": "S'abonner", "href": "/contact" }
+  },
+  "nav": [
+    { "label": "Sommaire", "href": "/" },
+    { "label": "Numéros", "href": "/realisations" },
+    { "label": "La revue", "href": "/a-propos" },
+    { "label": "Nous écrire", "href": "/contact" }
+  ]
+}

@@ -246,6 +246,15 @@ const ENGINE_ONLY_TESTS = [
 // lui-même (et `git archive HEAD` y échouerait de toute façon, le site
 // généré n'étant pas encore un dépôt git à l'étape "next steps").
 const GENERATOR_TOOLING = ["scripts/ace", "tests/unit/ace-generator-cli.test.ts"];
+// Fixtures internes de validation + comparaison anti-template : contiennent
+// l'identité d'AUTRES fixtures (éditoriale/immersive) et ne doivent jamais
+// partir dans un site client.
+const ENGINE_ONLY_FIXTURES = [
+  "validation-inputs",
+  "docs/anti-template",
+  "scripts/ace/compare-creative-fingerprints.mjs",
+  "tests/unit/anti-template.test.ts",
+];
 
 const pruned = [
   ...ENGINE_ONLY_DOCS,
@@ -254,6 +263,7 @@ const pruned = [
   ...STUDIO_ONLY_COMPONENTS,
   ...ENGINE_ONLY_TESTS,
   ...GENERATOR_TOOLING,
+  ...ENGINE_ONLY_FIXTURES,
 ];
 for (const rel of pruned) {
   rmSync(path.join(extracted, rel), { recursive: true, force: true });
