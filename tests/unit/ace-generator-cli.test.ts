@@ -343,10 +343,21 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
       ]);
       expect(res.status).toBe(0);
       const featuresFile = readFileSync(path.join(out, "src/config/features.generated.ts"), "utf8");
-      expect(featuresFile).toMatch(/"stickyMobileCta":\s*false/);
-      expect(featuresFile).toMatch(/"darkMode":\s*false/);
+      expect(featuresFile).toMatch(/stickyMobileCta:\s*false/);
+      expect(featuresFile).toMatch(/darkMode:\s*false/);
     } finally {
       rmSync(cfgPath, { force: true });
     }
+  });
+
+  it("src/config/features.generated.ts généré est conforme au style Prettier du dépôt", () => {
+    // Régression : JSON.stringify() produit des clés citées sans virgule
+    // finale, rejetées par prettier --check du site généré (quality gate).
+    const out = tmpOut("features-prettier");
+    const res = runCli(["--name", "Prettier", "--out", out, "--skip-install", "--skip-check"]);
+    expect(res.status).toBe(0);
+    const generated = readFileSync(path.join(out, "src/config/features.generated.ts"), "utf8");
+    expect(generated).not.toMatch(/"[a-zA-Z]+":\s/); // clés citées = style JSON.stringify, pas Prettier
+    expect(generated).toMatch(/darkMode: (true|false),\n};\n$/); // virgule finale avant l'accolade
   });
 });

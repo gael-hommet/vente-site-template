@@ -346,6 +346,14 @@ writeFileSync(path.join(extracted, ".env.local"), envLines.join("\n") + "\n");
 
 // Features résolues (src/config/features.generated.ts) — chaque flag a un
 // effet réel : StickyMobileCTA, ThemeToggle, etc. les consomment déjà.
+// Émis comme littéral TS valide (clés non-citées, virgule finale) pour rester
+// conforme au style Prettier du dépôt sans dépendre de prettier à l'exécution.
+const featuresObjectLiteral =
+  "{\n" +
+  Object.entries(resolvedFeatures)
+    .map(([k, v]) => `  ${k}: ${JSON.stringify(v)},`)
+    .join("\n") +
+  "\n}";
 const featuresTs = `import type { ResolvedFeatures } from "@/ace/config";
 
 /**
@@ -353,7 +361,7 @@ const featuresTs = `import type { ResolvedFeatures } from "@/ace/config";
  * client (${path.basename(configArg)}). Réécrit à chaque génération — ne pas
  * éditer à la main.
  */
-export const resolvedFeatures: ResolvedFeatures = ${JSON.stringify(resolvedFeatures, null, 2)};
+export const resolvedFeatures: ResolvedFeatures = ${featuresObjectLiteral};
 `;
 writeFileSync(path.join(extracted, "src/config/features.generated.ts"), featuresTs);
 
