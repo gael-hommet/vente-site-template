@@ -59,6 +59,19 @@ async function waitForServer(url, timeoutMs) {
   }
 }
 
+/** Fait défiler la page de haut en bas (déclenche les montages lazy au scroll). */
+async function scrollFullPage(page) {
+  await page.evaluate(async () => {
+    const step = Math.max(300, window.innerHeight * 0.8);
+    const height = () => document.body.scrollHeight;
+    for (let y = 0; y < height(); y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 200));
+    }
+    window.scrollTo(0, 0);
+  });
+}
+
 async function main() {
   const base = `http://127.0.0.1:${port}`;
   const server = spawn("pnpm", ["start", "-p", String(port)], {
@@ -77,6 +90,11 @@ async function main() {
       if (r.url().endsWith(".js")) jsUrls.push(r.url());
     });
     await page.goto(base + "/", { waitUntil: "networkidle" });
+    // Défilement complet : les scènes sont lazy (montées à l'entrée dans le
+    // viewport). Sans scroll, un chunk WebGL déclenché plus bas ne serait
+    // jamais requêté → le « 0 WebGL » couvre l'ensemble de la page, pas
+    // seulement le premier écran.
+    await scrollFullPage(page);
     await page.waitForTimeout(2500);
 
     let webglChunks = 0;
@@ -95,7 +113,8 @@ async function main() {
       const rmPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
       await rmPage.emulateMedia({ reducedMotion: "reduce" });
       await rmPage.goto(base + "/", { waitUntil: "domcontentloaded" });
-      await rmPage.waitForTimeout(3000);
+      await scrollFullPage(rmPage);
+      await rmPage.waitForTimeout(3500); // laisser le poster (next/image) peindre
       reducedMotion = {
         canvasCount: await rmPage.locator("canvas").count(),
         fallbackCount: await rmPage.locator(fallbackSelector).count(),
@@ -129,19 +148,22 @@ async function main() {
       ? "AUCUN WebGL chargé (conforme éditorial)"
       : "WebGL chargé alors qu'attendu ABSENT";
   } else {
-    // Immersif : (1) pipeline WebGL câblé — soit chunk+canvas réel, soit
-    // fallback poster (headless GL logiciel) ; (2) sous reduced-motion, la
-    // scène dégrade vers le fallback (pas de canvas animé) et le contenu reste
-    // lisible.
-    const pipelineOk = result.webglChunks > 0 || result.canvasCount > 0 || result.fallbackCount > 0;
+    // Immersif — preuve STRICTE (pas de faux positif fallback-only) :
+    // (1) le pipeline WebGL est réellement câblé ⇒ un CHUNK three.js est
+    //     téléchargé (le chunk prouve le câblage même si le GL logiciel
+    //     retombe ensuite sur le poster ; un fallback SANS chunk = scène cassée
+    //     ou éditorial, donc REFUSÉ) ;
+    // (2) sous reduced-motion, la scène dégrade EXPLICITEMENT vers un poster
+    //     visible (fallbackCount > 0) — l'absence de canvas ne suffit pas.
+    const pipelineOk = result.webglChunks > 0;
     const rm = result.reducedMotion;
-    const reducedOk = !!rm && rm.h1Visible && (rm.fallbackCount > 0 || rm.canvasCount === 0);
+    const reducedOk = !!rm && rm.h1Visible && rm.fallbackCount > 0 && rm.canvasCount === 0;
     ok = pipelineOk && reducedOk;
     result.verdict = ok
-      ? "WebGL câblé (canvas/chunk ou fallback) + dégradation reduced-motion vers fallback lisible"
+      ? "WebGL réellement câblé (chunk three.js chargé) + dégradation reduced-motion vers poster visible"
       : !pipelineOk
-        ? "ni WebGL, ni canvas, ni fallback (pipeline WebGL absent)"
-        : "pipeline OK mais dégradation reduced-motion non prouvée";
+        ? "aucun chunk WebGL chargé (pipeline absent ou scène cassée ; un fallback seul ne prouve pas le câblage)"
+        : "chunk WebGL OK mais dégradation reduced-motion non prouvée (poster attendu, canvas interdit)";
   }
 
   console.log(JSON.stringify(result, null, 2));

@@ -19,9 +19,16 @@ import { siteConfig } from "@/config/site";
  * recettes de navigation n'ont pas de slot dédié et doivent rester génériques.
  */
 export function ConfiguredHeader() {
-  const navId = hasNavigationRecipe(resolvedClient.recipes.navigation)
-    ? resolvedClient.recipes.navigation
-    : "minimal-header";
+  const requested = resolvedClient.recipes.navigation;
+  let navId = requested;
+  if (!hasNavigationRecipe(requested)) {
+    navId = "minimal-header";
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        `[ACE] navigation inconnue "${requested}" dans client.resolved.ts — repli sur "minimal-header". Corrigez l'id.`,
+      );
+    }
+  }
   const Nav = getNavigationRecipe(navId).Component;
 
   return (

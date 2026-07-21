@@ -219,6 +219,7 @@ const ENGINE_ONLY_DOCS = [
   "docs/ACE-ROADMAP-FINAL.md",
   "docs/ACE-ANTI-TEMPLATE-VALIDATION.md",
   "docs/ACE-FINAL-REPORT.md",
+  "docs/ACE-NEXT-CLIENT-RUNBOOK.md",
 ];
 // Routes Studio/Lab/Engine : jamais expédiées à un client — absence PHYSIQUE,
 // pas seulement noindex (preuve automatisée en test).
@@ -562,14 +563,25 @@ export default function HomePage() {
 writeFileSync(path.join(extracted, "src/app/page.tsx"), homePageTs);
 
 // layout.tsx : remplace SiteHeader par ConfiguredHeader (recipe de navigation).
+// Chaque remplacement est vérifié : si l'ancre change en amont (formatage,
+// réordonnancement d'import), on échoue AVANT d'écrire un layout incohérent
+// (import sans usage ou usage sans import) — plutôt que de livrer un site cassé
+// ou qui garde silencieusement l'en-tête starter.
 const layoutPath = path.join(extracted, "src/app/layout.tsx");
-let layoutSrc = readFileSync(layoutPath, "utf8");
-layoutSrc = layoutSrc
-  .replace(
-    'import { SiteHeader } from "@/components/layout/site-header";',
-    'import { ConfiguredHeader } from "@/components/site/ConfiguredHeader";',
-  )
-  .replace(/<SiteHeader\s*\/>/, "<ConfiguredHeader />");
+const layoutBefore = readFileSync(layoutPath, "utf8");
+const layoutAfterImport = layoutBefore.replace(
+  'import { SiteHeader } from "@/components/layout/site-header";',
+  'import { ConfiguredHeader } from "@/components/site/ConfiguredHeader";',
+);
+if (layoutAfterImport === layoutBefore) {
+  rmSync(staging, { recursive: true, force: true });
+  die("layout.tsx : ancre d'import SiteHeader introuvable (le générateur doit être mis à jour).");
+}
+const layoutSrc = layoutAfterImport.replace(/<SiteHeader\s*\/>/, "<ConfiguredHeader />");
+if (layoutSrc === layoutAfterImport) {
+  rmSync(staging, { recursive: true, force: true });
+  die("layout.tsx : ancre <SiteHeader /> introuvable (le générateur doit être mis à jour).");
+}
 writeFileSync(layoutPath, layoutSrc);
 console.log("✓ home + en-tête câblés sur les recipes sélectionnées");
 

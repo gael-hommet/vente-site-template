@@ -4,6 +4,8 @@ import { ConfiguredHome } from "@/components/site/ConfiguredHome";
 import { ConfiguredHeader } from "@/components/site/ConfiguredHeader";
 import { ThemeProvider } from "@/components/layout/theme";
 import { siteContent } from "@/config/site-content";
+import { resolvedClient } from "@/config/client.resolved";
+import { layoutMainClass, LAYOUT_MAIN_CLASS } from "@/ace/recipes/layouts";
 
 /**
  * Le rendu config-driven est ce qui rend la sélection de recipes réellement
@@ -43,6 +45,33 @@ describe("ConfiguredHome (rendu config-driven)", () => {
     // sans WebGL (les scènes sont différées et gatées par tier).
     expect(container.textContent).toContain(siteContent.hero.title);
     expect(container.textContent).toContain(siteContent.conversion.title);
+  });
+
+  it("applique RÉELLEMENT la recipe de layout (data-layout + classe de conteneur observable)", () => {
+    const { container } = render(<ConfiguredHome />);
+    const layoutEl = container.querySelector("[data-layout]");
+    expect(layoutEl).not.toBeNull();
+    // L'id de layout résolu est celui du contrat, et sa classe est appliquée.
+    const id = resolvedClient.recipes.layout || "editorial-layout";
+    expect(layoutEl!.getAttribute("data-layout")).toBe(id);
+    for (const cls of layoutMainClass(id).split(" ")) {
+      expect(layoutEl!.className).toContain(cls);
+    }
+  });
+});
+
+describe("layoutMainClass — la recipe de layout a un effet DOM distinct", () => {
+  it("chaque layout produit une classe de conteneur différente (pas d'alias)", () => {
+    const ids = Object.keys(LAYOUT_MAIN_CLASS);
+    const classes = ids.map((id) => layoutMainClass(id));
+    // Deux layouts distincts ⇒ classes distinctes (sinon la sélection layout
+    // serait un faux signal anti-template — c'était le finding corrigé).
+    expect(new Set(classes).size).toBe(ids.length);
+    expect(layoutMainClass("editorial-layout")).not.toBe(layoutMainClass("immersive-layout"));
+  });
+
+  it("un id inconnu retombe sur editorial-layout", () => {
+    expect(layoutMainClass("does-not-exist")).toBe(LAYOUT_MAIN_CLASS["editorial-layout"]);
   });
 });
 
