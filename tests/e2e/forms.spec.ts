@@ -27,6 +27,10 @@ test.describe("Contact form (universal)", () => {
       .getByLabel(/^Message\b/)
       .fill("Bonjour, ceci est un message de test suffisamment long.");
     await form.getByRole("checkbox").check();
+    // Anti-spam : le endpoint rejette (422 "too_fast") toute soumission < 1,2 s
+    // après l'ouverture du formulaire. Respecter ce contrat (un vrai humain met
+    // plus d'une seconde). Sur mobile émulé, remplir+cliquer est plus rapide.
+    await page.waitForTimeout(1400);
     await form.getByRole("button", { name: /Envoyer/i }).click();
     await expect(page.getByText(/Message envoyé/i)).toBeVisible();
   });
