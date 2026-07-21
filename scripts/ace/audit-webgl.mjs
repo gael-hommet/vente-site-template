@@ -85,9 +85,24 @@ async function main() {
       if (WEBGL_SIGNATURE.test(await res.text())) webglChunks++;
     }
     const canvasCount = await page.locator("canvas").count();
-    const fallbackCount = await page
-      .locator("img[alt*='aperçu'], img[alt*='statique'], img[alt*='poster']")
-      .count();
+    const fallbackSelector = "img[alt*='aperçu'], img[alt*='statique'], img[alt*='poster']";
+    const fallbackCount = await page.locator(fallbackSelector).count();
+
+    // Passe reduced-motion (mode webgl uniquement) : la scène doit dégrader vers
+    // le poster/fallback (pas de canvas animé autonome), contenu toujours lisible.
+    let reducedMotion = null;
+    if (expect === "webgl") {
+      const rmPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+      await rmPage.emulateMedia({ reducedMotion: "reduce" });
+      await rmPage.goto(base + "/", { waitUntil: "domcontentloaded" });
+      await rmPage.waitForTimeout(3000);
+      reducedMotion = {
+        canvasCount: await rmPage.locator("canvas").count(),
+        fallbackCount: await rmPage.locator(fallbackSelector).count(),
+        h1Visible: await rmPage.getByRole("heading", { level: 1 }).first().isVisible(),
+      };
+      await rmPage.close();
+    }
 
     result = {
       site: path.basename(siteDir),
@@ -96,6 +111,7 @@ async function main() {
       webglChunks,
       canvasCount,
       fallbackCount,
+      reducedMotion,
     };
     await browser.close();
   } finally {
@@ -113,12 +129,19 @@ async function main() {
       ? "AUCUN WebGL chargé (conforme éditorial)"
       : "WebGL chargé alors qu'attendu ABSENT";
   } else {
-    // Immersif : soit un chunk WebGL + canvas réel, soit (headless logiciel) un
-    // fallback poster monté. Les deux prouvent que le pipeline WebGL est câblé.
-    ok = result.webglChunks > 0 || result.canvasCount > 0 || result.fallbackCount > 0;
+    // Immersif : (1) pipeline WebGL câblé — soit chunk+canvas réel, soit
+    // fallback poster (headless GL logiciel) ; (2) sous reduced-motion, la
+    // scène dégrade vers le fallback (pas de canvas animé) et le contenu reste
+    // lisible.
+    const pipelineOk = result.webglChunks > 0 || result.canvasCount > 0 || result.fallbackCount > 0;
+    const rm = result.reducedMotion;
+    const reducedOk = !!rm && rm.h1Visible && (rm.fallbackCount > 0 || rm.canvasCount === 0);
+    ok = pipelineOk && reducedOk;
     result.verdict = ok
-      ? "WebGL réel monté (canvas) ou fallback présent (conforme immersif)"
-      : "ni WebGL, ni canvas, ni fallback (pipeline WebGL absent)";
+      ? "WebGL câblé (canvas/chunk ou fallback) + dégradation reduced-motion vers fallback lisible"
+      : !pipelineOk
+        ? "ni WebGL, ni canvas, ni fallback (pipeline WebGL absent)"
+        : "pipeline OK mais dégradation reduced-motion non prouvée";
   }
 
   console.log(JSON.stringify(result, null, 2));
