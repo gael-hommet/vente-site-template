@@ -7,18 +7,19 @@ dans `scripts/ace/new-site.mjs`).
 
 ## 1. Entrées
 
-| Argument         | Obligatoire | Défaut                   | Rôle                                                                     |
-| ---------------- | ----------- | ------------------------ | ------------------------------------------------------------------------ |
-| `--name`         | oui         | —                        | Nom affiché du client.                                                   |
-| `--out`          | oui         | —                        | Dossier cible (vide ou absent, sauf `--force`).                          |
-| `--slug`         | non         | dérivé de `--name`       | Slug kebab-case (`package.json:name`, `ace.meta.json`).                  |
-| `--config`       | non         | `input/client.config.ts` | Configuration client TypeScript.                                         |
-| `--brief`        | non         | `input/CLIENT_BRIEF.md`  | Brief Markdown copié tel quel dans `input/`.                             |
-| `--assets`       | non         | —                        | Dossier d'assets à copier + inventorier.                                 |
-| `--url`          | non         | —                        | Origine absolue (canonical/OG/sitemap).                                  |
-| `--force`        | non         | `false`                  | Écrase un dossier de sortie non vide.                                    |
-| `--skip-install` | non         | `false`                  | N'exécute pas `pnpm install` dans le site généré.                        |
-| `--skip-check`   | non         | `false`                  | N'exécute pas les quality gates (§ voir ACE-GENERATOR-QUALITY-GATES.md). |
+| Argument         | Obligatoire | Défaut                    | Rôle                                                                      |
+| ---------------- | ----------- | ------------------------- | ------------------------------------------------------------------------- |
+| `--name`         | oui         | —                         | Nom affiché du client.                                                    |
+| `--out`          | oui         | —                         | Dossier cible (vide ou absent, sauf `--force`).                           |
+| `--slug`         | non         | dérivé de `--name`        | Slug kebab-case (`package.json:name`, `ace.meta.json`).                   |
+| `--config`       | non         | `input/client.config.ts`  | Configuration client TypeScript.                                          |
+| `--brief`        | non         | `input/CLIENT_BRIEF.md`   | Brief Markdown copié tel quel dans `input/`.                              |
+| `--assets`       | non         | —                         | Dossier d'assets à copier + inventorier.                                  |
+| `--content`      | non         | `<dir du config>/content` | Dossier contenant `content.json` (contenu éditorial → `site-content.ts`). |
+| `--url`          | non         | —                         | Origine absolue (canonical/OG/sitemap).                                   |
+| `--force`        | non         | `false`                   | Écrase un dossier de sortie non vide.                                     |
+| `--skip-install` | non         | `false`                   | N'exécute pas `pnpm install` dans le site généré.                         |
+| `--skip-check`   | non         | `false`                   | N'exécute pas les quality gates (§ voir ACE-GENERATOR-QUALITY-GATES.md).  |
 
 ### 1.1 Configuration client (`--config`)
 
@@ -63,7 +64,13 @@ refusées ; extensions inattendues copiées mais signalées.
    (`ResolvedFeatures` sérialisé) — consommé par le layout et les composants
    pour un effet **réel** (voir § 3).
 8. **Configuration résolue** — écrit `src/config/client.resolved.json`
-   (config Zod complète, défauts appliqués).
+   (config Zod complète) + `src/config/client.resolved.ts` (sélection de
+   recipes typée) + `src/config/site-content.ts` (contenu depuis `content.json`
+   ou dérivé neutre).
+   8b. **Rendu config-driven** — réécrit `src/app/page.tsx` → `ConfiguredHome`
+   (monte hero/scène/storytelling/collection/conversion via les recipes
+   résolues + le layout) et remplace `SiteHeader` par `ConfiguredHeader` dans
+   `layout.tsx` (recipe de navigation). Deux configs → DOM différent.
 9. **Routes** — retire `src/app/realisations` si `features.collections` est
    inactif et qu'aucune page `standard: "collection"` n'est déclarée active.
 10. **Mode proposition privée** — si `proposal.isPrivateProposal`, remplace
