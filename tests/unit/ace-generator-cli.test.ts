@@ -274,12 +274,21 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
       return files;
     };
 
+    // Les specs e2e conservées ne doivent pas non plus NAVIGUER vers une route
+    // interne supprimée (page.goto("/lab")…) — c'est une chaîne, pas un import,
+    // donc invisible au typecheck mais un 404 à l'exécution du site client.
+    const forbiddenRouteVisits = [
+      /goto\(\s*["'`]\/lab(\/|["'`])/,
+      /goto\(\s*["'`]\/ace-lab(\/|["'`])/,
+      /goto\(\s*["'`]\/engine(\/|["'`])/,
+    ];
+
     const testsDir = path.join(out, "tests");
     const offenders: string[] = [];
     if (existsSync(testsDir)) {
       for (const file of walkTestFiles(testsDir)) {
         const content = readFileSync(file, "utf8");
-        for (const pattern of forbiddenImportPatterns) {
+        for (const pattern of [...forbiddenImportPatterns, ...forbiddenRouteVisits]) {
           if (pattern.test(content)) {
             offenders.push(`${path.relative(out, file)} matches ${pattern}`);
           }
@@ -287,6 +296,27 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
       }
     }
     expect(offenders).toEqual([]);
+  });
+
+  it("conserve les specs universelles (home, reduced-motion) et exclut leurs variantes engine-only", () => {
+    const out = tmpOut("universal-specs-kept");
+    const res = runCli([
+      "--name",
+      "Specs Universelles",
+      "--out",
+      out,
+      "--skip-install",
+      "--skip-check",
+    ]);
+    expect(res.status).toBe(0);
+    // Universelles conservées :
+    expect(existsSync(path.join(out, "tests/e2e/home.spec.ts"))).toBe(true);
+    expect(existsSync(path.join(out, "tests/e2e/reduced-motion.spec.ts"))).toBe(true);
+    expect(existsSync(path.join(out, "tests/e2e/a11y.spec.ts"))).toBe(true);
+    // Variantes engine-only exclues :
+    expect(existsSync(path.join(out, "tests/e2e/home-starter.spec.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/e2e/reduced-motion-engine.spec.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/e2e/a11y-engine-internal.spec.ts"))).toBe(false);
   });
 
   it("n'expédie aucun document interne du moteur", () => {

@@ -31,8 +31,11 @@ test.describe("Home (universal)", () => {
 
   test("a conversion path reaches the contact page and its form", async ({ page }) => {
     await page.goto("/");
-    const contactLink = page.locator('a[href="/contact"]').first();
-    await expect(contactLink).toBeVisible();
+    // A VISIBLE link to /contact must exist (desktop nav links may be hidden on
+    // mobile, but the hero/conversion CTA is always reachable — house rule:
+    // the CTA is reachable without finishing any scene/animation).
+    const contactLink = page.locator('a[href="/contact"]:visible').first();
+    await expect(contactLink).toBeVisible({ timeout: 20_000 });
     await contactLink.click();
     await expect(page).toHaveURL(/\/contact$/);
     await expect(page.getByRole("heading", { level: 1, name: "Contact" })).toBeVisible();

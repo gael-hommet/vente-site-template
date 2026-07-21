@@ -241,6 +241,13 @@ const ENGINE_ONLY_TESTS = [
   // et /engine — remplacées/absentes dans un site client (home.spec.ts couvre
   // l'universel).
   "tests/e2e/home-starter.spec.ts",
+  // reduced-motion-engine visite /lab (route interne) — absente d'un site
+  // client. Le volet universel (/ sous reduced-motion) reste dans
+  // reduced-motion.spec.ts (conservé côté client).
+  "tests/e2e/reduced-motion-engine.spec.ts",
+  // forms-engine teste le LeadForm riche de /lab (route interne). Le volet
+  // universel (ContactForm sur /contact) reste dans forms.spec.ts.
+  "tests/e2e/forms-engine.spec.ts",
 ];
 // Le générateur lui-même : un site client ne régénère jamais de site depuis
 // lui-même (et `git archive HEAD` y échouerait de toute façon, le site

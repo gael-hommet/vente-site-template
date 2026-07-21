@@ -33,17 +33,31 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    // forms.spec exercises /lab's MapLibre on software GL — brutal enough to
-    // degrade the shared browser process for tests that follow it. It runs in
-    // its own project so every other spec gets a fresh browser.
-    { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] }, testIgnore: /forms\.spec/ },
+    // forms specs exercise a form flow; the engine-only variant hits /lab's
+    // MapLibre on software GL — brutal enough to degrade the shared browser
+    // process for tests that follow. Both run in their own project so every
+    // other spec gets a fresh browser. Match both forms.spec and
+    // forms-engine.spec.
+    {
+      name: "chromium-desktop",
+      use: { ...devices["Desktop Chrome"] },
+      testIgnore: /forms(-engine)?\.spec/,
+    },
     {
       name: "chromium-desktop-forms",
       use: { ...devices["Desktop Chrome"] },
-      testMatch: /forms\.spec/,
+      testMatch: /forms(-engine)?\.spec/,
     },
-    { name: "chromium-mobile", use: { ...devices["Pixel 7"] }, testIgnore: /forms\.spec/ },
-    { name: "chromium-mobile-forms", use: { ...devices["Pixel 7"] }, testMatch: /forms\.spec/ },
+    {
+      name: "chromium-mobile",
+      use: { ...devices["Pixel 7"] },
+      testIgnore: /forms(-engine)?\.spec/,
+    },
+    {
+      name: "chromium-mobile-forms",
+      use: { ...devices["Pixel 7"] },
+      testMatch: /forms(-engine)?\.spec/,
+    },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
