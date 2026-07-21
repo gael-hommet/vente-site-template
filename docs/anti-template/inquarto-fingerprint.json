@@ -1,0 +1,50 @@
+{
+  "identity": "IN QUARTO Architecte & Associés (site témoin, figé)",
+  "sector": "architecture",
+  "source": {
+    "recipes": "N/A — IN QUARTO précède le système de recipes config-driven ; composants sur-mesure hand-built (HeroIntro, BioclimaticCut, Cotation, Cartouche, MissionFrieze, Folio…)",
+    "design": "config (preset custom 'inquarto', NEXT_PUBLIC_ACE_PRESET)",
+    "structure": "observation du code figé /workspaces/inquarto (src/app/page.tsx, components/inquarto/*) — jamais modifié",
+    "webgl": "observation : scène maquette-etude (BioclimaticCut) montée via AdaptiveCanvas, gatée par tier"
+  },
+  "designLanguage": "inquarto (preset custom hors des 8 presets moteur — palette Chaux/Garrigue)",
+  "recipes": {
+    "hero": "sur-mesure (HeroIntro) — apparenté split/typographique mais habillé architecture",
+    "navigation": "sur-mesure (Folio, routes métier /projets /approche /agence)",
+    "projects": "sur-mesure (ProjectPlate, élévation par typologie, SVG)",
+    "storytelling": "sur-mesure (MissionFrieze, Cotation)",
+    "conversion": "sur-mesure (EtudeForm)",
+    "layout": "sur-mesure"
+  },
+  "motionProfile": "cinématique (GSAP/ScrollTrigger, coupe bioclimatique animée)",
+  "sceneProfile": "product/environment (maquette 3D d'étude, tier-gated)",
+  "webgl": true,
+  "canvasMounted": true,
+  "density": "dense éditoriale technique",
+  "grid": "grille architecturale (PlanGrid), planches ProjectPlate, cartouches",
+  "width": "colonnes techniques, plans",
+  "alignment": "mixte, composition planche/cartouche",
+  "dominantSurface": "papier chaux clair, thème sombre chaud non-inversé",
+  "palette": "Chaux/Garrigue (ocres, verts olive, terre) — signature architecte",
+  "typography": "Fraunces (serif) ≥1.75rem, chiffres mono tabulaires, capitales",
+  "rhythm": "monographie architecturale, 9 chapitres, frise mission",
+  "sectionOrder": [
+    "hero(HeroIntro)",
+    "coupe bioclimatique(WebGL)",
+    "cotation",
+    "frise mission",
+    "projets(ProjectPlate)",
+    "FAQ",
+    "contact(EtudeForm)"
+  ],
+  "heroDom": "intro architecturale sur-mesure, hachures, cartouche",
+  "navigationDom": "Folio maison, routes métier architecte, hachures/cartouches",
+  "collectionDom": "planches ProjectPlate (21 projets), élévation SVG par typologie, navigation folio par typologie",
+  "conversionDom": "EtudeForm (demande d'étude), cotation budget animée",
+  "mobileBehavior": "StickyMobileCTA, planches responsives, coupe adaptée",
+  "cta": "Demander une étude",
+  "footer": "sur-mesure architecte",
+  "interactions": "coupe bioclimatique interactive, maquette 3D orbitable, cotations animées",
+  "canvas": true,
+  "mediaTreatment": "SVG architecturaux (hachures, élévations), maquette 3D d'étude + fallback"
+}

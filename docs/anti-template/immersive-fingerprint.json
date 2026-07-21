@@ -1,0 +1,48 @@
+{
+  "identity": "Orbe (fixture immersive ACE)",
+  "sector": "technology",
+  "source": {
+    "recipes": "config (validation-inputs/immersive/client.config.ts + src/config/client.resolved.ts)",
+    "design": "config",
+    "structure": "config + observation captures docs/anti-template/captures/immersive-*.png",
+    "webgl": "audit réel (scripts/ace/audit-webgl.mjs --expect webgl : 4 chunks + 1 canvas ; reduced-motion → fallback)"
+  },
+  "designLanguage": "precision-dark",
+  "recipes": {
+    "hero": "media-first",
+    "navigation": "immersive-overlay",
+    "projects": "horizontal-chapters",
+    "storytelling": "immersive-scroll",
+    "conversion": "premium-inquiry",
+    "layout": "immersive-layout"
+  },
+  "motionProfile": "cinematic",
+  "sceneProfile": "immersive-environment",
+  "webgl": true,
+  "canvasMounted": true,
+  "density": "compact",
+  "grid": "pleine largeur, chapitres horizontaux à défilement",
+  "width": "full-bleed (immersive-layout)",
+  "alignment": "bas de page (items-end), média plein cadre",
+  "dominantSurface": "sombre (quasi-noir cyan precision-dark)",
+  "palette": "noir froid, accent cyan électrique",
+  "typography": "display serrée, kicker mono, hiérarchie contrastée",
+  "rhythm": "cinématique, défilement immersif, sections plein écran",
+  "sectionOrder": [
+    "hero(media-first)",
+    "scene(webgl)",
+    "storytelling(immersive)",
+    "collection(horizontal)",
+    "conversion(premium)"
+  ],
+  "heroDom": "média plein cadre + voile sombre, titre bas de page, scène WebGL montée sous le hero",
+  "navigationDom": "déclencheur 'MENU' → overlay plein écran (role=dialog), liens display géants, fermeture Escape",
+  "collectionDom": "carrousel horizontal à scroll-snap (chapitres), pas de grille verticale",
+  "conversionDom": "bande brand + carte d'action premium (premium-inquiry)",
+  "mobileBehavior": "overlay nav plein écran, hero plein cadre conservé, sticky CTA mobile actif",
+  "cta": "Demander une présentation (bouton cyan proéminent)",
+  "footer": "sombre, aligné au thème",
+  "interactions": "scène WebGL orbitable, défilement immersif, overlay au clic ; fallback poster si LITE/reduced-motion",
+  "canvas": true,
+  "mediaTreatment": "média plein cadre + scène 3D réelle (demo.product-reveal), fallback poster obligatoire"
+}

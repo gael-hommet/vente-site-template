@@ -1,0 +1,42 @@
+{
+  "identity": "Revue Liseré (fixture éditoriale ACE)",
+  "sector": "culture",
+  "source": {
+    "recipes": "config (validation-inputs/editorial/client.config.ts + src/config/client.resolved.ts)",
+    "design": "config",
+    "structure": "config + observation captures docs/anti-template/captures/editorial-*.png",
+    "webgl": "audit réel (scripts/ace/audit-webgl.mjs --expect none)"
+  },
+  "designLanguage": "editorial-light",
+  "recipes": {
+    "hero": "typographic",
+    "navigation": "editorial-folio",
+    "projects": "editorial-index",
+    "storytelling": "alternating-narrative",
+    "conversion": "minimal-contact",
+    "layout": "editorial-layout"
+  },
+  "motionProfile": "subtle",
+  "sceneProfile": "no-scene",
+  "webgl": false,
+  "canvasMounted": false,
+  "density": "spacious",
+  "grid": "colonne éditoriale large, sommaire en lignes indexées",
+  "width": "large (max-w-6xl), aéré",
+  "alignment": "haut de page, texte à gauche",
+  "dominantSurface": "claire (papier chaud editorial-light)",
+  "palette": "papier/encre, accent ardoise bleu",
+  "typography": "typographique dominante, très grand titre, chiffres mono en folio",
+  "rhythm": "magazine, respirations amples entre sections",
+  "sectionOrder": ["hero", "storytelling(alternating)", "collection(index)", "conversion"],
+  "heroDom": "titre géant sans média, kicker mono, deux CTA texte — aucun canvas",
+  "navigationDom": "barre folio : liens numérotés (01/02…) inline desktop, menu 'Menu' plein texte mobile",
+  "collectionDom": "sommaire indexé (ordered list numérotée), méta mono, pas de vignettes média",
+  "conversionDom": "bloc centré sobre (minimal-contact), un CTA d'abonnement",
+  "mobileBehavior": "nav repliée en 'Menu' texte, hero typographique conservé, pas de sticky CTA",
+  "cta": "S'abonner (texte, discret)",
+  "footer": "sobre, texte",
+  "interactions": "reveal léger au scroll, aucune interaction WebGL/gestuelle",
+  "canvas": false,
+  "mediaTreatment": "aucun média 3D ni image plein cadre ; typographie comme visuel"
+}
