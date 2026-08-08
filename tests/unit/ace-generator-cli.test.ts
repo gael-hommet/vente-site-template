@@ -339,6 +339,7 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(existsSync(path.join(out, "docs/ACE-MEDIA-ARCHITECTURE.md"))).toBe(false);
     expect(existsSync(path.join(out, "docs/ACE-HIGGSFIELD-SETUP.md"))).toBe(false);
     expect(existsSync(path.join(out, "docs/ACE-ANTI-LOW-POLY.md"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-0.2-FINAL-REPORT.md"))).toBe(false);
     // Tests de doctrine média : élagués (tests moteur, pas du site client).
     expect(existsSync(path.join(out, "tests/unit/media-engine.test.ts"))).toBe(false);
     expect(existsSync(path.join(out, "tests/unit/cinematic-scroll.test.tsx"))).toBe(false);

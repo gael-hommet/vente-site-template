@@ -223,6 +223,7 @@ const ENGINE_ONLY_DOCS = [
   // ACE 0.2 — doc interne de la couche média (le RUNTIME média, lui, reste
   // shippé : src/ace/media-engine + src/components/media/CinematicScroll).
   "docs/ACE-0.2-IMPLEMENTATION-PLAN.md",
+  "docs/ACE-0.2-FINAL-REPORT.md",
   "docs/ACE-MEDIA-ARCHITECTURE.md",
   "docs/ACE-MEDIA-QA.md",
   "docs/ACE-PROVIDER-INTEGRATION.md",
