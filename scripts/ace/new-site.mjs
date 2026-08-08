@@ -220,6 +220,17 @@ const ENGINE_ONLY_DOCS = [
   "docs/ACE-ANTI-TEMPLATE-VALIDATION.md",
   "docs/ACE-FINAL-REPORT.md",
   "docs/ACE-NEXT-CLIENT-RUNBOOK.md",
+  // ACE 0.2 — doc interne de la couche média (le RUNTIME média, lui, reste
+  // shippé : src/ace/media-engine + src/components/media/CinematicScroll).
+  "docs/ACE-0.2-IMPLEMENTATION-PLAN.md",
+  "docs/ACE-MEDIA-ARCHITECTURE.md",
+  "docs/ACE-MEDIA-QA.md",
+  "docs/ACE-PROVIDER-INTEGRATION.md",
+  "docs/ACE-HIGGSFIELD-SETUP.md",
+  "docs/ACE-SCROLL-CINEMA.md",
+  "docs/ACE-COST-GUARD.md",
+  "docs/ACE-ANTI-LOW-POLY.md",
+  "docs/ACE-PUBLIC-RELEASE.md",
 ];
 // Routes Studio/Lab/Engine : jamais expédiées à un client — absence PHYSIQUE,
 // pas seulement noindex (preuve automatisée en test).
@@ -249,6 +260,11 @@ const ENGINE_ONLY_TESTS = [
   // forms-engine teste le LeadForm riche de /lab (route interne). Le volet
   // universel (ContactForm sur /contact) reste dans forms.spec.ts.
   "tests/e2e/forms-engine.spec.ts",
+  // ACE 0.2 — tests de la DOCTRINE média (anti-low-poly, stratégie, cost, QA,
+  // providers) : tests moteur, pas des tests du site client. Le runtime testé
+  // (media-engine + CinematicScroll) reste shippé et couvert côté moteur.
+  "tests/unit/media-engine.test.ts",
+  "tests/unit/cinematic-scroll.test.tsx",
 ];
 // Le générateur lui-même : un site client ne régénère jamais de site depuis
 // lui-même (et `git archive HEAD` y échouerait de toute façon, le site
@@ -585,12 +601,23 @@ if (layoutSrc === layoutAfterImport) {
 writeFileSync(layoutPath, layoutSrc);
 console.log("✓ home + en-tête câblés sur les recipes sélectionnées");
 
-// package.json : nom du site + retrait du script du générateur (scripts/ace
-// est élagué — la commande "ace:new-site" n'aurait plus de fichier à exécuter).
+// package.json : nom du site + retrait des scripts du moteur. `scripts/ace` est
+// entièrement élagué (GENERATOR_TOOLING) — tout script pointant dedans
+// (ace:new-site, ace:media:*, ace:provider:*, ace:audit-webgl,
+// ace:compare-fingerprints) n'aurait plus de fichier à exécuter. On les retire
+// pour ne pas livrer de commandes cassées au client.
 const pkgPath = path.join(extracted, "package.json");
 const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 pkg.name = slug;
-delete pkg.scripts?.["ace:new-site"];
+if (pkg.scripts) {
+  const removedScripts = Object.entries(pkg.scripts)
+    .filter(([, cmd]) => typeof cmd === "string" && /(^|[^\w/])scripts\/ace\//.test(cmd))
+    .map(([key]) => key);
+  for (const key of removedScripts) delete pkg.scripts[key];
+  if (removedScripts.length > 0) {
+    console.log(`✓ scripts moteur retirés de package.json : ${removedScripts.join(", ")}`);
+  }
+}
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 
 // ace.meta.json : traçabilité moteur ↔ site (diff/upgrade futur).

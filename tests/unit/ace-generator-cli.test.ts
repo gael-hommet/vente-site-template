@@ -328,6 +328,36 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(existsSync(path.join(out, "docs/ACE-GENERATOR.md"))).toBe(false);
   });
 
+  it("élague l'outillage média interne (CLI/docs/tests + scripts) mais garde le runtime média", () => {
+    const out = tmpOut("media-tooling-pruned");
+    const res = runCli(["--name", "Média", "--out", out, "--skip-install", "--skip-check"]);
+    expect(res.status).toBe(0);
+
+    // CLI média interne : élaguée (scripts/ace entier).
+    expect(existsSync(path.join(out, "scripts/ace/media"))).toBe(false);
+    // Docs média internes : élaguées.
+    expect(existsSync(path.join(out, "docs/ACE-MEDIA-ARCHITECTURE.md"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-HIGGSFIELD-SETUP.md"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-ANTI-LOW-POLY.md"))).toBe(false);
+    // Tests de doctrine média : élagués (tests moteur, pas du site client).
+    expect(existsSync(path.join(out, "tests/unit/media-engine.test.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/unit/cinematic-scroll.test.tsx"))).toBe(false);
+
+    // Scripts moteur retirés de package.json (leur cible scripts/ace est élaguée).
+    const pkg = JSON.parse(readFileSync(path.join(out, "package.json"), "utf8"));
+    const scriptKeys = Object.keys(pkg.scripts ?? {});
+    expect(scriptKeys).not.toContain("ace:new-site");
+    expect(scriptKeys.filter((k) => k.startsWith("ace:"))).toEqual([]);
+    for (const cmd of Object.values(pkg.scripts ?? {})) {
+      expect(String(cmd)).not.toMatch(/scripts\/ace\//);
+    }
+
+    // RUNTIME média : conservé (réutilisable dans le site client).
+    expect(existsSync(path.join(out, "src/ace/media-engine/index.ts"))).toBe(true);
+    expect(existsSync(path.join(out, "src/ace/media-engine/anti-low-poly.ts"))).toBe(true);
+    expect(existsSync(path.join(out, "src/components/media/CinematicScroll.tsx"))).toBe(true);
+  });
+
   it("copie les assets fournis et produit un manifeste tracé", () => {
     const out = tmpOut("assets");
     const assetsDir = mkdtempSync(path.join(tmpdir(), "ace-cli-assets-"));
