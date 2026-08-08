@@ -142,3 +142,23 @@ Types + strategy + cost + QA + anti-low-poly + provider layer (local réel +
 higgsfield guardé) + orchestration scroll + CLI + docs, avec tests, `pnpm check`
 vert, aucun secret, aucun faux succès provider, et un rapport final honnête
 listant réel / stub / dépendant-externe.
+
+## 5. État d'avancement (mis à jour)
+
+> Addendum de suivi. Les sections 1–4 ci-dessus sont le plan d'origine ; ce qui
+> suit est l'état RÉEL après implémentation (le plan reste l'historique fidèle).
+
+| Phase                                                           | État        | Notes de réconciliation vs plan                                                                                                                                                                                                 |
+| --------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 — audit réel                                                  | ✅          | ffmpeg/sharp/gltf présents ; aucun provider IA ; runtime scroll-cinéma existant.                                                                                                                                                |
+| 1 — plan                                                        | ✅          | ce document.                                                                                                                                                                                                                    |
+| 2 — fondations (types, strategy, shot, cost, qa, anti-low-poly) | ✅          | La continuité vit dans `qa.ts` (`assessContinuity`), **pas** dans un `continuity.ts` séparé. Le contrat de résultat provider s'appelle `ProviderResult` (`providers/types.ts`), pas `AceProviderResult`.                        |
+| 3 — provider layer (local + higgsfield + registry + config)     | ✅          | `local` = traitement réel (ffmpeg) ; `higgsfield` guardé, jamais simulé (schéma réponse **À CONFIRMER**).                                                                                                                       |
+| 4 — scroll cinema (`CinematicScroll`)                           | ✅          | Orchestre `video-scroll`/`image-sequence` ; autres stratégies → poster (jamais de 3D cheap). `DepthParallax` n'est pas monté par ce wrapper (repli poster).                                                                     |
+| 5 — CLI                                                         | ⚠️ partiel  | Livrés : `capabilities`, `plan`, `frames`, `report`, `provider:check`. **Non livrés** : `generate`, `qa`, `cost`, `assemble`, `optimize` (logique QA/coût existe en module, sans wrapper CLI). À implémenter, jamais à simuler. |
+| 6 — docs                                                        | ✅          | `ACE-MEDIA-ARCHITECTURE`, `ACE-PROVIDER-INTEGRATION`, `ACE-HIGGSFIELD-SETUP`, `ACE-SCROLL-CINEMA`, `ACE-COST-GUARD`, `ACE-MEDIA-QA`, `ACE-ANTI-LOW-POLY`, `ACE-PUBLIC-RELEASE`.                                                 |
+| 7 — élagage générateur + validation + rapport honnête           | ⏳ en cours | Voir `ACE-PUBLIC-RELEASE.md` pour la matrice shippé/élagué.                                                                                                                                                                     |
+
+**Écarts assumés** (honnêteté) : la génération IA n'est pas fonctionnelle par
+défaut (provider requis, mapping Higgsfield à confirmer) ; les CLI
+`generate/qa/assemble/optimize` ne sont pas fournies dans cette itération.
