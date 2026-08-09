@@ -3,6 +3,18 @@
 Document **interne au moteur** (élagué à la génération). Cadre de contrôle
 qualité des médias (générés ou fournis) et de la continuité inter-plans.
 
+## Deux étages de QA
+
+| Étage          | Module                           | Ce qu'il mesure                                                   | Automatisable ?                      |
+| -------------- | -------------------------------- | ----------------------------------------------------------------- | ------------------------------------ |
+| **Technique**  | `node/technical-qa.ts` (ffprobe) | existence, intégrité, dimensions, durée, fps, codec, poids, audio | ✅ **oui**, ce sont des faits        |
+| **Continuité** | `node/continuity.ts` (ffmpeg)    | frames de raccord, SSIM, écart de couleur                         | ✅ partiellement (ruptures franches) |
+| **Artistique** | `art-direction.ts`               | composition, réalisme, premium feel, usability                    | ❌ **non** — revue humaine / vision  |
+
+`pnpm ace:media:qa` exécute les deux premiers étages sur de VRAIS fichiers et
+renvoie `PASS` / `REVIEW_REQUIRED` / `REJECT` (exit 1 s'il y a un REJECT).
+Un `PASS` technique n'est **jamais** une approbation artistique.
+
 ## Honnêteté d'abord
 
 Évaluer visuellement un rendu (déformations, artefacts, « trop IA », raccords)

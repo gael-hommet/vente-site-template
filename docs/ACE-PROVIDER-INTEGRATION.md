@@ -17,8 +17,10 @@ interface MediaProvider {
 
 - `ProviderCapability` : `generate-image`, `generate-video`, `extract-frames`,
   `assemble-video`, `optimize`, `upscale`, `interpolate`.
-- `ProviderStatus` : `READY` (configuré/utilisable), `PROVIDER_NOT_CONFIGURED`
-  (connu mais credentials absents), `UNAVAILABLE` (dépendance manquante).
+- `ProviderStatus` : `READY` · `PROVIDER_NOT_CONFIGURED` (aucun mécanisme
+  d'accès) · `PROVIDER_AUTH_PENDING` (outil présent, authentification absente) ·
+  `PROVIDER_CONTRACT_UNVERIFIED` (accès possible, contrat non vérifié) ·
+  `UNAVAILABLE` (dépendance manquante).
 - `ProviderResult` = union `{ ok: true, outputs, meta? }` |
   `{ ok: false, code, message }` avec `code ∈ { PROVIDER_NOT_CONFIGURED,
 MEDIA_ASSET_REQUIRED, UNAVAILABLE, GENERATION_FAILED }`.
@@ -61,14 +63,27 @@ si ffmpeg est présent, sinon `UNAVAILABLE`. La détection réelle des binaires 
 faite côté Node (CLI) et injectée via `setLocalToolAvailability(...)` — le bundle
 client ne teste jamais un binaire. Pas de `generate` (aucune génération IA).
 
-### `higgsfield` — génération IA (guardé, jamais simulé)
+### `higgsfield` — génération IA via le CLI OFFICIEL `hf-api`
 
-Capacités : `generate-image`, `generate-video`. `status()` =
-`PROVIDER_NOT_CONFIGURED` sans `HIGGSFIELD_API_KEY`. `generate()` **refuse
-proprement** sans credential ; avec credential, il fait un vrai `fetch`, mais le
-**mapping de la réponse reste À CONFIRMER** contre l'API réelle : il renvoie
-`GENERATION_FAILED` explicite plutôt qu'un faux succès. Voir
-[ACE-HIGGSFIELD-SETUP.md](ACE-HIGGSFIELD-SETUP.md).
+Capacités : `generate-image`, `generate-video`.
+
+> Une version antérieure appelait un endpoint REST **supposé**
+> (`api.higgsfield.ai/v1`). L'audit a mesuré `HTTP 521` : cet endpoint ne sert
+> pas d'API. Il a été **supprimé**. ACE s'appuie désormais sur le CLI officiel
+> `@higgsfield/cloud-cli`, conçu pour être piloté par un agent autonome, dont le
+> contrat a été capturé **en exécutant le binaire**.
+
+L'adapter reste **isomorphe** (aucun `node:*`) : il décrit le provider et délègue
+l'exécution à un pilote injecté côté Node (`setHiggsfieldRuntime`), implémenté
+dans `node/hf-cli.ts` + `node/provider-runtime.ts`. Statut :
+
+| Constat réel                                   | `status()`                |
+| ---------------------------------------------- | ------------------------- |
+| binaire `hf-api` absent                        | `PROVIDER_NOT_CONFIGURED` |
+| binaire présent, `hf-api auth status` en échec | `PROVIDER_AUTH_PENDING`   |
+| binaire + authentification                     | `READY`                   |
+
+Voir [ACE-HIGGSFIELD-SETUP.md](ACE-HIGGSFIELD-SETUP.md).
 
 ## Ajouter un nouveau provider
 

@@ -81,6 +81,30 @@ estimateCost({
 Passer `shotCount: 6` avec le même tarif porte `recommendedCost` à `48` (sous
 seuil) ; un `unitCost` plus élevé le ferait basculer au-dessus → alerte.
 
+## Coût RÉELLEMENT consommé (`budget.ts`)
+
+`cost.ts` estime _a priori_ ; `budget.ts` suit ce qui est réellement dépensé
+pendant un run et **arrête la boucle** au plafond :
+
+```ts
+createBudget({ maxSpend, maxAttemptsPerShot, maxTotalGenerations, currency });
+canGenerate(state, nextCost); // refuse AVANT de dépenser
+recordSpend(state, record); // amount: number | null
+summarizeBudget(state); // { spent, remaining, perShot, isLowerBound }
+```
+
+Les montants proviennent du provider lui-même (`hf-api estimate` avant,
+`hf-api usage` après) — jamais d'un tarif inventé. Un coût non communiqué est
+enregistré `null`, jamais `0` : le total est alors marqué **minorant**
+(`isLowerBound: true`) et le nombre de coûts inconnus est affiché.
+
+Garde-fous anti-emballement, tous testés :
+
+- `maxAttemptsPerShot` (défaut 3) borne les retries ;
+- `WOULD_EXCEED_MAX_SPEND` refuse une génération qui ferait dépasser le plafond ;
+- `MAX_SPEND_REACHED` / `MAX_GENERATIONS_REACHED` arrêtent le run ;
+- `ace:media:generate` exige `--yes` pour dépenser (`--dry-run` = estimation seule).
+
 ## Règles
 
 - Le moteur ne connaît **aucun** prix par défaut : renseigner le tarif réel du

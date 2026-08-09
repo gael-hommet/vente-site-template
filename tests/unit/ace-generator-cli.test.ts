@@ -343,6 +343,11 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     // Tests de doctrine média : élagués (tests moteur, pas du site client).
     expect(existsSync(path.join(out, "tests/unit/media-engine.test.ts"))).toBe(false);
     expect(existsSync(path.join(out, "tests/unit/cinematic-scroll.test.tsx"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/unit/media-orchestrator.test.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/unit/media-delivery.test.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/unit/media-pipeline-e2e.test.ts"))).toBe(false);
+    // Couche Node du media-engine (spawn ffmpeg/hf-api) : outillage moteur.
+    expect(existsSync(path.join(out, "src/ace/media-engine/node"))).toBe(false);
 
     // Scripts moteur retirés de package.json (leur cible scripts/ace est élaguée).
     const pkg = JSON.parse(readFileSync(path.join(out, "package.json"), "utf8"));
@@ -356,7 +361,26 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     // RUNTIME média : conservé (réutilisable dans le site client).
     expect(existsSync(path.join(out, "src/ace/media-engine/index.ts"))).toBe(true);
     expect(existsSync(path.join(out, "src/ace/media-engine/anti-low-poly.ts"))).toBe(true);
+    expect(existsSync(path.join(out, "src/ace/media-engine/premium-gate.ts"))).toBe(true);
+    expect(existsSync(path.join(out, "src/ace/media-engine/delivery-mode.ts"))).toBe(true);
     expect(existsSync(path.join(out, "src/components/media/CinematicScroll.tsx"))).toBe(true);
+
+    // Le runtime conservé ne doit JAMAIS importer la couche Node élaguée,
+    // sinon le typecheck du site client casse.
+    const walk = (dir: string): string[] => {
+      const files: string[] = [];
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) files.push(...walk(full));
+        else if (/\.(ts|tsx)$/.test(entry.name)) files.push(full);
+      }
+      return files;
+    };
+    const engineDir = path.join(out, "src/ace/media-engine");
+    // On cible les IMPORTS réels (pas les simples mentions en commentaire).
+    const nodeImport = /(?:from|import)\s*\(?\s*["'][^"']*(?:media-engine\/node|\.\.?\/node)\//;
+    const offenders = walk(engineDir).filter((f) => nodeImport.test(readFileSync(f, "utf8")));
+    expect(offenders).toEqual([]);
   });
 
   it("copie les assets fournis et produit un manifeste tracé", () => {

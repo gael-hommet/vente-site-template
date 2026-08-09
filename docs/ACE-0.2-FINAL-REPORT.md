@@ -1,114 +1,191 @@
 # ACE 0.2 — Rapport final honnête (Creative Media Autonomous Engine)
 
-Document **interne au moteur** (élagué à la génération). Rapport de clôture de la
-couche média ACE 0.2. **Sans complaisance** : ce qui est réel, ce qui est
-stub/à-configurer, ce qui dépend d'un provider ou d'un asset externe.
+Document **interne au moteur** (élagué à la génération). Rapport de clôture,
+**sans complaisance** : ce qui est réel, ce qui est prouvé, ce qui ne l'est pas.
 
-> Règle d'or de ce rapport : **ne rien surévaluer**. Une capacité n'est
-> « fonctionne » que si elle a été exécutée et vérifiée ici.
+> Règle de ce rapport : une capacité n'est « fonctionne » que si elle a été
+> **exécutée et vérifiée ici**. Tout le reste est marqué comme non prouvé.
 
-## 1. Ce qui a été réellement créé
+## 1. Version avant
 
-| Livrable                                              | Fichiers                                                                                                                               | État                                |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| Contrats typés                                        | `src/ace/media-engine/types.ts`                                                                                                        | ✅ réel, sérialisable               |
-| Doctrine anti-low-poly (garde + verdict)              | `anti-low-poly.ts`                                                                                                                     | ✅ réel, **testé**                  |
-| Strategy decision layer (pure)                        | `strategy.ts`                                                                                                                          | ✅ réel, **testé**                  |
-| Shot planner (storyboard + raccords)                  | `shot-planner.ts`                                                                                                                      | ✅ réel, **testé**                  |
-| Media plan builder                                    | `plan.ts`                                                                                                                              | ✅ réel, **testé**                  |
-| Cost guard                                            | `cost.ts`                                                                                                                              | ✅ réel, **testé**                  |
-| QA + continuité (cadre + heuristiques)                | `qa.ts`                                                                                                                                | ✅ réel, **testé**                  |
-| Config providers (ENV only)                           | `config.ts`                                                                                                                            | ✅ réel                             |
-| Contrat + registre de providers                       | `providers/{types,registry}.ts`                                                                                                        | ✅ réel, fail-safe                  |
-| Adapter local (ffmpeg/sharp)                          | `providers/local.ts`                                                                                                                   | ✅ réel (statut injecté par la CLI) |
-| Adapter Higgsfield (guardé)                           | `providers/higgsfield.ts`                                                                                                              | ⚠️ **stub honnête** (voir §3)       |
-| Runtime scroll-cinéma                                 | `src/components/media/CinematicScroll.tsx`                                                                                             | ✅ réel, **testé**                  |
-| CLI capabilities/plan/frames/report/provider-check    | `scripts/ace/media/*`, `provider-check.mjs`                                                                                            | ✅ réel, **exécuté**                |
-| Docs (8)                                              | `docs/ACE-MEDIA-*`, `ACE-PROVIDER-*`, `ACE-HIGGSFIELD-*`, `ACE-COST-*`, `ACE-ANTI-LOW-POLY`, `ACE-SCROLL-CINEMA`, `ACE-PUBLIC-RELEASE` | ✅ réel                             |
-| Élagage générateur (runtime shippé, outillage élagué) | `scripts/ace/new-site.mjs`                                                                                                             | ✅ réel, **testé end-to-end**       |
+`ACE_VERSION = "0.1.0"` (package.json `0.1.0`).
 
-Volume : ~1240 lignes de logique média + 133 lignes de runtime + 325 lignes de
-tests. 4 commits (`cd0aeef`, `72a6cd2`, `c4e4b68`, `36e651e`).
+## 2. Version après
 
-## 2. Ce qui FONCTIONNE ici, maintenant (vérifié)
+`ACE_VERSION = "0.2.0"` (package.json `0.2.0`). Bump effectué **après**
+vérification de la Definition of Done (§22 du mandat) — voir §19.
 
-- **Décision de stratégie** : `chooseStrategy` mappe intention+assets+providers+
-  contraintes → stratégie + blocker honnête. Exécuté via `pnpm ace:media:plan`.
-- **Doctrine anti-low-poly** : un besoin photoréaliste sans asset ni provider
-  renvoie `editorial-fallback` + `PROVIDER_NOT_CONFIGURED` avec la mention « ACE
-  ne bricole PAS de low-poly ». **Prouvé** par `ace:media:plan --demo` (exit 1) et
-  par les tests unitaires (WebGL+photoreal+sans modèle 3D → exception).
-- **Traitement local réel** : `pnpm ace:media:frames` extrait de vraies frames
-  webp via ffmpeg (ffmpeg 7.1.5 présent). Non destructif.
-- **Audit honnête de l'environnement** : `pnpm ace:media:capabilities` /
-  `ace:media:report` reflètent l'état RÉEL (ffmpeg/sharp/gltf ✓, aucun provider ✗).
-- **Statut providers** : `pnpm ace:provider:check` → `PROVIDER_NOT_CONFIGURED`,
-  exit 3, sans jamais afficher de valeur de credential.
-- **Runtime scroll-cinéma** : `CinematicScroll` orchestre video-scroll/
-  image-sequence, honore reduced-motion (poster), garde le CTA atteignable, ne
-  monte jamais de 3D cheap. Testé.
-- **Élagage générateur** : un site client généré ne contient ni CLI média, ni
-  docs média, ni tests de doctrine, ni script `ace:*` cassé — mais **garde** le
-  runtime média réutilisable. Vérifié en générant un site (47 entrées élaguées).
-- **`pnpm check`** vert : lint + typecheck + **205 tests** + build.
+## 3. Commits créés
 
-## 3. Ce qui est STUB / à CONFIGURER (honnêteté)
+| Commit      | Contenu                                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `12c1e8d`   | Provider officiel hf-api, orchestrateur, router, gate premium, budget, manifeste, reference lock, art direction, QA ffprobe (+23 tests) |
+| `a1c1415`   | CLI `generate` / `qa` / `assemble` / `optimize` + alignement `capabilities`/`provider:check`/`report`                                   |
+| `24af9d0`   | Continuité v2 (fichiers réels), mode de diffusion, Scroll Cinema v2, pipeline E2E (+20 tests)                                           |
+| (ce commit) | Docs à jour, élagage générateur, bump 0.2.0, changelog, rapport                                                                         |
 
-- **Génération IA (Higgsfield)** : l'adapter est codé, guardé et testé, mais **le
-  contrat exact de l'API n'est PAS validé** (aucune credential, aucun accès réseau
-  vérifié ici). Tant que le schéma payload/réponse n'est pas confirmé,
-  `generate()` renvoie `GENERATION_FAILED` explicite — **jamais** un faux succès.
-  Voir [ACE-HIGGSFIELD-SETUP.md](ACE-HIGGSFIELD-SETUP.md). Aucune image/vidéo ne
-  peut être générée par défaut.
-- **CLI `generate` / `qa` / `assemble` / `optimize`** : **non fournies** comme
-  scripts dans cette itération. La logique QA (`qa.ts`) et l'assemblage local
-  (`frames.mjs` + provider `local`) existent, mais sans wrapper CLI dédié. À
-  implémenter, jamais à simuler.
-- **QA visuelle IA** : non automatisable ici sans modèle de vision. `qa.ts`
-  fournit un cadre de scoring + des heuristiques structurelles ; chaque rapport
-  porte `requiresHumanReview: true`. Aucun « ✓ vendable » automatique.
+## 4. Modules créés
 
-## 4. Ce qui dépend d'un PROVIDER ou d'un ASSET externe
+**Isomorphes** (shippés dans les sites générés) : `model-router.ts` ·
+`reference-lock.ts` · `premium-gate.ts` · `art-direction.ts` · `budget.ts` ·
+`manifest.ts` · `orchestrator.ts` · `delivery-mode.ts` · `qa-verdict.ts`.
 
-- **Générer** une image/vidéo IA : requiert un provider configuré ET son contrat
-  d'API validé.
-- **Stratégie `hybrid`** (génération → assemblage) : requiert un provider ; sinon
-  la décision retombe honnêtement sur `editorial-fallback` + blocker.
-- **Stratégies `video-scroll` / `image-sequence` / `2.5d` / `webgl`** : requièrent
-  l'**asset** correspondant (vidéo continue, séquence de frames, images+depth,
-  vrai modèle glTF). Sans asset ni provider pour un besoin premium → blocker
-  `MEDIA_ASSET_REQUIRED` / `PROVIDER_NOT_CONFIGURED`, jamais de dégradation cheap.
-- **Coûts** : chiffrés uniquement si un `AceProviderPricing` (tarif + source) est
-  fourni ; sinon `0` + note « non chiffré ».
+**Node uniquement** (outillage moteur, élagué) : `node/hf-cli.ts` ·
+`node/provider-runtime.ts` · `node/technical-qa.ts` · `node/continuity.ts`.
 
-## 5. Sécurité & public-ready (vérifié)
+**CLI** : `scripts/ace/media/{generate.ts, qa.ts, assemble.mjs, optimize.mjs}`.
 
-- **Aucun secret** en dur dans la couche média (scan `sk-`/`AKIA`/clé privée : 0).
-- **Aucune lecture de fichier `.env`** : uniquement `process.env`, confiné aux
-  variables `HIGGSFIELD_*` déclarées. Aucune valeur de credential loguée.
-- **Aucune identité client en dur** (IN QUARTO / autre) dans la couche média.
-- **IN QUARTO figé** : dépôt vérifié **0 modification** — intact.
-- **Aucun push / déploiement / publication** : la couche média n'ajoute aucun
-  hook de ce type.
+## 5. Commandes réellement fonctionnelles
 
-## 6. Écarts assumés vs mandat
+Toutes exécutées et vérifiées dans cet environnement :
 
-- **Emplacement** : mandat = `packages/ace-media-*` ; dépôt = mono-package. Choix
-  **additif** `src/ace/media-engine/` documenté — un refactor monorepo aurait été
-  destructeur (le mandat interdisait la refonte). Voir
-  [ACE-0.2-IMPLEMENTATION-PLAN.md](ACE-0.2-IMPLEMENTATION-PLAN.md).
-- **CLI partielle** : 5 commandes réelles livrées sur les ~10 évoquées ; les 4
-  manquantes (generate/qa/assemble/optimize) sont documentées comme non fournies,
-  pas simulées.
-- **Génération non fonctionnelle par défaut** : par honnêteté (schéma Higgsfield à
-  confirmer), pas par oubli.
+| Commande                 | Preuve                                                                        |
+| ------------------------ | ----------------------------------------------------------------------------- |
+| `ace:media:capabilities` | ✅ rapporte ffmpeg/ffprobe/sharp/gltf ✓, higgsfield `PROVIDER_NOT_CONFIGURED` |
+| `ace:media:plan`         | ✅ `--demo` → `editorial-fallback` + `PROVIDER_NOT_CONFIGURED`, exit 1        |
+| `ace:media:qa`           | ✅ 3 rushes `PASS` ; média corrompu → `REJECT`, exit 1                        |
+| `ace:media:assemble`     | ✅ 3×2 s → master **6.00 s**, concat _sans recompression_ + webm + poster     |
+| `ace:media:optimize`     | ✅ desktop −12 %/−32 %, mobile −50 %/−51 %, upscale refusé                    |
+| `ace:media:frames`       | ✅ 48 frames webp extraites                                                   |
+| `ace:media:report`       | ✅ rapport can/can't complet                                                  |
+| `ace:provider:check`     | ✅ exit 3 sans CLI ; `PROVIDER_AUTH_PENDING` avec le VRAI binaire             |
+| `ace:media:generate`     | ✅ **exit 3** sans CLI · **exit 4** avec le vrai CLI non authentifié          |
 
-## 7. Prochaine passe recommandée
+## 6. Provider réel configuré : **NON**
 
-1. Valider le contrat API Higgsfield (ou un provider équivalent) et finaliser le
-   mapping réponse → `outputs`.
-2. Ajouter les CLI `generate` (via provider), `qa` (wrapper de `qa.ts`),
-   `assemble`/`optimize` (via provider `local` réel).
-3. Brancher un tarif réel dans le cost guard pour des estimations chiffrées.
-4. Étendre `CinematicScroll` (ou une surface dédiée) au montage 2.5D quand des
-   depth maps sont fournies.
+Le CLI officiel `hf-api` a été téléchargé et **réellement exécuté** (v0.1.2,
+build 2026-07-16) pour capturer son contrat, mais **aucune clé API n'est
+disponible** dans cet environnement.
+
+## 7. Génération IA réellement exécutée : **NON**
+
+Aucune image, aucune vidéo n'a été générée.
+
+## 8. Raison exacte
+
+`hf-api auth status` renvoie `Error: Not authenticated.` (**exit 2**). Sans clé
+`<api_key_id>:<secret>`, ACE refuse de générer et retourne
+`PROVIDER_AUTH_PENDING` (exit 4). **Aucune génération n'a été simulée** pour
+masquer cette absence — c'était l'exigence n°1 du mandat.
+
+## 9. Tests pipeline local
+
+**12 tests** (`media-pipeline-e2e.test.ts`), média synthétique ffmpeg, coût nul :
+faits techniques réels · rejet d'un fichier corrompu et d'un fichier absent ·
+contrainte de dimensions · **rupture de continuité détectée** · coupe volontaire
+non pénalisée · assemblage (durée = somme) · **refus d'assembler sans sortie
+approuvée** · optimisation sans upscale · extraction de frames · CLI QA exit 1/0
+· refus du média de test comme livrable premium · rapport ffprobe traçable.
+
+## 10. Tests provider
+
+**Statut : `PROVIDER_AUTH_PENDING`.** Vérifié avec le vrai binaire officiel :
+détection du CLI, lecture du statut d'authentification, codes de sortie honnêtes
+(3 / 4). Le chemin de génération lui-même **n'est pas validé de bout en bout** —
+il n'est donc PAS marqué VALIDATED.
+
+## 11. Anti-low-poly
+
+Doctrine intacte et testée : WebGL + barre photoréaliste + aucun modèle 3D réel
+⇒ exception ; `chooseStrategy` renvoie `editorial-fallback` + blocker avec la
+mention « ACE ne bricole PAS de low-poly ». Vérifié aussi via la CLI.
+
+## 12. Premium output gate
+
+`premium-gate.ts` : 8 violations couvertes (low-poly, média manquant, corrompu,
+QA rejetée, asset de test, placeholder, verrou rompu, repli silencieux) et
+3 actions (`SHIP` / `DECLARE_FALLBACK` / `BLOCK`). Un site peut fonctionner avec
+un repli ; un repli **déguisé** en premium est refusé.
+
+## 13. Reference lock
+
+`research/media/<subject-id>/` avec `reference-lock.json`. Invariants,
+contraintes négatives, références sources et approuvées. La sortie approuvée du
+plan N devient la référence forte du plan N+1 (vérifié par test). Un lock trop
+pauvre est signalé inexploitable.
+
+## 14. Continuité
+
+V2 sur **fichiers réels** : extraction des frames de raccord + SSIM + écart de
+couleur moyenne. **Calibration mesurée, pas supposée** — et elle a invalidé
+l'approche naïve : deux images sans aucun rapport ont scoré SSIM **0.155** dans
+un cas et **0.657** dans l'autre. Conclusion codée : ne jamais conclure sur le
+SSIM seul ; deux signaux doivent concorder, sinon `REVIEW_REQUIRED`.
+
+## 15. QA visuelle
+
+**Non automatisée, et c'est dit partout.** Un modèle de vision n'est pas branché
+dans le pipeline. `art-direction.ts` fournit la structure du jugement ; sans
+scores fournis, le verdict est `REVIEW_REQUIRED` — **jamais** `APPROVE`. Un
+`PASS` technique n'est pas une promesse esthétique.
+
+## 16. Cost guard
+
+Estimation _a priori_ (`cost.ts`) + **dépense consommée** (`budget.ts`) : plafond
+`maxSpend`, `maxAttemptsPerShot` (défaut 3), `maxTotalGenerations`, refus
+`WOULD_EXCEED_MAX_SPEND` avant dépense, arrêt net du run. Un coût non communiqué
+est `null` — jamais `0` : le total est marqué **minorant**. `--yes` obligatoire
+pour dépenser, `--dry-run` pour estimer seulement.
+
+## 17. Scroll cinema
+
+Complété sans réécriture : calque poster `next/image` jusqu'à la première image
+décodée (**plus de flash noir**), `onProgress` exposé, chapitres **réellement
+synchronisés** (`aria-current="step"`), sources mobiles dédiées, reduced-motion
+et CTA atteignable préservés. Arbitrage `VIDEO_SCROLL` / `IMAGE_SEQUENCE` chiffré.
+
+## 18. Public readiness
+
+✅ Aucun secret en dur · aucune lecture de `.env` (uniquement `process.env`) ·
+la clé n'est **jamais** passée en argument CLI · aucune valeur de credential
+loguée · provider **optionnel** (sans lui le moteur reste pleinement utilisable)
+· aucun artefact de test lourd committé · aucun push, aucun déploiement.
+
+⚠️ **Une réserve, signalée et non corrigée unilatéralement** :
+`docs/anti-template/inquarto-fingerprint.json` et
+`scripts/ace/compare-creative-fingerprints.mjs` contiennent le **nom d'un client
+réel** (« IN QUARTO ») et la description de son parti-pris visuel. Aucun secret,
+aucune coordonnée. Ces fichiers sont **élagués des sites générés** (donc aucune
+fuite vers un client), mais ils resteraient présents si **le moteur lui-même**
+était publié. Pré-existant à ce chantier et utilisé par la validation
+anti-template : à arbitrer (anonymiser en « site témoin A » ou retirer du dépôt
+public). Je ne l'ai pas supprimé de ma propre initiative pour ne pas casser
+cette validation.
+
+## 19. Tests finaux
+
+`pnpm check` **vert** : lint **0 warning** · typecheck · **248 tests** (27
+fichiers) · build. Générateur : **26 tests** verts, et un site généré
+**typecheck sans erreur** avec le runtime média conservé et la couche Node
+élaguée.
+
+Definition of Done §22 : **A→R satisfaits**, avec la nuance explicite du point H
+(`generate` retourne correctement `PROVIDER_NOT_CONFIGURED` /
+`PROVIDER_AUTH_PENDING` sans simulation, faute de credential).
+
+## 20. Éléments encore NON prouvés
+
+1. **Génération IA réelle** — jamais exécutée (pas de credential). Le code est
+   écrit et refuse proprement ; il n'est pas validé contre l'API.
+2. **Schéma JSON des réponses** (`models`, `estimate`, `generate`) — extracteurs
+   tolérants, mais à confirmer à la première authentification. En cas d'échec :
+   `HF_SCHEMA_UNVERIFIED`, jamais un faux succès.
+3. **Téléchargement des sorties** — `downloadTo()` n'a jamais tourné sur une
+   vraie URL de provider.
+4. **Model router sur catalogue réel** — testé sur des catalogues fabriqués ;
+   jamais sur la vraie sortie de `hf-api models`.
+5. **QA visuelle** — non automatisée (pas de modèle de vision branché).
+6. **Continuité fine d'identité** — SSIM et couleur détectent les ruptures
+   franches, pas une dérive subtile (poignée de porte, matériau).
+7. **Coûts chiffrés** — aucun tarif réel observé ; `estimate`/`usage` non
+   exécutés авec authentification.
+8. **Scroll Cinema v2 en navigateur réel** — couvert en jsdom (chapitres,
+   fallback, CTA) ; le rendu du calque poster et l'absence de flash noir n'ont
+   pas été validés visuellement dans un vrai navigateur.
+
+## Prochaine passe recommandée
+
+1. Authentifier `hf-api`, lancer **un** `--dry-run` puis **une** génération
+   minimale, confirmer les schémas et affiner les extracteurs.
+2. Brancher un inspecteur visuel (modèle de vision) sur `art-direction.ts`.
+3. Arbitrer la réserve du §18 avant toute publication du moteur.

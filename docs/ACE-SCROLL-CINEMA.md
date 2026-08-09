@@ -57,6 +57,22 @@ stratégies réellement **orchestrées** par ce wrapper (les autres → poster).
 > gestion de perte de contexte) **avec un vrai modèle glTF** — jamais par ce
 > wrapper, qui ne rend aucune 3D (anti-low-poly).
 
+## Scroll Cinema v2 — ce que la version 0.2 ajoute
+
+- **Aucun flash noir** : `ScrollVideo` superpose un calque poster (`next/image`,
+  `priority`) qui ne s'efface qu'une fois la première image décodée
+  (`onLoadedData` / `onSeeked`). L'attribut `poster` seul n'y suffit pas.
+- **Chapitres réellement synchronisés** : `CinematicScroll` reçoit la progression
+  du scrub (`onProgress`) et met en avant le chapitre courant
+  (`aria-current="step"`, corps du chapitre actif affiché). Ce n'est plus une
+  liste statique.
+- **Source mobile dédiée** : `mobileSources` + `mobileBreakpoint` servent une
+  variante allégée — même récit, même durée, résolution adaptée.
+- **Mode de diffusion arbitré** : `chooseDeliveryMode()` tranche entre
+  `VIDEO_SCROLL` et `IMAGE_SEQUENCE` sur des chiffres (poids réels, nombre de
+  frames, budget, mobile) et recommande la stratégie de préchargement
+  (`poster-then-full` ou `progressive-batches`).
+
 ## Accessibilité & anti scroll-jacking (non négociables)
 
 - **Reduced-motion** : `CinematicScroll` détecte `useReducedMotion()` et rend un

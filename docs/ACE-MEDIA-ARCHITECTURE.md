@@ -5,10 +5,14 @@ qui fait évoluer ACE d'un moteur qui _intègre_ de beaux assets vers un moteur
 qui _décide, planifie, oriente la création, contrôle et assemble_ des médias
 premium — **sans jamais dégrader silencieusement l'ambition artistique**.
 
-> Périmètre honnête : cette couche **décide, planifie, chiffre, contrôle** et
-> **assemble localement** (ffmpeg/sharp). Elle **ne génère pas** d'images/vidéos
-> IA par elle-même : la génération dépend d'un provider configuré (voir
-> [ACE-PROVIDER-INTEGRATION.md](ACE-PROVIDER-INTEGRATION.md)). Rien n'est simulé.
+> Périmètre honnête : cette couche **décide, planifie, route, chiffre, génère
+> (via un provider), contrôle, assemble et optimise**. La GÉNÉRATION d'images/
+> vidéos dépend d'un provider **authentifié** — sans lui, ACE fait tout le reste
+> et refuse explicitement de générer (`PROVIDER_NOT_CONFIGURED` /
+> `PROVIDER_AUTH_PENDING`). Rien n'est jamais simulé.
+>
+> La QA **visuelle** (déformations, artefacts, « trop IA ») n'est pas
+> automatisée : `REVIEW_REQUIRED` est une sortie valide et fréquente.
 
 ## Principe
 
@@ -31,21 +35,35 @@ sujet. Décision **additive**, documentée dans
 [ACE-0.2-IMPLEMENTATION-PLAN.md](ACE-0.2-IMPLEMENTATION-PLAN.md) :
 
 ```
-src/ace/media-engine/            # logique pure (décision/plan/coût/QA/providers)
+src/ace/media-engine/            # logique pure, isomorphe (aucun node:*)
   types.ts                       # contrats typés (source de vérité)
+  qa-verdict.ts                  # PASS | REVIEW_REQUIRED | REJECT (partagé)
   anti-low-poly.ts               # doctrine non négociable (garde + verdict)
+  premium-gate.ts                # ACE PREMIUM OUTPUT GATE (extension)
   strategy.ts                    # chooseStrategy() — quelle technique ?
+  model-router.ts                # routeModel() — catalogue RÉEL uniquement
   shot-planner.ts                # buildShotPlan() — storyboard + raccords
+  reference-lock.ts              # verrou d'identité du sujet
   plan.ts                        # buildMediaPlan() — plan complet
-  cost.ts                        # estimateCost() — cost guard
-  qa.ts                          # assessMedia()/assessContinuity()
-  config.ts                      # lecture ENV des providers (jamais .env)
+  cost.ts                        # estimateCost() — estimation a priori
+  budget.ts                      # dépense consommée + arrêt au plafond
+  qa.ts                          # cadre de scoring (revue humaine)
+  art-direction.ts               # reviewArtDirection() — verdict esthétique
+  manifest.ts                    # provenance (modèle, promptHash, tentatives)
+  orchestrator.ts                # la boucle, avec PORTS INJECTÉS (testable)
+  delivery-mode.ts               # video-scroll vs image-sequence (chiffré)
+  config.ts                      # lecture ENV (jamais .env)
   providers/
     types.ts                     # contrat MediaProvider (pluggable)
     registry.ts                  # registre fail-safe
     local.ts                     # ffmpeg/sharp/gltf (traitement, pas d'IA)
-    higgsfield.ts                # adapter guardé (jamais simulé)
-  index.ts                       # barrel
+    higgsfield.ts                # adapter sur CLI officiel (jamais simulé)
+  node/                          # ⚠ Node UNIQUEMENT — hors du barrel
+    hf-cli.ts                    # pilote du CLI officiel `hf-api`
+    provider-runtime.ts          # câblage des capacités réelles
+    technical-qa.ts              # QA RÉELLE via ffprobe
+    continuity.ts                # continuité v2 (frames + SSIM + couleur)
+  index.ts                       # barrel (isomorphe)
 
 scripts/ace/media/               # CLI (outillage interne, élagué à la génération)
 src/components/media/CinematicScroll.tsx   # runtime (réutilisable, shippé)
@@ -147,20 +165,40 @@ le moteur. Voir [ACE-PROVIDER-INTEGRATION.md](ACE-PROVIDER-INTEGRATION.md).
 
 ## CLI
 
-| Commande                                    | Rôle                                               | État                                                 |
-| ------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------- |
-| `pnpm ace:media:capabilities`               | Audit réel (ffmpeg/sharp/gltf, providers, runtime) | ✅ réel                                              |
-| `pnpm ace:media:plan <brief.json>`          | Plan média typé via le media-engine                | ✅ réel                                              |
-| `pnpm ace:media:frames <video> --out <dir>` | Extraction de frames webp (ffmpeg)                 | ✅ réel                                              |
-| `pnpm ace:media:report`                     | Rapport consolidé can/can't                        | ✅ réel                                              |
-| `pnpm ace:provider:check`                   | Statut honnête des providers                       | ✅ réel                                              |
-| `ace:media:{generate,qa,assemble,optimize}` | Génération/QA/assemblage batch                     | ⏳ non fourni — dépend d'un provider / à implémenter |
+| Commande                                     | Rôle                                                       | État                                       |
+| -------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------ |
+| `pnpm ace:media:capabilities`                | Audit réel (ffmpeg/ffprobe/sharp/gltf, providers, runtime) | ✅ réel                                    |
+| `pnpm ace:media:plan <brief>`                | Décision + storyboard + coût estimé                        | ✅ réel                                    |
+| `pnpm ace:media:generate --brief <f>`        | Pipeline orchestré complet                                 | ✅ réel — refuse honnêtement sans provider |
+| `pnpm ace:media:qa --manifest <f>`           | QA technique ffprobe + cohérence du manifeste              | ✅ réel                                    |
+| `pnpm ace:media:assemble <in...> --out <d>`  | Concat ffmpeg (copy si possible) → master                  | ✅ réel                                    |
+| `pnpm ace:media:optimize <master> --out <d>` | Variantes desktop/mobile + poster                          | ✅ réel                                    |
+| `pnpm ace:media:frames <video> --out <d>`    | Séquence webp pour le scrub                                | ✅ réel                                    |
+| `pnpm ace:media:report`                      | Rapport consolidé can/can't                                | ✅ réel                                    |
+| `pnpm ace:provider:check`                    | Statut providers (CLI installé ? authentifié ?)            | ✅ réel                                    |
 
-> **Honnêteté :** les commandes `generate/qa/assemble/optimize` du mandat ne sont
-> **pas** livrées comme scripts CLI dans cette itération. La logique QA existe
-> (`qa.ts`) mais n'a pas de wrapper CLI ; l'assemblage/optimisation batch
-> réutilisera `frames.mjs` + `local` provider. À implémenter dans une prochaine
-> passe, jamais à simuler.
+Codes de sortie de `generate` : `0` succès · `1` aucun plan approuvé · `2` usage
+· `3` `PROVIDER_NOT_CONFIGURED` · `4` `PROVIDER_AUTH_PENDING` · `5`
+`PROVIDER_CONTRACT_UNVERIFIED`. Aucune sortie n'est simulée.
+
+## La boucle d'orchestration
+
+```
+PLAN → RESOLVE MODEL (catalogue réel) → COST CHECK (estimate + plafond)
+     → GENERATE → STORE → QA TECHNIQUE (ffprobe) → ART REVIEW
+     → PREMIUM GATE → ACCEPT / REJECT → RETRY borné → PLAN N+1
+```
+
+Garanties, toutes couvertes par des tests :
+
+- retries bornés par `maxAttemptsPerShot` (jamais de boucle infinie) ;
+- arrêt net dès que le budget est atteint ;
+- une sortie rejetée n'est **jamais** promue ni assemblée ;
+- une erreur d'authentification n'est pas réessayée (inutile et coûteux) ;
+- le plan N approuvé devient la **référence forte** du plan N+1.
+
+L'orchestrateur reçoit des **ports injectés** (génération, estimation, QA,
+revue, horloge) : la boucle est donc prouvable sans provider payant.
 
 ## Ce que la couche NE fait pas
 

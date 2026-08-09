@@ -1,85 +1,155 @@
-# ACE 0.2 — Setup du provider Higgsfield
+# ACE 0.2 — Setup du provider Higgsfield (CLI officiel `hf-api`)
 
-Document **interne au moteur** (élagué à la génération). Guide d'activation de
-l'adapter Higgsfield pour la génération d'images/vidéos.
+Document **interne au moteur** (élagué à la génération). Active la génération
+d'images/vidéos dans ACE.
 
-> **Statut d'honnêteté (à lire d'abord).** L'adapter est **codé, guardé et
-> testé**, mais le **contrat exact de l'API Higgsfield n'a pas été validé** dans
-> cet environnement (aucune credential, aucun accès réseau vérifié). Tant que le
-> schéma payload/réponse n'est pas confirmé contre l'API réelle, `generate()`
-> **refuse honnêtement** (`GENERATION_FAILED` avec message explicite) plutôt que
-> de renvoyer un faux succès. Aucune génération n'est simulée.
+> **Correctif d'honnêteté.** Une version antérieure de cette doc décrivait une
+> API REST `https://api.higgsfield.ai/v1/generations` avec un header
+> `Authorization: Bearer <clé>`. **Ce contrat n'a jamais été vérifié et il est
+> faux** : l'audit a mesuré `HTTP 521` sur cet hôte (Cloudflare — origine
+> injoignable). Cet endpoint a été supprimé du code.
+>
+> La voie officielle **réellement disponible** est le CLI `hf-api`, dont le
+> contrat ci-dessous a été capturé **en exécutant le binaire**.
 
-## Ce que l'adapter fait aujourd'hui
+## Pourquoi le CLI et pas une API maison
 
-- Déclare ses capacités : `generate-image`, `generate-video`.
-- Rapporte un statut RÉEL : `PROVIDER_NOT_CONFIGURED` sans `HIGGSFIELD_API_KEY`,
-  `READY` une fois la clé présente.
-- Encapsule l'appel réseau (endpoint/headers/payload paramétrables par env).
-- **N'invente jamais un succès.** Le mapping de la réponse est marqué
-  `À CONFIRMER` dans `src/ace/media-engine/providers/higgsfield.ts`.
+Le paquet officiel [`@higgsfield/cloud-cli`](https://www.npmjs.com/package/@higgsfield/cloud-cli)
+(dépôt `github.com/higgsfield-ai/cloud-cli`) se décrit lui-même ainsi :
 
-## Variables d'environnement
+> _« hf-api drives the Higgsfield platform generation API using an API key.
+> It is designed to be operated by an autonomous agent. »_
 
-| Variable              | Rôle                                                      | Requis  |
-| --------------------- | --------------------------------------------------------- | ------- |
-| `HIGGSFIELD_API_KEY`  | Clé d'authentification (`Authorization: Bearer …`)        | **oui** |
-| `HIGGSFIELD_BASE_URL` | Base URL de l'API (défaut `https://api.higgsfield.ai/v1`) | non     |
-| `HIGGSFIELD_MODEL`    | Modèle à cibler                                           | non     |
+C'est exactement le cas d'usage d'ACE. Le CLI expose de surcroît tout ce dont le
+moteur a besoin : découverte des modèles, estimation de coût, génération,
+polling, et consommation réelle.
 
-> ACE lit ces variables via `process.env` **uniquement**. Il ne lit **jamais**
-> un fichier `.env` (gitignoré). C'est le runtime/CI qui charge l'environnement.
-> Ne jamais committer la clé ; ne jamais la loguer.
+## Installation
 
-## Activer (local)
+```bash
+npm i -g @higgsfield/cloud-cli     # installe le binaire `hf-api`
+hf-api --version
+```
 
-1. Obtenir une clé API Higgsfield (compte du client / du projet).
-2. Exporter la clé dans l'environnement du shell (jamais dans un fichier suivi) :
-   ```bash
-   export HIGGSFIELD_API_KEY="votre_cle"
-   # optionnel :
-   export HIGGSFIELD_BASE_URL="https://api.higgsfield.ai/v1"
-   export HIGGSFIELD_MODEL="<modele>"
-   ```
-3. Vérifier le statut (aucune valeur de clé n'est affichée) :
-   ```bash
-   pnpm ace:provider:check
-   ```
-   Attendu sans clé : `✗ higgsfield — PROVIDER_NOT_CONFIGURED` (exit 3).
-   Avec clé : `✓ higgsfield — READY` (exit 0).
+> Le postinstall télécharge le binaire (Go, statique) correspondant à la
+> plateforme depuis les releases GitHub du dépôt officiel.
+>
+> **ACE ne déclare PAS ce paquet en dépendance** : le provider doit rester
+> optionnel et l'installation ne doit pas dépendre du réseau. Sans lui, ACE
+> fonctionne pleinement — il ne génère simplement pas de médias IA.
 
-## Confirmer le contrat d'API (étape requise avant usage réel)
+Binaire hors `PATH` ? Pointer ACE dessus :
 
-Avant toute génération réelle, il faut **valider le schéma** contre la doc
-officielle Higgsfield et adapter l'adapter en conséquence :
+```bash
+export HF_API_BIN=/chemin/vers/hf-api
+```
 
-1. Endpoint exact (l'adapter appelle `POST {baseUrl}/generations` — **à vérifier**).
-2. Format du **payload** (l'adapter envoie `model`, `prompt`, `reference_image`,
-   `shot`, `camera`, `duration_s` — **à mapper** sur les champs réels).
-3. Format de la **réponse** (synchrone ? asynchrone avec polling ? où sont les
-   URLs de sortie ?). Adapter le retour `outputs` au format réel.
-4. Codes d'erreur et limites de débit.
+## Authentification (deux voies équivalentes)
 
-Tant que ces points ne sont pas confirmés, l'adapter renvoie `GENERATION_FAILED`
-avec un aperçu des clés reçues — c'est **volontaire** (honnêteté).
+La clé a le format **`<api_key_id>:<secret>`** (et non un simple token).
+
+```bash
+hf-api auth login                       # invite interactive (clé stockée par le CLI)
+# ou
+export HIGGSFIELD_API_KEY="<id>:<secret>"
+```
+
+Vérifier — aucune valeur de credential n'est jamais affichée :
+
+```bash
+hf-api auth status
+pnpm ace:provider:check
+```
+
+| État                    | `ace:provider:check`      | Code |
+| ----------------------- | ------------------------- | ---- |
+| CLI absent              | `PROVIDER_NOT_CONFIGURED` | 3    |
+| CLI présent, pas de clé | `PROVIDER_AUTH_PENDING`   | 3    |
+| CLI + clé valides       | `READY`                   | 0    |
+
+> ACE lit `process.env` **uniquement** ; il ne lit **jamais** un fichier `.env`
+> (gitignoré) et ne passe **jamais** la clé en argument de ligne de commande
+> (elle fuiterait dans la table des processus). Aucune clé n'est loguée.
+
+## Contrat du CLI (vérifié en l'exécutant)
+
+```
+hf-api auth login|status|logout
+hf-api models [slug] [--search s] [--output-type image|video|audio|3d_model]
+                     [--operation-type text2image|image2video]
+hf-api estimate <slug> [--param k=v]... [--input params.json]
+hf-api generate <slug> [--param k=v]... [--input params.json]
+                       [--wait] [--wait-interval d] [--wait-timeout d]
+hf-api status <request_id>
+hf-api wait   <request_id> [--interval d] [--timeout d]
+hf-api usage  [--timeframe hour|day|week|month] [--model s] [--start] [--end]
+--json  # global : réponses JSON brutes sur stdout
+```
+
+**Codes de sortie mesurés** : `0` succès · `1` erreur d'usage · `2` non
+authentifié. Les erreurs sortent en **texte sur stderr** (pas en JSON, même avec
+`--json`) — ACE en tient compte.
+
+Ce que chaque commande apporte au moteur :
+
+| Commande          | Rôle dans ACE                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| `models`          | **Catalogue réel** (« listed == usable ») → le model router ne propose que des modèles existants |
+| `estimate`        | Coût **avant** dépense → cost guard, `--dry-run`                                                 |
+| `generate --wait` | Génération + attente de l'état terminal                                                          |
+| `status` / `wait` | Suivi d'une requête                                                                              |
+| `usage`           | Coût **réellement consommé** par modèle                                                          |
+
+## Utilisation depuis ACE
+
+```bash
+pnpm ace:provider:check                                   # statut
+pnpm ace:media:generate --brief brief.json --dry-run      # estimation seule
+pnpm ace:media:generate --brief brief.json --out out --yes \
+     --max-spend 20 --max-attempts 3                      # génération réelle
+pnpm ace:media:qa --manifest out/media-manifest.json      # contrôle
+```
+
+`--yes` est **obligatoire** pour dépenser : sans lui, la commande s'arrête après
+l'estimation. `--max-spend` arrête net la boucle au plafond.
+
+## Ce qui reste À CONFIRMER
+
+Le **contrat de commande** est vérifié ; le **schéma JSON des réponses** ne l'est
+pas (aucune authentification disponible lors de l'implémentation). ACE ne devine
+donc aucun chemin de champ :
+
+- `extractModels()` accepte plusieurs formes et renvoie `HF_SCHEMA_UNVERIFIED`
+  s'il ne trouve rien d'exploitable — plutôt qu'une liste vide trompeuse ;
+- `extractOutputUrls()` parcourt récursivement la réponse à la recherche d'URLs ;
+- l'estimation cherche une valeur numérique sans supposer son emplacement.
+
+À la première authentification réelle, vérifier :
+
+```bash
+hf-api models --json | head -40
+hf-api estimate <slug> --param prompt="test" --json
+```
+
+puis, si nécessaire, affiner les extracteurs dans
+`src/ace/media-engine/node/hf-cli.ts`.
 
 ## Coûts
 
-Le cost guard (`estimateCost`) n'utilise que des tarifs **fournis** via
-`AceProviderPricing` (avec `source` déclarée). Renseigner le tarif Higgsfield
-réel depuis la grille officielle — ACE n'invente aucun prix. Voir
-[ACE-COST-GUARD.md](ACE-COST-GUARD.md).
+Le cost guard n'utilise que des montants **fournis par le provider**
+(`estimate` / `usage`). ACE n'invente aucun tarif ; un coût inconnu est `null` et
+le total est déclaré **minorant**. Voir [ACE-COST-GUARD.md](ACE-COST-GUARD.md).
 
 ## Dépannage
 
-| Symptôme                                  | Cause probable                    | Action                                        |
-| ----------------------------------------- | --------------------------------- | --------------------------------------------- |
-| `PROVIDER_NOT_CONFIGURED`                 | `HIGGSFIELD_API_KEY` absente/vide | exporter la clé dans l'ENV                    |
-| `GENERATION_FAILED` (mapping À CONFIRMER) | schéma de réponse non validé      | confirmer le contrat d'API, adapter `outputs` |
-| `GENERATION_FAILED` (réseau/env)          | pas d'accès réseau / URL erronée  | vérifier connectivité + `HIGGSFIELD_BASE_URL` |
-| `4xx/5xx`                                 | clé invalide / quota / payload    | vérifier la clé et le format contre la doc    |
+| Symptôme                  | Cause                                    | Action                                           |
+| ------------------------- | ---------------------------------------- | ------------------------------------------------ |
+| `PROVIDER_NOT_CONFIGURED` | binaire `hf-api` introuvable             | `npm i -g @higgsfield/cloud-cli` ou `HF_API_BIN` |
+| `PROVIDER_AUTH_PENDING`   | pas de clé active                        | `hf-api auth login`                              |
+| `HF_SCHEMA_UNVERIFIED`    | réponse non reconnue                     | inspecter `--json`, ajuster les extracteurs      |
+| `NO_MATCHING_MODEL`       | catalogue sans modèle couvrant le besoin | changer de stratégie ou fournir un asset         |
 
 ## Voir aussi
 
-- [ACE-PROVIDER-INTEGRATION.md](ACE-PROVIDER-INTEGRATION.md) — le contrat générique.
+- [ACE-PROVIDER-INTEGRATION.md](ACE-PROVIDER-INTEGRATION.md) — brancher un autre provider.
 - [ACE-MEDIA-ARCHITECTURE.md](ACE-MEDIA-ARCHITECTURE.md) — la couche complète.

@@ -72,6 +72,21 @@ passe par `AdaptiveCanvas` avec un vrai modèle, hors de ce wrapper).
 `tests/unit/cinematic-scroll.test.tsx` vérifie qu'aucun `<canvas>` n'est monté
 pour une stratégie `webgl` (repli poster).
 
+## Extension 0.2 — ACE PREMIUM OUTPUT GATE
+
+La doctrine ne couvre plus seulement le low-poly. `premium-gate.ts` interdit de
+présenter comme la RÉALISATION de l'intention premium :
+
+`LOW_POLY_SUBSTITUTION` · `MISSING_MEDIA` · `CORRUPTED_MEDIA` ·
+`QA_REJECTED_MEDIA` · `TEST_ASSET_AS_FINAL` · `PLACEHOLDER_AS_FINAL` ·
+`SUBJECT_LOCK_BROKEN` · `SILENT_FALLBACK`
+
+Trois actions possibles : `SHIP` · `DECLARE_FALLBACK` · `BLOCK`.
+
+Distinction clé : **un site peut fonctionner avec un fallback** — le gate ne
+casse rien. Ce qu'il refuse, c'est le MENSONGE : un repli non déclaré présenté
+comme l'expérience premium promise devient `DECLARE_FALLBACK`, jamais `SHIP`.
+
 ## Formulation courte (pour un reviewer)
 
 > Si le besoin est photoréaliste/premium et qu'il n'y a ni modèle 3D réel, ni

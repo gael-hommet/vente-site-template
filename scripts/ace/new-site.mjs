@@ -224,6 +224,7 @@ const ENGINE_ONLY_DOCS = [
   // shippé : src/ace/media-engine + src/components/media/CinematicScroll).
   "docs/ACE-0.2-IMPLEMENTATION-PLAN.md",
   "docs/ACE-0.2-FINAL-REPORT.md",
+  "docs/ACE-CHANGELOG.md",
   "docs/ACE-MEDIA-ARCHITECTURE.md",
   "docs/ACE-MEDIA-QA.md",
   "docs/ACE-PROVIDER-INTEGRATION.md",
@@ -262,15 +263,27 @@ const ENGINE_ONLY_TESTS = [
   // universel (ContactForm sur /contact) reste dans forms.spec.ts.
   "tests/e2e/forms-engine.spec.ts",
   // ACE 0.2 — tests de la DOCTRINE média (anti-low-poly, stratégie, cost, QA,
-  // providers) : tests moteur, pas des tests du site client. Le runtime testé
-  // (media-engine + CinematicScroll) reste shippé et couvert côté moteur.
+  // providers, orchestration, pipeline ffmpeg) : tests moteur, pas des tests du
+  // site client. Le runtime testé (media-engine + CinematicScroll) reste shippé
+  // et couvert côté moteur.
   "tests/unit/media-engine.test.ts",
   "tests/unit/cinematic-scroll.test.tsx",
+  "tests/unit/media-orchestrator.test.ts",
+  "tests/unit/media-delivery.test.ts",
+  "tests/unit/media-pipeline-e2e.test.ts",
 ];
 // Le générateur lui-même : un site client ne régénère jamais de site depuis
 // lui-même (et `git archive HEAD` y échouerait de toute façon, le site
 // généré n'étant pas encore un dépôt git à l'étape "next steps").
-const GENERATOR_TOOLING = ["scripts/ace", "tests/unit/ace-generator-cli.test.ts"];
+const GENERATOR_TOOLING = [
+  "scripts/ace",
+  "tests/unit/ace-generator-cli.test.ts",
+  // ACE 0.2 — couche Node du media-engine (spawn ffmpeg/ffprobe/hf-api) :
+  // outillage MOTEUR, uniquement consommé par la CLI `scripts/ace/media` qui est
+  // elle-même élaguée. Le runtime média isomorphe (types, stratégie, routeur,
+  // gate premium, CinematicScroll) reste shippé et n'en dépend pas.
+  "src/ace/media-engine/node",
+];
 // Fixtures internes de validation + comparaison anti-template : contiennent
 // l'identité d'AUTRES fixtures (éditoriale/immersive) et ne doivent jamais
 // partir dans un site client.
