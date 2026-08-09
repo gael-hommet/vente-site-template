@@ -99,6 +99,15 @@ export {
   type ShotOutcome,
 } from "./orchestrator";
 
+export {
+  chooseDeliveryMode,
+  SEQUENCE_MAX_WEIGHT_KB,
+  SEQUENCE_MAX_FRAMES,
+  type DeliveryMode,
+  type DeliveryModeInput,
+  type DeliveryModeDecision,
+} from "./delivery-mode";
+
 export { chooseStrategy, type ChooseStrategyInput } from "./strategy";
 export { buildShotPlan } from "./shot-planner";
 export { buildMediaPlan, type MediaBriefInput } from "./plan";

@@ -12,6 +12,8 @@ export interface ScrollImageSequenceProps {
   length?: number;
   className?: string;
   overlay?: React.ReactNode;
+  /** Scrub progress 0..1 — lets a parent synchronise chapters/overlays. */
+  onProgress?: (progress: number) => void;
 }
 
 /**
@@ -26,6 +28,7 @@ export function ScrollImageSequence({
   length = 3,
   className,
   overlay,
+  onProgress,
 }: ScrollImageSequenceProps) {
   const playerRef = React.useRef<ImageSequenceHandle>(null);
   const { ref } = useScrubProgress<HTMLDivElement>({
@@ -33,7 +36,10 @@ export function ScrollImageSequence({
     end: `+=${length * 100}%`,
     pin: true,
     scrub: 0.3,
-    onProgress: (p) => playerRef.current?.seek(p),
+    onProgress: (p) => {
+      onProgress?.(p);
+      playerRef.current?.seek(p);
+    },
   });
 
   return (

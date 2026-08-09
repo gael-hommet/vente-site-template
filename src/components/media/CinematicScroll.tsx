@@ -5,6 +5,7 @@ import { ScrollVideo } from "./ScrollVideo";
 import { ScrollImageSequence } from "./ScrollImageSequence";
 import { MediaFallback } from "./MediaFallback";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { cn } from "@/lib/utils";
 import type { AceMediaStrategy } from "@/ace/media-engine";
 
 /**
@@ -42,7 +43,16 @@ interface BaseProps {
 
 export type CinematicScrollProps = BaseProps &
   (
-    | { strategy: "video-scroll"; sources: { src: string; type: string }[] }
+    | {
+        strategy: "video-scroll";
+        sources: { src: string; type: string }[];
+        /**
+         * Sources allégées servies sous `mobileBreakpoint` (même récit, même
+         * durée — seulement la résolution/le débit changent).
+         */
+        mobileSources?: { src: string; type: string }[];
+        mobileBreakpoint?: number;
+      }
     | { strategy: "image-sequence"; frames: string[] }
     | {
         strategy: "2.5d" | "editorial-fallback" | "webgl" | "hybrid";
@@ -52,25 +62,60 @@ export type CinematicScrollProps = BaseProps &
       }
   );
 
-/** Overlay de chapitres + CTA, superposé au média (non bloquant). */
+/** Index du chapitre actif pour une progression donnée (le dernier franchi). */
+export function activeChapterIndex(
+  chapters: readonly CinematicChapter[] | undefined,
+  progress: number,
+): number {
+  if (!chapters?.length) return -1;
+  let active = -1;
+  chapters.forEach((c, i) => {
+    if (progress >= c.at) active = i;
+  });
+  return active;
+}
+
+/**
+ * Overlay de chapitres + CTA, superposé au média (non bloquant).
+ * Les chapitres sont RÉELLEMENT synchronisés à la progression : le chapitre
+ * courant est mis en avant et exposé aux lecteurs d'écran via aria-current.
+ */
 function CinemaOverlay({
   chapters,
   cta,
+  progress,
 }: {
   chapters?: readonly CinematicChapter[];
   cta?: React.ReactNode;
+  progress: number;
 }) {
   if (!chapters?.length && !cta) return null;
+  const active = activeChapterIndex(chapters, progress);
   return (
     <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-6">
       {chapters?.length ? (
-        <ol className="glass pointer-events-auto w-fit max-w-sm rounded-[var(--radius-lg)] p-4 text-sm">
-          {chapters.map((c) => (
-            <li key={c.title} className="text-foreground/90">
-              <span className="text-muted mr-2 font-mono text-xs">{Math.round(c.at * 100)}%</span>
-              {c.title}
-            </li>
-          ))}
+        <ol className="glass pointer-events-auto w-fit max-w-sm rounded-lg p-4 text-sm">
+          {chapters.map((c, i) => {
+            const isActive = i === active;
+            return (
+              <li
+                key={c.title}
+                aria-current={isActive ? "step" : undefined}
+                className={cn(
+                  "transition-opacity duration-300",
+                  isActive
+                    ? "text-foreground font-medium opacity-100"
+                    : "text-foreground/70 opacity-70",
+                )}
+              >
+                <span className="text-muted mr-2 font-mono text-xs">{Math.round(c.at * 100)}%</span>
+                {c.title}
+                {isActive && c.body ? (
+                  <p className="text-muted mt-1 text-xs leading-snug">{c.body}</p>
+                ) : null}
+              </li>
+            );
+          })}
         </ol>
       ) : (
         <span />
@@ -80,11 +125,38 @@ function CinemaOverlay({
   );
 }
 
+/** Sélectionne les sources mobiles sous le point de rupture (sans casser le SSR). */
+function useMobileSources(
+  sources: { src: string; type: string }[] | undefined,
+  mobileSources: { src: string; type: string }[] | undefined,
+  breakpoint: number,
+): { src: string; type: string }[] {
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    if (!mobileSources?.length) return;
+    const mq = window.matchMedia(`(max-width: ${String(breakpoint)}px)`);
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, [mobileSources, breakpoint]);
+  return isMobile && mobileSources?.length ? mobileSources : (sources ?? []);
+}
+
 export function CinematicScroll(props: CinematicScrollProps) {
   const reduced = useReducedMotion();
-  const overlay = <CinemaOverlay chapters={props.chapters} cta={props.cta} />;
+  // Progression du scrub : pilote la synchronisation des chapitres.
+  const [progress, setProgress] = React.useState(0);
+  const videoSources = useMobileSources(
+    props.strategy === "video-scroll" ? props.sources : undefined,
+    props.strategy === "video-scroll" ? props.mobileSources : undefined,
+    (props.strategy === "video-scroll" ? props.mobileBreakpoint : undefined) ?? 768,
+  );
+
+  const overlay = <CinemaOverlay chapters={props.chapters} cta={props.cta} progress={progress} />;
 
   // Reduced-motion : poster statique + overlay (contenu toujours lisible).
+  // La progression reste à 0 : aucun mouvement, mais tous les chapitres listés.
   if (reduced) {
     return (
       <MediaFallback poster={props.poster} alt={props.alt} className={props.className}>
@@ -97,12 +169,13 @@ export function CinematicScroll(props: CinematicScrollProps) {
     case "video-scroll":
       return (
         <ScrollVideo
-          sources={props.sources}
+          sources={videoSources}
           poster={props.poster}
           alt={props.alt}
           length={props.length}
           className={props.className}
           overlay={overlay}
+          onProgress={setProgress}
         />
       );
     case "image-sequence":
@@ -113,6 +186,7 @@ export function CinematicScroll(props: CinematicScrollProps) {
           length={props.length}
           className={props.className}
           overlay={overlay}
+          onProgress={setProgress}
         />
       );
     // 2.5d / webgl / hybrid / editorial-fallback : hors périmètre du scroll-cinéma
