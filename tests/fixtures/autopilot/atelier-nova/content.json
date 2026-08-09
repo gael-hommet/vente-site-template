@@ -1,0 +1,47 @@
+{
+  "hero": {
+    "eyebrow": "Mobilier contemporain sur mesure · Nantes",
+    "title": "Atelier Nova",
+    "subtitle": "Depuis 2014, nous dessinons et fabriquons à Nantes des pièces de mobilier contemporain conçues pour un lieu, et pour lui seul."
+  },
+  "story": {
+    "heading": "Une pièce, un lieu, une histoire",
+    "intro": "Chaque commande commence par une visite et se termine par une pièce qui ne pouvait exister ailleurs.",
+    "chapters": [
+      {
+        "eyebrow": "01",
+        "title": "Comprendre le lieu",
+        "body": "Nous mesurons, observons la lumière et écoutons l'usage réel de l'espace avant de dessiner la moindre ligne."
+      },
+      {
+        "eyebrow": "02",
+        "title": "Dessiner sur mesure",
+        "body": "Le dessin naît des contraintes du lieu : proportions, circulation, matériaux choisis pour vieillir correctement."
+      },
+      {
+        "eyebrow": "03",
+        "title": "Fabriquer à l'atelier",
+        "body": "La fabrication reste à Nantes, dans notre atelier, du débit des panneaux à la finition à la main."
+      }
+    ]
+  },
+  "collection": {
+    "heading": "Réalisations",
+    "intro": "[À CONFIRMER — sélection de réalisations à valider avec le client]",
+    "itemLabel": "réalisation",
+    "items": [
+      {
+        "title": "[À CONFIRMER — nom du projet]",
+        "meta": ["[À CONFIRMER — année]", "[À CONFIRMER — typologie]"]
+      },
+      {
+        "title": "[À CONFIRMER — nom du projet]",
+        "meta": ["[À CONFIRMER — année]", "[À CONFIRMER — typologie]"]
+      }
+    ]
+  },
+  "conversion": {
+    "title": "Parlons de votre projet",
+    "description": "Décrivez-nous le lieu et l'usage : nous revenons vers vous avec une première intention de dessin."
+  }
+}

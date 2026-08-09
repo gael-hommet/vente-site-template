@@ -37,7 +37,10 @@
     "ace:media:qa": "tsx scripts/ace/media/qa.ts",
     "ace:media:generate": "tsx scripts/ace/media/generate.ts",
     "ace:media:assemble": "node scripts/ace/media/assemble.mjs",
-    "ace:media:optimize": "node scripts/ace/media/optimize.mjs"
+    "ace:media:optimize": "node scripts/ace/media/optimize.mjs",
+    "ace:doctor": "node scripts/ace/autopilot/doctor.mjs",
+    "ace:autopilot": "tsx scripts/ace/autopilot/run.ts",
+    "ace:resume": "tsx scripts/ace/autopilot/run.ts resume"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

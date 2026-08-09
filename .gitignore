@@ -45,3 +45,6 @@ next-env.d.ts
 # Claude Code local (per-user) settings — keep out of the template
 .claude/settings.local.json
 .claude/settings.local.json*
+
+# ACE Autopilot — état de mission local (jamais committé)
+.ace/

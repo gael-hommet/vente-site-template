@@ -1,0 +1,31 @@
+{
+  "facts": [
+    {
+      "key": "businessName",
+      "value": "Atelier Nova",
+      "source": "fixture locale (entreprise fictive)",
+      "confidence": "claimed"
+    },
+    {
+      "key": "activity",
+      "value": "mobilier contemporain sur mesure",
+      "source": "fixture locale",
+      "confidence": "claimed"
+    },
+    { "key": "city", "value": "Nantes", "source": "fixture locale", "confidence": "claimed" },
+    {
+      "key": "email",
+      "value": "contact@atelier-nova.test",
+      "source": "fixture locale",
+      "confidence": "claimed"
+    },
+    {
+      "key": "phone",
+      "value": "+33 2 00 00 00 00",
+      "source": "fixture locale",
+      "confidence": "claimed"
+    },
+    { "key": "founded", "value": "2014", "source": "fixture locale", "confidence": "claimed" }
+  ],
+  "notFound": ["horaires d'ouverture", "numéro SIRET"]
+}
