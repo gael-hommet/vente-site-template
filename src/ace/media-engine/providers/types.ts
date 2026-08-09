@@ -19,9 +19,11 @@ export type ProviderCapability =
   | "interpolate";
 
 export type ProviderStatus =
-  | "READY" // configuré et utilisable
-  | "PROVIDER_NOT_CONFIGURED" // connu mais credentials absents
-  | "UNAVAILABLE"; // dépendance manquante (ex. ffmpeg absent)
+  | "READY" // configuré, authentifié, utilisable
+  | "PROVIDER_NOT_CONFIGURED" // connu mais aucun mécanisme d'accès configuré
+  | "PROVIDER_AUTH_PENDING" // outil présent, authentification manquante
+  | "PROVIDER_CONTRACT_UNVERIFIED" // accès possible mais contrat non vérifié
+  | "UNAVAILABLE"; // dépendance manquante (ex. ffmpeg ou CLI absent)
 
 export interface ProviderResultOk {
   ok: true;
@@ -33,7 +35,13 @@ export interface ProviderResultOk {
 
 export interface ProviderResultErr {
   ok: false;
-  code: "PROVIDER_NOT_CONFIGURED" | "MEDIA_ASSET_REQUIRED" | "UNAVAILABLE" | "GENERATION_FAILED";
+  code:
+    | "PROVIDER_NOT_CONFIGURED"
+    | "PROVIDER_AUTH_PENDING"
+    | "PROVIDER_CONTRACT_UNVERIFIED"
+    | "MEDIA_ASSET_REQUIRED"
+    | "UNAVAILABLE"
+    | "GENERATION_FAILED";
   message: string;
 }
 
@@ -47,6 +55,13 @@ export interface GenerateRequest {
   referenceImage?: string;
   /** Dossier de sortie. */
   outDir: string;
+  /**
+   * Slug de modèle résolu par le model router à partir du catalogue RÉEL du
+   * provider (`hf-api models`). Jamais un slug inventé.
+   */
+  model?: string;
+  /** Paramètres additionnels conformes au schéma du modèle choisi. */
+  params?: Record<string, unknown>;
 }
 
 /** Le contrat que tout adapter de provider doit satisfaire. */

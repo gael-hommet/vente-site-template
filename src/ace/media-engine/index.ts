@@ -23,6 +23,82 @@ export type {
   AceContinuityReport,
 } from "./types";
 
+export type { TechnicalVerdict } from "./qa-verdict";
+export { TECHNICAL_VERDICTS } from "./qa-verdict";
+
+export {
+  routeModel,
+  requiredMode,
+  outputKindForShot,
+  routingNeedsHumanValidation,
+  CONTINUITY_CRITICAL_INTENTS,
+  type RoutableModel,
+  type GenerationMode,
+  type ModelRoutingInput,
+  type ModelRoutingDecision,
+  type ModelRoutingBlocker,
+} from "./model-router";
+
+export {
+  createReferenceLock,
+  strongestReference,
+  lockPromptFragment,
+  negativePromptFragment,
+  assessLockIntegrity,
+  type AceReferenceLock,
+  type LockIntegrityReport,
+} from "./reference-lock";
+
+export {
+  evaluatePremiumOutput,
+  assertPremiumOutput,
+  type PremiumViolation,
+  type PremiumGateInput,
+  type PremiumGateVerdict,
+} from "./premium-gate";
+
+export {
+  reviewArtDirection,
+  ART_APPROVE_THRESHOLD,
+  ART_REJECT_THRESHOLD,
+  type AceArtDirectionScores,
+  type AceArtDirectionReview,
+  type ArtDirectionVerdict,
+  type ArtDirectionInput,
+} from "./art-direction";
+
+export {
+  createBudget,
+  recordSpend,
+  canGenerate,
+  remainingBudget,
+  summarizeBudget,
+  DEFAULT_BUDGET_LIMITS,
+  type BudgetLimits,
+  type BudgetState,
+  type SpendRecord,
+  type BudgetDecision,
+  type BudgetSummary,
+} from "./budget";
+
+export {
+  promptHash,
+  emptyManifest,
+  summarizeManifest,
+  type AceMediaManifest,
+  type AceMediaManifestEntry,
+  type AceGenerationAttempt,
+} from "./manifest";
+
+export {
+  orchestrateGeneration,
+  buildShotPrompt,
+  type OrchestratorPorts,
+  type OrchestrationRequest,
+  type OrchestrationResult,
+  type ShotOutcome,
+} from "./orchestrator";
+
 export { chooseStrategy, type ChooseStrategyInput } from "./strategy";
 export { buildShotPlan } from "./shot-planner";
 export { buildMediaPlan, type MediaBriefInput } from "./plan";
@@ -36,11 +112,19 @@ export {
 
 export {
   isProviderConfigured,
+  isProviderEnvConfigured,
   configuredProviders,
   unconfiguredProviders,
   KNOWN_PROVIDERS,
   type ProviderEnvSpec,
 } from "./config";
+
+export {
+  setHiggsfieldRuntime,
+  resetHiggsfieldRuntime,
+  type HiggsfieldRuntime,
+} from "./providers/higgsfield";
+export { setLocalToolAvailability } from "./providers/local";
 
 export { allProviders, getProvider, readyProviders, providersFor } from "./providers/registry";
 export type {

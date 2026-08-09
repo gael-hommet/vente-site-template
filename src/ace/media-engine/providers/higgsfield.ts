@@ -1,96 +1,95 @@
 import type { GenerateRequest, MediaProvider, ProviderResult, ProviderStatus } from "./types";
-import { isProviderConfigured } from "../config";
 
 /**
- * ACE 0.2 — Adapter Higgsfield (GUARDÉ, honnête, jamais simulé).
+ * ACE 0.2 — Adapter Higgsfield, bâti sur le CLI OFFICIEL `hf-api`.
  *
- * HONNÊTETÉ TECHNIQUE : le contrat exact de l'API Higgsfield n'est pas
- * vérifiable dans cet environnement (aucune credential, aucun accès réseau
- * validé). Cet adapter :
- *   - déclare ses capacités et son statut RÉEL (configuré ou non) ;
- *   - encapsule proprement l'appel réseau (endpoint/headers/payload
- *     paramétrables par env) ;
- *   - N'INVENTE JAMAIS un succès : sans credential → PROVIDER_NOT_CONFIGURED ;
- *   - marque explicitement le corps de génération comme À VALIDER contre la
- *     vraie API (le mapping payload/réponse doit être confirmé avant usage réel).
+ * ────────────────────────────────────────────────────────────────────────────
+ * POURQUOI PAS DE REST ICI
+ * Une version antérieure de cet adapter appelait un endpoint REST supposé
+ * (`https://api.higgsfield.ai/v1/generations`). Cet endpoint n'a JAMAIS été
+ * vérifié et l'audit a montré qu'il ne sert pas d'API (HTTP 521). Il a été
+ * supprimé : ACE n'invente pas de contrat d'API.
  *
- * Config via env (jamais via lecture de .env par le moteur) :
- *   HIGGSFIELD_API_KEY   (requis)
- *   HIGGSFIELD_BASE_URL  (optionnel, défaut ci-dessous)
- *   HIGGSFIELD_MODEL     (optionnel)
+ * La voie officielle réellement disponible est le CLI `hf-api`
+ * (`@higgsfield/cloud-cli`, github.com/higgsfield-ai/cloud-cli), explicitement
+ * « designed to be operated by an autonomous agent ». Son contrat de commande a
+ * été vérifié en l'exécutant. Voir `../node/hf-cli.ts` (module Node) pour le
+ * détail et docs/ACE-HIGGSFIELD-SETUP.md pour l'installation.
+ * ────────────────────────────────────────────────────────────────────────────
+ *
+ * Ce module reste ISOMORPHE (aucun `node:*`) : il décrit le provider et délègue
+ * l'exécution réelle à un pilote injecté par la CLI Node
+ * (`setHiggsfieldRuntime`). Sans pilote, il refuse proprement — jamais de faux
+ * succès, jamais de génération simulée.
  */
 
-const DEFAULT_BASE_URL = "https://api.higgsfield.ai/v1";
+/** État réel du provider, renseigné côté Node (jamais deviné). */
+export interface HiggsfieldRuntime {
+  /** Le binaire `hf-api` est installé et exécutable. */
+  cliAvailable: boolean;
+  /** Une authentification active a été confirmée (`hf-api auth status`). */
+  authenticated: boolean;
+  /** Pilote de génération réel, fourni par la CLI Node. */
+  generate?: (req: GenerateRequest) => Promise<ProviderResult>;
+}
+
+const UNKNOWN_RUNTIME: HiggsfieldRuntime = { cliAvailable: false, authenticated: false };
+
+let runtime: HiggsfieldRuntime = { ...UNKNOWN_RUNTIME };
+
+/**
+ * Renseigne l'état réel du provider (appelé depuis la CLI Node après avoir
+ * interrogé `hf-api`). Le bundle client ne teste jamais un binaire.
+ */
+export function setHiggsfieldRuntime(next: Partial<HiggsfieldRuntime>): void {
+  runtime = { ...runtime, ...next };
+}
+
+/** Réinitialise l'état (tests, et pour éviter toute fuite entre exécutions). */
+export function resetHiggsfieldRuntime(): void {
+  runtime = { ...UNKNOWN_RUNTIME };
+}
 
 export const higgsfieldProvider: MediaProvider = {
   name: "higgsfield",
   capabilities: ["generate-image", "generate-video"],
 
   status(): ProviderStatus {
-    return isProviderConfigured("higgsfield") ? "READY" : "PROVIDER_NOT_CONFIGURED";
+    if (!runtime.cliAvailable) return "PROVIDER_NOT_CONFIGURED";
+    if (!runtime.authenticated) return "PROVIDER_AUTH_PENDING";
+    return "READY";
   },
 
   async generate(req: GenerateRequest): Promise<ProviderResult> {
-    if (!isProviderConfigured("higgsfield")) {
+    if (!runtime.cliAvailable) {
       return {
         ok: false,
         code: "PROVIDER_NOT_CONFIGURED",
         message:
-          "Higgsfield non configuré : définir HIGGSFIELD_API_KEY dans l'environnement. " +
-          "Voir docs/ACE-HIGGSFIELD-SETUP.md. Aucune génération simulée.",
+          "Higgsfield indisponible : le CLI officiel `hf-api` n'est pas installé. " +
+          "Installer avec `npm i -g @higgsfield/cloud-cli` (voir docs/ACE-HIGGSFIELD-SETUP.md). " +
+          "Aucune génération n'est simulée.",
       };
     }
-
-    const apiKey = process.env.HIGGSFIELD_API_KEY as string;
-    const baseUrl = process.env.HIGGSFIELD_BASE_URL?.trim() || DEFAULT_BASE_URL;
-    const model = process.env.HIGGSFIELD_MODEL?.trim();
-
-    // ⚠️ À VALIDER CONTRE LA VRAIE API. Le schéma exact (endpoint, champs,
-    // format de réponse, polling asynchrone) doit être confirmé avant un usage
-    // réel. On échoue proprement plutôt que de prétendre un succès.
-    try {
-      const res = await fetch(`${baseUrl}/generations`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          prompt: req.prompt,
-          reference_image: req.referenceImage,
-          // Paramètres dérivés du plan (à mapper sur le schéma réel du provider).
-          shot: req.shot.id,
-          camera: req.shot.cameraMove,
-          duration_s: req.shot.durationS,
-        }),
-      });
-
-      if (!res.ok) {
-        return {
-          ok: false,
-          code: "GENERATION_FAILED",
-          message: `Higgsfield a répondu ${res.status} ${res.statusText}. Vérifier le contrat d'API (docs).`,
-        };
-      }
-
-      const data: unknown = await res.json();
-      // Le mapping data → outputs dépend du schéma réel : tant qu'il n'est pas
-      // confirmé, on signale explicitement plutôt que d'inventer des chemins.
+    if (!runtime.authenticated) {
       return {
         ok: false,
-        code: "GENERATION_FAILED",
+        code: "PROVIDER_AUTH_PENDING",
         message:
-          "Réponse reçue mais le mapping du schéma de réponse Higgsfield reste À CONFIRMER " +
-          "(voir docs/ACE-HIGGSFIELD-SETUP.md). Adapter `outputs` au format réel avant usage. " +
-          `Aperçu clés reçues : ${data && typeof data === "object" ? Object.keys(data as object).join(", ") : typeof data}.`,
-      };
-    } catch (e) {
-      return {
-        ok: false,
-        code: "GENERATION_FAILED",
-        message: `Appel Higgsfield échoué (réseau/env) : ${e instanceof Error ? e.message : String(e)}.`,
+          "Higgsfield : CLI installé mais aucune authentification active. " +
+          "Exécuter `hf-api auth login` ou définir HIGGSFIELD_API_KEY. " +
+          "Aucune génération n'est simulée.",
       };
     }
+    if (!runtime.generate) {
+      return {
+        ok: false,
+        code: "PROVIDER_CONTRACT_UNVERIFIED",
+        message:
+          "Higgsfield authentifié mais aucun pilote de génération n'est branché " +
+          "dans ce contexte d'exécution (la génération passe par la CLI Node ACE).",
+      };
+    }
+    return runtime.generate(req);
   },
 };
