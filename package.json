@@ -33,7 +33,11 @@
     "assets:images": "node scripts/assets/images.mjs",
     "assets:video": "node scripts/assets/video.mjs",
     "assets:models": "node scripts/assets/models.mjs",
-    "assets:all": "node scripts/assets/all.mjs"
+    "assets:all": "node scripts/assets/all.mjs",
+    "ace:media:qa": "tsx scripts/ace/media/qa.ts",
+    "ace:media:generate": "tsx scripts/ace/media/generate.ts",
+    "ace:media:assemble": "node scripts/ace/media/assemble.mjs",
+    "ace:media:optimize": "node scripts/ace/media/optimize.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
