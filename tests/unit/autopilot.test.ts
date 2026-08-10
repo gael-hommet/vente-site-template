@@ -316,3 +316,53 @@ describe("Rapports — deux publics", () => {
     expect(r).toMatch(/AUTOPILOT ne pousse ni ne déploie/i);
   });
 });
+
+describe("Scénarios du mandat", () => {
+  it("TEST 3 — média requis + provider absent ⇒ ADMIN_PROVIDER_AUTH_REQUIRED, jamais de low-poly", () => {
+    const intent = detectIntent("Fais un site premium pour ce restaurant");
+    const ad = decideArtDirection(intent);
+    // Parti-pris porté par l'image, aucun asset fourni, aucun provider.
+    const g = providerGate({
+      mediaRequired: requiresGeneratedMedia(ad, { hasUsableAssets: false }),
+      providerAuthenticated: false,
+    });
+    expect(g.reason).toBe("ADMIN_PROVIDER_AUTH_REQUIRED");
+    // Le message décrit une action ADMIN, jamais une solution de repli bricolée.
+    expect(g.message).toMatch(/administrateur/i);
+    expect(g.message).not.toMatch(/low-?poly|3D|cube/i);
+  });
+
+  it("TEST 5 — sous le seuil : automatique ; au-dessus : WAITING_FOR_APPROVAL", () => {
+    const under = spendGate({
+      estimatedTotal: AUTOPILOT_POLICY.spend.approvalThreshold - 1,
+      currency: "USD",
+    });
+    expect(under.pass).toBe(true);
+
+    const over = spendGate({
+      estimatedTotal: AUTOPILOT_POLICY.spend.approvalThreshold + 1,
+      currency: "USD",
+    });
+    expect(over.pass).toBe(false);
+    const m = block(mission("Fais un site"), over.reason ?? "SPEND_APPROVAL_REQUIRED", NOW);
+    expect(m.state).toBe("WAITING_FOR_APPROVAL");
+  });
+
+  it("TEST 6 — une mission COMPLETE ne pousse ni ne déploie jamais", () => {
+    let m = mission("Fais un site pour Atelier Nova");
+    m = { ...m, state: "COMPLETE", targetDir: "/workspaces/atelier-nova" };
+    const report = userReport(m);
+    expect(report).toMatch(/aucune publication/i);
+    // Le gate de déploiement refuse par construction.
+    expect(deploymentGate().pass).toBe(false);
+    // Et la politique l'interdit explicitement.
+    expect(AUTOPILOT_POLICY.autonomy.forbidden.join(" ")).toMatch(/pousser|déployer/i);
+  });
+
+  it("le rapport reste honnête quand aucune preview n'est active", () => {
+    let m = mission("Fais un site");
+    m = { ...m, state: "COMPLETE", targetDir: "/tmp/x", previewUrl: null };
+    // On n'invente pas une adresse qui ne répond pas.
+    expect(userReport(m)).not.toMatch(/localhost:\d+/);
+  });
+});

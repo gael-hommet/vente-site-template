@@ -8,18 +8,60 @@ Ce dépôt est l'**usine** (moteur, modules, règles, skills, agents, laboratoir
 pas un site client. La page racine `/` est un tableau de bord ; `/lab` démontre
 chaque brique technique sans marque ni asset protégé.
 
-## Pour créer un nouveau site
+## Prompt → site premium
 
-1. **Créer un dépôt** depuis ce template (« Use this template » sur GitHub).
-2. **Ouvrir le Codespace** (le dev container installe tout automatiquement).
-3. Compléter **`input/CLIENT_BRIEF.md`** (faits vérifiés uniquement).
-4. Déposer les fichiers dans **`input/assets/`** (logo, photos, vidéos, modèles).
-5. Lancer **`claude`**.
-6. Exécuter **`/build-site`** — recherche, stratégie, direction artistique, choix
-   cinématique, code, optimisation, preview et tests.
-7. Ouvrir la **preview** (`/preview-site`, port 3000 auto-forwardé).
-8. Exécuter **`/audit-site`** (conversion, design, responsive, SEO, a11y, perf).
-9. Exécuter **`/finalize-site`** (nettoyage, tests, build prod — **sans déployer**).
+**Vous n'avez que deux choses à savoir : ouvrir Claude, et dire quel site vous
+voulez.** Le reste appartient à ACE.
+
+### Démarrage rapide (aucune compétence technique)
+
+1. **Ouvrir le Codespace** (« Use this template » → Code → Codespaces). Tout
+   s'installe seul.
+2. Vérifier que tout va bien :
+   ```bash
+   pnpm ace:doctor
+   ```
+   Vous devez lire **`ACE READY`**. Si vous lisez `ACE NEEDS ADMIN SETUP`, c'est
+   une action d'administrateur (voir plus bas) — ACE sait déjà créer des sites
+   sans elle.
+3. Lancer **`claude`**.
+4. Écrire **une phrase**, par exemple :
+
+   > Fais-moi un site premium pour ce restaurant : https://exemple.fr
+
+   ou :
+
+   > Crée un site pour le cabinet de mon père. Moderne, rassurant et classe.
+
+5. Attendre. ACE cherche les informations, choisit la direction artistique,
+   construit le site, le teste, le relit et vous donne l'adresse de l'aperçu.
+
+Ce que vous **n'avez pas** à faire : choisir une palette, comprendre les
+commandes, configurer un outil, arbitrer entre « vidéo » et « séquence
+d'images ». ACE tranche.
+
+### Ce qu'ACE ne fera jamais tout seul
+
+- publier ou déployer le site (il reste sur votre machine) ;
+- inventer une information sur l'entreprise (tout ce qui manque est marqué
+  `[À CONFIRMER]`) ;
+- dépenser au-delà d'un petit seuil sans vous poser **une** question ;
+- livrer un visuel bas de gamme pour combler un manque.
+
+### Configuration administrateur (une seule fois)
+
+La génération d'**images et vidéos par IA** demande un compte fournisseur. Cette
+étape se fait **une fois** par l'administrateur du Codespace, jamais par les
+utilisateurs : voir **[docs/ACE-ADMIN-SETUP.md](docs/ACE-ADMIN-SETUP.md)**.
+
+Sans elle, ACE reste pleinement utilisable : il construit le site avec les
+visuels que vous fournissez, ou vous dit franchement qu'un visuel manque.
+
+### Mode expert (développeurs)
+
+Le moteur reste pilotable à la main : `pnpm ace:new-site`, `pnpm ace:media:*`,
+`pnpm ace:provider:check`, `pnpm check`… Voir
+[docs/ACE-AUTOPILOT.md](docs/ACE-AUTOPILOT.md) et les docs `docs/ACE-*`.
 
 ## Commandes essentielles
 

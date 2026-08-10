@@ -1,6 +1,6 @@
 # Audit de réintégration — enseignements du site témoin → moteur ACE
 
-> 2026-07-18. Le premier site témoin (`/workspaces/inquarto`, IN QUARTO) a servi
+> 2026-07-18. Le premier site témoin (`<dépôt local du site témoin>`, Site témoin A) a servi
 > de crash-test. Ce document trace les défauts **génériques** découverts pendant
 > sa construction/finalisation et **backportés dans le moteur**, en excluant
 > strictement toute identité visible du client.
@@ -9,7 +9,7 @@
 
 Diff fichier par fichier des composants **partagés** (générés depuis ce moteur)
 entre le témoin et le moteur ; seules les améliorations sans saveur client sont
-remontées. L'esthétique IN QUARTO (palette Chaux, Fraunces, hachures, cartouches,
+remontées. L'esthétique Site témoin A (palette Chaux, Fraunces, hachures, cartouches,
 planches d'élévation, coupe, maquette, routes, textes, 21 projets) **reste dans
 le dépôt client** et n'entre jamais dans le moteur.
 
@@ -31,8 +31,8 @@ le dépôt client** et n'entre jamais dans le moteur.
 ## NON backporté (spécifique client, resté dans le témoin)
 
 `ProjectPlate` (planches d'élévation), `Cartouche`/`Cotation`/`BioclimaticCut`
-(vocabulaire architectural), `HeroIntro` (anti-flash sur le hero IN QUARTO),
-preset `inquarto`, palette Chaux/Garrigue, fontes Fraunces/Archivo/Plex,
+(vocabulaire architectural), `HeroIntro` (anti-flash sur le hero Site témoin A),
+preset `temoin-a`, palette Chaux/Garrigue, fontes Fraunces/Archivo/Plex,
 contenus, routes `/projets|/approche|/agence`, corrections de hiérarchie de
 titres propres aux pages client, folios, numérotations. Ces éléments démontrent
 ce qu'ACE **peut** produire, sans jamais être imposés par le moteur.

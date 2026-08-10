@@ -2,16 +2,16 @@
 
 Document **interne au moteur** (élagué à la génération). Prouve qu'ACE ne
 produit pas « le même template repeint » : trois expériences issues du même
-moteur — le site témoin **IN QUARTO** (architecture, figé), la validation
+moteur — le site témoin **Site témoin A** (architecture, figé), la validation
 **éditoriale** (Revue Liseré) et la validation **immersive** (Orbe) — sont
 structurellement distinctes.
 
 ## 1. Méthode
 
-- **Empreintes créatives** : `docs/anti-template/{inquarto,editorial,immersive}-fingerprint.json`.
+- **Empreintes créatives** : `docs/anti-template/{temoin-a,editorial,immersive}-fingerprint.json`.
   Chaque champ est soit **extrait de la config** (recipes, Design Language,
   features — pour les deux validations générées), soit **observé** (DOM,
-  captures — pour IN QUARTO, hand-built, antérieur aux recipes). La source de
+  captures — pour Site témoin A, hand-built, antérieur aux recipes). La source de
   chaque donnée est déclarée dans le champ `source` du fingerprint.
 - **Détection automatisée** : `scripts/ace/compare-creative-fingerprints.mjs`
   (`pnpm ace:compare-fingerprints`) calcule une **proximité pondérée** par
@@ -27,11 +27,11 @@ limites, §5).
 
 ## 2. Résultat de la comparaison automatisée
 
-| Paire                  | Proximité | Seuil | Verdict  |
-| ---------------------- | --------- | ----- | -------- |
-| IN QUARTO ↔ éditoriale | 0.016     | 0.5   | distinct |
-| IN QUARTO ↔ immersive  | 0.079     | 0.5   | distinct |
-| éditoriale ↔ immersive | 0.060     | 0.5   | distinct |
+| Paire                      | Proximité | Seuil | Verdict  |
+| -------------------------- | --------- | ----- | -------- |
+| Site témoin A ↔ éditoriale | 0.016     | 0.5   | distinct |
+| Site témoin A ↔ immersive  | 0.079     | 0.5   | distinct |
+| éditoriale ↔ immersive     | 0.060     | 0.5   | distinct |
 
 **Verdict global : ANTI-TEMPLATE CONCLUANT** — les trois expériences sont très
 en-dessous du seuil de proximité (reproductible via `pnpm ace:compare-fingerprints`).
@@ -47,7 +47,7 @@ Captures de référence : `docs/anti-template/captures/`.
   respiration ample. Le texte EST le visuel.
 - **Immersive** : hero **media-first** plein cadre, fond sombre, titre ancré
   en BAS (`items-end`), **scène WebGL montée** sous le hero.
-- **IN QUARTO** : intro architecturale sur-mesure (HeroIntro), hachures,
+- **Site témoin A** : intro architecturale sur-mesure (HeroIntro), hachures,
   cartouche, coupe bioclimatique.
 
 Trois silhouettes de premier écran incompatibles.
@@ -58,7 +58,7 @@ Trois silhouettes de premier écran incompatibles.
   mobile.
 - **Immersive** : déclencheur **« MENU » → overlay plein écran** (role=dialog,
   liens display géants, fermeture Escape).
-- **IN QUARTO** : Folio maison, routes **métier** (/projets, /approche,
+- **Site témoin A** : Folio maison, routes **métier** (/projets, /approche,
   /agence).
 
 Trois paradigmes de navigation différents (inline numéroté / overlay plein
@@ -69,13 +69,13 @@ Trois paradigmes de navigation différents (inline numéroté / overlay plein
 - **Éditoriale** : **sommaire indexé** (liste numérotée, méta mono, aucune
   vignette).
 - **Immersive** : **carrousel horizontal** à scroll-snap (chapitres).
-- **IN QUARTO** : **planches ProjectPlate** (élévations SVG par typologie).
+- **Site témoin A** : **planches ProjectPlate** (élévations SVG par typologie).
 
 Grille verticale indexée vs défilement horizontal vs planches techniques.
 
 ### Palette, surface, densité, mouvement
 
-|         | Éditoriale            | Immersive                   | IN QUARTO        |
+|         | Éditoriale            | Immersive                   | Site témoin A    |
 | ------- | --------------------- | --------------------------- | ---------------- |
 | Surface | claire (papier chaud) | sombre (noir cyan)          | papier chaux     |
 | Densité | spacious              | compact                     | dense technique  |
@@ -98,9 +98,9 @@ Grille verticale indexée vs défilement horizontal vs planches techniques.
 
 Les trois sites partagent **uniquement** : le niveau de finition, la
 performance, l'accessibilité (axe vert partout), la rigueur et la stabilité.
-Aucune esthétique commune, aucune palette commune, aucune identité IN QUARTO
+Aucune esthétique commune, aucune palette commune, aucune identité Site témoin A
 imposée aux validations (contrôle anti-fuite vert : aucun « Orbe » dans
-l'éditorial, aucun « Liseré » dans l'immersif, aucun littéral IN QUARTO).
+l'éditorial, aucun « Liseré » dans l'immersif, aucun littéral Site témoin A).
 
 ## 5. Limites honnêtes
 
@@ -108,7 +108,7 @@ l'éditorial, aucun « Liseré » dans l'immersif, aucun littéral IN QUARTO).
   créativité. Deux recipes différentes comptent comme « différentes » même si
   un rendu pouvait converger — d'où les dimensions **DOM/mobile/média
   observées** qui complètent les ids.
-- Le fingerprint d'IN QUARTO est **observationnel** (site hand-built figé,
+- Le fingerprint d'Site témoin A est **observationnel** (site hand-built figé,
   antérieur au système de recipes) : ses champs `recipes.*` sont des
   rapprochements documentés, pas des ids moteur.
 - Les captures sont **légères et inspectées**, prises en headless (GL logiciel)

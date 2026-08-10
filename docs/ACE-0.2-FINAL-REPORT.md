@@ -142,9 +142,9 @@ loguée · provider **optionnel** (sans lui le moteur reste pleinement utilisabl
 · aucun artefact de test lourd committé · aucun push, aucun déploiement.
 
 ⚠️ **Une réserve, signalée et non corrigée unilatéralement** :
-`docs/anti-template/inquarto-fingerprint.json` et
+`docs/anti-template/temoin-a-fingerprint.json` et
 `scripts/ace/compare-creative-fingerprints.mjs` contiennent le **nom d'un client
-réel** (« IN QUARTO ») et la description de son parti-pris visuel. Aucun secret,
+réel** (« Site témoin A ») et la description de son parti-pris visuel. Aucun secret,
 aucune coordonnée. Ces fichiers sont **élagués des sites générés** (donc aucune
 fuite vers un client), mais ils resteraient présents si **le moteur lui-même**
 était publié. Pré-existant à ce chantier et utilisé par la validation

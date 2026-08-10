@@ -72,7 +72,7 @@ générateur config-aware ne peuvent exister. Puis l'**infrastructure de recipes
 Les deux validations : `pnpm check` vert (131 tests chacune), e2e chromium
 desktop+mobile+forms verts, axe vert, WebGL prouvé (éditorial 0 chunk /
 immersif 4 chunks + canvas + fallback reduced-motion). Aucune identité
-IN QUARTO dans le moteur ni dans les validations. Aucun push. Aucun déploiement.
+Site témoin A dans le moteur ni dans les validations. Aucun push. Aucun déploiement.
 
 Voir `docs/ACE-FINAL-REPORT.md` (rapport de clôture) et
 `docs/ACE-NEXT-CLIENT-RUNBOOK.md` (procédure prochain client).

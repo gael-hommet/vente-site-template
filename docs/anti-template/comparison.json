@@ -26,7 +26,7 @@
   "limits": "Garde-fou structurel, pas un juge esthétique. Deux recipes différentes comptent comme différentes même si un rendu pouvait converger — complété par les dimensions DOM/mobile/média observées.",
   "pairs": [
     {
-      "pair": "inquarto ↔ editorial",
+      "pair": "temoin-a ↔ editorial",
       "proximity": 0.016,
       "threshold": 0.5,
       "tooClose": false,
@@ -52,7 +52,7 @@
       ]
     },
     {
-      "pair": "inquarto ↔ immersive",
+      "pair": "temoin-a ↔ immersive",
       "proximity": 0.079,
       "threshold": 0.5,
       "tooClose": false,

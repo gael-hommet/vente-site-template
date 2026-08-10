@@ -22,14 +22,14 @@ Voir `REINTEGRATION-AUDIT.md` (commit moteur). Tous génériques, testés vert :
 ## B. NON backporté (spécifique client — reste dans le témoin)
 
 Ne JAMAIS remonter au moteur : `ProjectPlate`, `Cartouche`, `Cotation`,
-`BioclimaticCut`, `HeroIntro` (version IN QUARTO), preset `inquarto`, palette
+`BioclimaticCut`, `HeroIntro` (version Site témoin A), preset `temoin-a`, palette
 Chaux/Garrigue, fontes Fraunces/Archivo/Plex, contenus, routes d'architecte,
 folios, corrections de hiérarchie propres aux pages client. Ces éléments sont des
 **démonstrations** de ce qu'ACE peut produire, pas des primitives du moteur.
 
 ## C. Lacunes structurelles — À CONSTRUIRE (pas un backport)
 
-Ce ne sont pas des fichiers à copier depuis IN QUARTO : ce sont des systèmes
+Ce ne sont pas des fichiers à copier depuis Site témoin A : ce sont des systèmes
 **génériques neufs** à écrire dans le moteur.
 
 | Système                  | Livrable                                                                                 | Phase |

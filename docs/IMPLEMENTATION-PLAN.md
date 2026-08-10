@@ -39,7 +39,7 @@
 
 - `pnpm ace:new-site` : export `git archive` (fichiers trackés seulement), élagage des docs internes, stamp `ace.meta.json`, contrôle de fuite bloquant. Validé de bout en bout sur un site témoin onyx (check + e2e verts, captures) — voir `docs/ACE-GENERATOR.md` (écarts détectés/corrigés inclus).
 
-## Phase 5 — Site pilote IN QUARTO
+## Phase 5 — Site pilote Site témoin A
 
 - Dérouler le parcours complet réel : brief → ingestion assets (pipeline `assets:*`) → DA → narration (agents art-director / experience-director / copywriter…) → build → audits → finalize. Premier test de vérité du moteur.
 

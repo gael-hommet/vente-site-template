@@ -1,13 +1,13 @@
 {
-  "identity": "IN QUARTO Architecte & Associés (site témoin, figé)",
+  "identity": "Site témoin A (architecture) (site témoin, figé)",
   "sector": "architecture",
   "source": {
-    "recipes": "N/A — IN QUARTO précède le système de recipes config-driven ; composants sur-mesure hand-built (HeroIntro, BioclimaticCut, Cotation, Cartouche, MissionFrieze, Folio…)",
-    "design": "config (preset custom 'inquarto', NEXT_PUBLIC_ACE_PRESET)",
-    "structure": "observation du code figé /workspaces/inquarto (src/app/page.tsx, components/inquarto/*) — jamais modifié",
+    "recipes": "N/A — Site témoin A précède le système de recipes config-driven ; composants sur-mesure hand-built (HeroIntro, BioclimaticCut, Cotation, Cartouche, MissionFrieze, Folio…)",
+    "design": "config (preset custom 'temoin-a', NEXT_PUBLIC_ACE_PRESET)",
+    "structure": "observation du code figé <dépôt local du site témoin> (src/app/page.tsx, components/temoin-a/*) — jamais modifié",
     "webgl": "observation : scène maquette-etude (BioclimaticCut) montée via AdaptiveCanvas, gatée par tier"
   },
-  "designLanguage": "inquarto (preset custom hors des 8 presets moteur — palette Chaux/Garrigue)",
+  "designLanguage": "temoin-a (preset custom hors des 8 presets moteur — palette Chaux/Garrigue)",
   "recipes": {
     "hero": "sur-mesure (HeroIntro) — apparenté split/typographique mais habillé architecture",
     "navigation": "sur-mesure (Folio, routes métier /projets /approche /agence)",

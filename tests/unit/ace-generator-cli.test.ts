@@ -383,6 +383,57 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("n'expédie JAMAIS le cerveau Autopilot dans un site client", () => {
+    // TEST 7 du mandat : un site livré embarque le runtime dont il a besoin,
+    // pas la machine à états qui l'a fabriqué, ni sa politique de dépense.
+    const out = tmpOut("no-autopilot");
+    const res = runCli([
+      "--name",
+      "Sans Autopilot",
+      "--out",
+      out,
+      "--skip-install",
+      "--skip-check",
+    ]);
+    expect(res.status).toBe(0);
+
+    expect(existsSync(path.join(out, "src/ace/autopilot"))).toBe(false);
+    expect(existsSync(path.join(out, "src/config/ace-autopilot-policy.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "scripts/ace/autopilot"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/unit/autopilot.test.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/fixtures/autopilot"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-AUTOPILOT.md"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-ADMIN-SETUP.md"))).toBe(false);
+    // Aucun état de mission (ni credential) ne doit voyager.
+    expect(existsSync(path.join(out, ".ace"))).toBe(false);
+
+    // Et aucun fichier conservé ne doit importer la couche élaguée.
+    const walk = (dir: string): string[] => {
+      const files: string[] = [];
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name === "node_modules") continue;
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) files.push(...walk(full));
+        else if (/\.(ts|tsx)$/.test(entry.name)) files.push(full);
+      }
+      return files;
+    };
+    const importsAutopilot =
+      /(?:from|import)\s*\(?\s*["'][^"']*(?:ace\/autopilot|ace-autopilot-policy)/;
+    const offenders = walk(path.join(out, "src")).filter((f) =>
+      importsAutopilot.test(readFileSync(f, "utf8")),
+    );
+    expect(offenders).toEqual([]);
+
+    // Les scripts autopilot ne doivent plus figurer dans package.json.
+    const pkg = JSON.parse(readFileSync(path.join(out, "package.json"), "utf8")) as {
+      scripts: Record<string, string>;
+    };
+    expect(Object.keys(pkg.scripts)).not.toContain("ace:autopilot");
+    expect(Object.keys(pkg.scripts)).not.toContain("ace:doctor");
+    expect(Object.keys(pkg.scripts)).not.toContain("ace:resume");
+  });
+
   it("copie les assets fournis et produit un manifeste tracé", () => {
     const out = tmpOut("assets");
     const assetsDir = mkdtempSync(path.join(tmpdir(), "ace-cli-assets-"));

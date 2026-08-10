@@ -167,7 +167,7 @@ export function comparePair(nameA, fpA, nameB, fpB) {
 /* --------------------------------- main ---------------------------------- */
 function main() {
   const files = {
-    inquarto: path.join(dir, "inquarto-fingerprint.json"),
+    temoinA: path.join(dir, "temoin-a-fingerprint.json"),
     editorial: path.join(dir, "editorial-fingerprint.json"),
     immersive: path.join(dir, "immersive-fingerprint.json"),
   };
@@ -182,8 +182,8 @@ function main() {
   );
 
   const pairs = [
-    comparePair("inquarto", fp.inquarto, "editorial", fp.editorial),
-    comparePair("inquarto", fp.inquarto, "immersive", fp.immersive),
+    comparePair("temoin-a", fp.temoinA, "editorial", fp.editorial),
+    comparePair("temoin-a", fp.temoinA, "immersive", fp.immersive),
     comparePair("editorial", fp.editorial, "immersive", fp.immersive),
   ];
   const allDistinct = pairs.every((p) => !p.tooClose);

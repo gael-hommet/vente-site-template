@@ -13,7 +13,7 @@ import {
  * Tests du détecteur de proximité anti-template. Couvre : empreintes
  * identiques, légèrement différentes, radicalement différentes, données
  * incomplètes, et les deux côtés du seuil. Vérifie aussi que les trois
- * empreintes réelles (inquarto/editorial/immersive) sont bien distinctes.
+ * empreintes réelles (temoin-a/editorial/immersive) sont bien distinctes.
  */
 
 const FP_DIR = path.resolve(__dirname, "../../docs/anti-template");
@@ -121,11 +121,11 @@ describe("compare-creative-fingerprints", () => {
   });
 
   it("les trois empreintes RÉELLES sont deux à deux distinctes (< seuil)", () => {
-    const inquarto = load("inquarto");
+    const temoinA = load("temoin-a");
     const editorial = load("editorial");
     const immersive = load("immersive");
-    expect(comparePair("i", inquarto, "e", editorial).tooClose).toBe(false);
-    expect(comparePair("i", inquarto, "m", immersive).tooClose).toBe(false);
+    expect(comparePair("i", temoinA, "e", editorial).tooClose).toBe(false);
+    expect(comparePair("i", temoinA, "m", immersive).tooClose).toBe(false);
     expect(comparePair("e", editorial, "m", immersive).tooClose).toBe(false);
   });
 });

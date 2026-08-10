@@ -1,6 +1,6 @@
-# Enseignements du pilote — IN QUARTO → ACE
+# Enseignements du pilote — Site témoin A → ACE
 
-> Le premier site témoin (IN QUARTO, `/workspaces/inquarto`, figé) a servi de
+> Le premier site témoin (Site témoin A, `<dépôt local du site témoin>`, figé) a servi de
 > crash-test. Ce document résume ce qu'il a appris au moteur, au-delà des
 > correctifs de fichiers déjà backportés (`REINTEGRATION-AUDIT.md`).
 
@@ -33,7 +33,7 @@ Le pilote a montré que, pour générer un **nouveau** client rapidement, il a f
    Motion/WebGL, feature flags. → **Phase 2**.
 2. **Pas de recipes.** Les registres Motion (9) et Scene (3) existent, mais il
    n'y a **aucune recette composable** pour heroes / navigation / collections /
-   storytelling / conversion. Chaque page a été écrite sur mesure pour IN QUARTO.
+   storytelling / conversion. Chaque page a été écrite sur mesure pour Site témoin A.
    Un second client repartirait de zéro visuellement. → **Phase 3**.
 3. **Pas de feature flags.** Activer/désactiver 3D, smooth-scroll, formulaire,
    collections, langues devrait être déclaratif. → **Phase 2 (`features.ts`)**.
@@ -48,4 +48,4 @@ Le pilote a montré que, pour générer un **nouveau** client rapidement, il a f
 
 La seule signature partagée entre sites ACE est la **qualité** (perf, a11y,
 fluidité, fiabilité) — jamais le design visible. Toute contrainte esthétique
-héritée d'IN QUARTO trouvée dans le moteur est un bug à abstraire ou supprimer.
+héritée d'Site témoin A trouvée dans le moteur est un bug à abstraire ou supprimer.

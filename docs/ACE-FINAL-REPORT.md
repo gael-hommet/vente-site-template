@@ -138,7 +138,7 @@ node scripts/ace/new-site.mjs --name "Orbe" --slug ace-validation-immersive \
 ## 8. Preuve anti-template
 
 Voir `docs/ACE-ANTI-TEMPLATE-VALIDATION.md`. Proximités structurelles
-(seuil 0.5) : IN QUARTO↔éditoriale **0.016**, IN QUARTO↔immersive **0.079**,
+(seuil 0.5) : Site témoin A↔éditoriale **0.016**, Site témoin A↔immersive **0.079**,
 éditoriale↔immersive **0.060**. **Verdict : concluant.** Opposition prouvée au
 RENDU (silhouette, navigation, collection, palette, densité, mouvement, WebGL,
 mobile) — captures dans `docs/anti-template/captures/`.
@@ -183,7 +183,7 @@ ci-dessous.
   sur Firefox/WebKit ailleurs.
 - **WebGL headless** : rendu sur GL logiciel — le rendu GPU matériel est plus
   riche ; les captures sont indicatives.
-- **Fingerprint IN QUARTO** : observationnel (site hand-built figé, antérieur
+- **Fingerprint Site témoin A** : observationnel (site hand-built figé, antérieur
   aux recipes). Ses `recipes.*` sont des rapprochements documentés.
 - **Contenu généré** : neutre/`[À CONFIRMER]` par défaut — un vrai client
   remplace chaque fait vérifié avant publication.
@@ -200,7 +200,7 @@ ci-dessous.
 
 - Historique de commits locaux cohérents (voir `git log`).
 - **Aucun push. Aucun déploiement. Aucune modification de domaine.**
-- Aucun secret committé. IN QUARTO figé, jamais modifié.
+- Aucun secret committé. Site témoin A figé, jamais modifié.
 - Les deux validations sont des dossiers reproductibles **hors Git**
   (`/workspaces/ace-validation-*`) ; leur génération est documentée exactement
   (§7). Leurs `node_modules`/`.next` ne sont jamais committés.

@@ -225,6 +225,8 @@ const ENGINE_ONLY_DOCS = [
   "docs/ACE-0.2-IMPLEMENTATION-PLAN.md",
   "docs/ACE-0.2-FINAL-REPORT.md",
   "docs/ACE-CHANGELOG.md",
+  "docs/ACE-AUTOPILOT.md",
+  "docs/ACE-ADMIN-SETUP.md",
   "docs/ACE-MEDIA-ARCHITECTURE.md",
   "docs/ACE-MEDIA-QA.md",
   "docs/ACE-PROVIDER-INTEGRATION.md",
@@ -271,6 +273,7 @@ const ENGINE_ONLY_TESTS = [
   "tests/unit/media-orchestrator.test.ts",
   "tests/unit/media-delivery.test.ts",
   "tests/unit/media-pipeline-e2e.test.ts",
+  "tests/unit/autopilot.test.ts",
 ];
 // Le générateur lui-même : un site client ne régénère jamais de site depuis
 // lui-même (et `git archive HEAD` y échouerait de toute façon, le site
@@ -283,6 +286,13 @@ const GENERATOR_TOOLING = [
   // elle-même élaguée. Le runtime média isomorphe (types, stratégie, routeur,
   // gate premium, CinematicScroll) reste shippé et n'en dépend pas.
   "src/ace/media-engine/node",
+  // ACE AUTOPILOT — le cerveau de PRODUCTION. Un site livré n'a aucune raison
+  // d'embarquer la machine à états qui l'a fabriqué (ni sa politique de
+  // dépense, ni ses fixtures d'acceptation).
+  "src/ace/autopilot",
+  "src/config/ace-autopilot-policy.ts",
+  "tests/fixtures/autopilot",
+  ".ace",
 ];
 // Fixtures internes de validation + comparaison anti-template : contiennent
 // l'identité d'AUTRES fixtures (éditoriale/immersive) et ne doivent jamais
