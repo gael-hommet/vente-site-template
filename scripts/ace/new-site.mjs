@@ -227,6 +227,7 @@ const ENGINE_ONLY_DOCS = [
   "docs/ACE-CHANGELOG.md",
   "docs/ACE-AUTOPILOT.md",
   "docs/ACE-ADMIN-SETUP.md",
+  "docs/ACE-AUTOPILOT-REPORT.md",
   "docs/ACE-MEDIA-ARCHITECTURE.md",
   "docs/ACE-MEDIA-QA.md",
   "docs/ACE-PROVIDER-INTEGRATION.md",

@@ -3,6 +3,51 @@
 Document **interne au moteur** (élagué à la génération). Versions de la couche
 moteur (`src/ace/core/version.ts`), pas de l'application.
 
+## 0.2.1 — ACE AUTOPILOT (une phrase suffit)
+
+Complète la promesse de 0.2 : « moteur média + orchestration provider +
+**autonomie utilisateur de haut niveau** ». Pas de bump majeur — Autopilot est
+ce que 0.2 était censé signifier ; le contrat des sites GÉNÉRÉS ne change pas
+(Autopilot est élagué), d'où un incrément de patch.
+
+### Ajouté
+
+- **`src/ace/autopilot/`** — machine à états persistante (16 états), détection
+  d'intention en langage naturel, garde-fous, direction artistique autonome,
+  rapports à deux niveaux.
+- **`pnpm ace:doctor`** — « ACE READY » / « ACE NEEDS ADMIN SETUP », séparation
+  essentiel / optionnel, aucune valeur de credential affichée.
+- **`pnpm ace:autopilot`** / **`pnpm ace:resume`** — point d'entrée unique.
+  Codes de sortie : 0 avancé · 3 besoin de l'agent · 4 bloqué · 5 accord attendu.
+- **`src/config/ace-autopilot-policy.ts`** — seuils de dépense, itérations
+  visuelles, et les deux listes explicites autorisé / interdit.
+- **État CONTENT** — les faits vérifiés deviennent de vrais textes écrits dans
+  `site-content.ts` ; les visuels fournis par le client sont câblés dans le hero
+  et la collection.
+- **Docs** — `ACE-AUTOPILOT.md` (parcours) et `ACE-ADMIN-SETUP.md` (opération
+  administrateur unique). README réécrit pour trois publics.
+- **CLAUDE.md** — section ACE OPERATOR MODE : une session Claude sans historique
+  sait quoi faire dès la première phrase de l'utilisateur.
+
+### Corrigé
+
+- Les profils sectoriels proposaient des recipes d'une **autre famille**
+  (`hero: "editorial"` n'existe pas) : la génération échouait. Corrigé, et un
+  test verrouille désormais chaque famille contre le catalogue réel.
+- Le **quality gate n'était pas branché** : un site noté 0.6 passait `COMPLETE`.
+  Il déclenche maintenant une nouvelle passe, puis `QUALITY_NOT_REACHED`.
+- Les visuels du client étaient copiés mais **jamais affichés**.
+- `PREVIEW` affirmait une URL sans l'avoir vérifiée : elle n'est annoncée que si
+  un serveur répond réellement.
+
+### Sécurité public-ready
+
+- L'identité d'un client réel présente dans 10 documents moteur et une empreinte
+  anti-template est **anonymisée** (« Site témoin A »), sans détruire la preuve :
+  la comparaison anti-template rend le même verdict et ses tests passent.
+- Le cerveau Autopilot, sa politique de dépense, ses fixtures et `.ace/` ne
+  partent **jamais** dans un site client (test de régression).
+
 ## 0.2.0 — Creative Media Autonomous Engine
 
 Passage d'un moteur qui _intègre_ de beaux médias à un moteur qui **décide,
