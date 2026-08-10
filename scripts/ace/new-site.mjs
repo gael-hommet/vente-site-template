@@ -277,7 +277,7 @@ const ENGINE_ONLY_TESTS = [
 const GENERATOR_TOOLING = [
   "scripts/ace",
   "tests/unit/ace-generator-cli.test.ts",
-  // ACE 0.2 — couche Node du media-engine (spawn ffmpeg/ffprobe/hf-api) :
+  // ACE — couche Node du media-engine (spawn ffmpeg/ffprobe) :
   // outillage MOTEUR, uniquement consommé par la CLI `scripts/ace/media` qui est
   // elle-même élaguée. Le runtime média isomorphe (types, stratégie, routeur,
   // gate premium, CinematicScroll) reste shippé et n'en dépend pas.

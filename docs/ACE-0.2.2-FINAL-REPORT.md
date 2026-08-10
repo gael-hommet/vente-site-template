@@ -113,7 +113,7 @@ photos distinctes. Un score n'est jamais fourni sans capture réellement examin�
 
 ## 11. Tests
 
-**262 tests** au vert (28 fichiers), lint et typecheck sans avertissement, build
+**254 tests** au vert (27 fichiers), lint et typecheck sans avertissement, build
 OK. Couverture des points A→L du mandat dans `tests/unit/autopilot.test.ts` :
 
 | Point | Vérifié                                                                       |

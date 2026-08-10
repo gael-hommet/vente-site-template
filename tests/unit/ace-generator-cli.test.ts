@@ -346,7 +346,7 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(existsSync(path.join(out, "tests/unit/media-orchestrator.test.ts"))).toBe(false);
     expect(existsSync(path.join(out, "tests/unit/media-delivery.test.ts"))).toBe(false);
     expect(existsSync(path.join(out, "tests/unit/media-pipeline-e2e.test.ts"))).toBe(false);
-    // Couche Node du media-engine (spawn ffmpeg/hf-api) : outillage moteur.
+    // Couche Node du media-engine (spawn ffmpeg/ffprobe) : outillage moteur.
     expect(existsSync(path.join(out, "src/ace/media-engine/node"))).toBe(false);
 
     // Scripts moteur retirés de package.json (leur cible scripts/ace est élaguée).

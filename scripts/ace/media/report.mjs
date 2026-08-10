@@ -2,10 +2,9 @@
 /**
  * ace:media:report — rapport média consolidé et HONNÊTE.
  *
- * Combine : capacités locales (ffmpeg/ffprobe/sharp/gltf), statut RÉEL des
- * providers (CLI officiel installé ? authentifié ?), stratégies runtime, et ce
- * qu'ACE peut / ne peut PAS faire ici. Point d'entrée « où en est-on ? » avant
- * de planifier ou de générer. Ne prétend aucune capacité non installée.
+ * Combine : capacités locales (ffmpeg/ffprobe/sharp/gltf), stratégies runtime,
+ * et ce qu'ACE peut / ne peut PAS faire ici. Point d'entrée « où en est-on ? ».
+ * Ne prétend aucune capacité non installée. Aucun service payant n'intervient.
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";
@@ -31,7 +30,7 @@ if (!cap) {
 const ok = (b) => (b ? "disponible ✓" : "ABSENT ✗");
 
 console.log("═══════════════════════════════════════════════");
-console.log(" ACE 0.2 — Rapport média consolidé");
+console.log(" ACE — Rapport média consolidé");
 console.log("═══════════════════════════════════════════════\n");
 
 console.log("Traitement local (assemblage / QA / frames / optimisation) :");
@@ -40,15 +39,9 @@ console.log(`  ffprobe         : ${ok(cap.ffprobe)}`);
 console.log(`  sharp           : ${ok(cap.sharp)}`);
 console.log(`  @gltf-transform : ${ok(cap.gltfTransform)}\n`);
 
-console.log("Génération IA (images / vidéos) :");
-for (const p of cap.providerDetails ?? []) {
-  const mark = p.status === "READY" ? "✓" : "✗";
-  console.log(
-    `  ${mark} ${p.name} — ${p.status} (CLI ${p.cliInstalled ? "installé" : "absent"}, ` +
-      `${p.authenticated ? "authentifié" : "non authentifié"})`,
-  );
-}
-if (!(cap.configuredProviders ?? []).length) console.log("  Aucun provider PRÊT.");
+console.log("Génération d'images / vidéos :");
+console.log("  Aucun service de génération n'est utilisé — coût média 0 €.");
+console.log("  Les visuels viennent du réel : fournis, officiels, ou apportés par vous.\n");
 
 console.log("\nStratégies d'expérience disponibles (runtime) :");
 console.log(`  ${(cap.runtimeStrategies ?? []).join(", ")}`);
@@ -56,8 +49,7 @@ console.log(`  ${(cap.runtimeStrategies ?? []).join(", ")}`);
 console.log("\nCe qu'ACE peut faire ICI, maintenant :");
 console.log("  ✓ Décider la stratégie média (anti-low-poly appliqué)");
 console.log("  ✓ Planifier plans/storyboard, verrouiller l'identité du sujet");
-console.log("  ✓ Router un modèle — uniquement dans un catalogue provider RÉEL");
-console.log("  ✓ Estimer puis plafonner le coût (arrêt net au budget)");
+console.log("  ✓ Importer et valider des visuels officiels (provenance + droits)");
 if (cap.ffprobe) console.log("  ✓ Contrôler techniquement un média (ffprobe réel)");
 if (cap.ffmpeg) {
   console.log("  ✓ Extraire des frames, assembler un master, optimiser desktop/mobile");
@@ -65,10 +57,8 @@ if (cap.ffmpeg) {
 console.log("  ✓ Appliquer le premium output gate (aucun repli déguisé en premium)");
 console.log("  ✓ Intégrer un média en scroll-cinéma (CinematicScroll)");
 
-console.log("\nCe qu'ACE NE peut PAS faire sans configuration/asset :");
-if (!(cap.configuredProviders ?? []).length) {
-  console.log("  ✗ Générer des images/vidéos IA (aucun provider authentifié)");
-}
+console.log("\nCe qu'ACE NE fait PAS :");
+console.log("  ✗ Générer une image ou une vidéo (par choix : coût média 0 €)");
 console.log("  ✗ Inventer un média premium à partir de rien (→ MEDIA_ASSET_REQUIRED)");
 console.log("  ✗ Substituer un besoin photoréaliste par une 3D low-poly (interdit)");
 console.log("  ✗ Juger seul la qualité VISUELLE d'un rendu (→ REVIEW_REQUIRED)");
@@ -80,10 +70,8 @@ if ((cap.notes ?? []).length) {
 
 console.log("\nCommandes disponibles :");
 console.log("  pnpm ace:media:capabilities          # audit de l'environnement");
-console.log("  pnpm ace:media:plan <brief.json>     # décision + storyboard + coût");
-console.log("  pnpm ace:media:generate --brief <f>  # génération (requiert un provider)");
+console.log("  pnpm ace:media:plan <brief.json>     # décision + storyboard");
 console.log("  pnpm ace:media:qa --manifest <f>     # QA technique réelle (ffprobe)");
 console.log("  pnpm ace:media:assemble <in...> --out <d>");
 console.log("  pnpm ace:media:optimize <master> --out <d>");
 console.log("  pnpm ace:media:frames <video> --out <d>");
-console.log("  pnpm ace:provider:check              # statut des providers");
