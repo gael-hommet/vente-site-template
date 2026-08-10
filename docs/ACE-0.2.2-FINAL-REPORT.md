@@ -159,9 +159,10 @@ contrat des sites générés.
 
 ## 14. Commits
 
-| Commit      | Contenu                                                                                                                   |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| (ce commit) | Suppression du paradigme provider, Asset Source Policy, nouveau workflow, SITE_BUILD/MOBILE_QA réels, docs, version 0.2.2 |
+| Commit    | Contenu                                                                                                                   |
+| --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `6c439f1` | Suppression du paradigme provider, Asset Source Policy, nouveau workflow, SITE_BUILD/MOBILE_QA réels, docs, version 0.2.2 |
+| `714ce86` | Purge des dernières traces provider dans `ace:media:capabilities` et `ace:media:report`                                   |
 
 ## 15. État git
 
