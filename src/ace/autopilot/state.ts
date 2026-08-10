@@ -13,13 +13,13 @@ import { TERMINAL_STATES } from "./types";
 const NEXT: Record<AutopilotState, AutopilotState | null> = {
   INTAKE: "RESEARCH",
   RESEARCH: "FACT_CHECK",
-  FACT_CHECK: "SITE_BOOTSTRAP",
-  SITE_BOOTSTRAP: "ART_DIRECTION",
+  FACT_CHECK: "ASSET_DISCOVERY",
+  ASSET_DISCOVERY: "ASSET_VALIDATION",
+  ASSET_VALIDATION: "ART_DIRECTION",
   ART_DIRECTION: "CONTENT",
   CONTENT: "MEDIA_PLAN",
-  MEDIA_PLAN: "MEDIA_GENERATION",
-  MEDIA_GENERATION: "MEDIA_QA",
-  MEDIA_QA: "SITE_BUILD",
+  MEDIA_PLAN: "MEDIA_PROCESSING",
+  MEDIA_PROCESSING: "SITE_BUILD",
   SITE_BUILD: "VISUAL_QA",
   VISUAL_QA: "MOBILE_QA",
   MOBILE_QA: "TECHNICAL_QA",
@@ -27,7 +27,6 @@ const NEXT: Record<AutopilotState, AutopilotState | null> = {
   PREVIEW: "COMPLETE",
   COMPLETE: null,
   BLOCKED: null,
-  WAITING_FOR_APPROVAL: null,
 };
 
 /** État suivant dans le workflow nominal (null si terminal). */
@@ -50,12 +49,12 @@ export function progressOf(state: AutopilotState): number {
     "INTAKE",
     "RESEARCH",
     "FACT_CHECK",
-    "SITE_BOOTSTRAP",
+    "ASSET_DISCOVERY",
+    "ASSET_VALIDATION",
     "ART_DIRECTION",
     "CONTENT",
     "MEDIA_PLAN",
-    "MEDIA_GENERATION",
-    "MEDIA_QA",
+    "MEDIA_PROCESSING",
     "SITE_BUILD",
     "VISUAL_QA",
     "MOBILE_QA",
@@ -71,12 +70,12 @@ const HUMAN_LABELS: Record<AutopilotState, string> = {
   INTAKE: "Analyse de votre demande",
   RESEARCH: "Recherche d'informations sur l'entreprise",
   FACT_CHECK: "Vérification des informations",
-  SITE_BOOTSTRAP: "Création du projet",
+  ASSET_DISCOVERY: "Recherche des visuels officiels",
+  ASSET_VALIDATION: "Vérification des visuels et de leur provenance",
   ART_DIRECTION: "Choix de la direction artistique",
   CONTENT: "Rédaction des textes",
-  MEDIA_PLAN: "Conception des visuels",
-  MEDIA_GENERATION: "Production des visuels",
-  MEDIA_QA: "Contrôle des visuels",
+  MEDIA_PLAN: "Conception de l'habillage visuel",
+  MEDIA_PROCESSING: "Optimisation des visuels",
   SITE_BUILD: "Construction du site",
   VISUAL_QA: "Relecture visuelle (ordinateur)",
   MOBILE_QA: "Relecture visuelle (mobile)",
@@ -84,7 +83,6 @@ const HUMAN_LABELS: Record<AutopilotState, string> = {
   PREVIEW: "Ouverture de l'aperçu",
   COMPLETE: "Terminé",
   BLOCKED: "En attente d'une action",
-  WAITING_FOR_APPROVAL: "En attente de votre accord",
 };
 
 export function humanLabel(state: AutopilotState): string {
@@ -93,14 +91,12 @@ export function humanLabel(state: AutopilotState): string {
 
 /** Message utilisateur pour chaque cause de blocage (jamais un log brut). */
 const BLOCKED_MESSAGES: Record<BlockedReason, string> = {
-  ADMIN_PROVIDER_AUTH_REQUIRED:
-    "La génération d'images/vidéos nécessite une activation par l'administrateur (une seule fois).",
   MISSING_ESSENTIAL_INFO:
     "Une information indispensable est introuvable publiquement et ne peut pas être devinée.",
   MEDIA_ASSET_REQUIRED:
-    "Un visuel de qualité professionnelle est nécessaire et ne peut pas être produit ici.",
-  SPEND_APPROVAL_REQUIRED:
-    "Cette production a un coût : votre accord est nécessaire pour continuer.",
+    "Il me faut au moins un vrai visuel de l'entreprise (photo officielle, ou image que vous me donnez).",
+  MEDIA_RIGHTS_UNCONFIRMED:
+    "Les droits de certains visuels ne sont pas confirmés : à valider avant toute publication.",
   ENVIRONMENT_NOT_READY: "L'environnement n'est pas prêt (lancez « ace:doctor » pour le détail).",
   QUALITY_NOT_REACHED:
     "Le résultat n'atteint pas encore le niveau attendu après plusieurs tentatives.",
@@ -129,6 +125,8 @@ export function createMission(input: {
     content: null,
     providedAssets: [],
     assetsDir: null,
+    assetInventory: null,
+    usage: "PRIVATE_DEMO",
     state: "INTAKE",
     blockedReason: null,
     blockedMessage: null,
@@ -136,6 +134,7 @@ export function createMission(input: {
     artDirection: null,
     mediaManifestPath: null,
     iterations: [],
+    stageReports: [],
     steps: [],
     spend: { amount: 0, currency: "—", isLowerBound: false },
     previewUrl: null,
@@ -161,7 +160,7 @@ export function block(
 ): AutopilotMission {
   return {
     ...mission,
-    state: reason === "SPEND_APPROVAL_REQUIRED" ? "WAITING_FOR_APPROVAL" : "BLOCKED",
+    state: "BLOCKED",
     blockedReason: reason,
     blockedMessage: detail ? `${blockedMessageFor(reason)} ${detail}` : blockedMessageFor(reason),
     updatedAt: now,
@@ -199,7 +198,7 @@ export function lastCompletedState(mission: AutopilotMission): AutopilotState | 
 /** État depuis lequel reprendre une mission interrompue. */
 export function resumeState(mission: AutopilotMission): AutopilotState {
   // Un blocage explicite reste le point de reprise (sa cause doit être levée).
-  if (mission.state === "BLOCKED" || mission.state === "WAITING_FOR_APPROVAL") {
+  if (mission.state === "BLOCKED") {
     const last = lastCompletedState(mission);
     return last ? (nextState(last) ?? mission.state) : "INTAKE";
   }

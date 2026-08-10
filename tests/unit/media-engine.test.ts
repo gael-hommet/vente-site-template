@@ -3,16 +3,11 @@ import {
   chooseStrategy,
   buildMediaPlan,
   buildShotPlan,
-  estimateCost,
   assessMedia,
   assessContinuity,
   evaluateLowPolyRisk,
   assertNoLowPolySubstitution,
   QA_ACCEPT_THRESHOLD,
-  isProviderConfigured,
-  configuredProviders,
-  allProviders,
-  getProvider,
   type AceAvailableAssets,
   type AceMediaConstraints,
 } from "@/ace/media-engine";
@@ -61,7 +56,6 @@ describe("strategy decision layer", () => {
       intent: "room-tour",
       qualityBar: "photoreal",
       assets: { ...NO_ASSETS, continuousVideo: true },
-      configuredProviders: [],
       constraints: CONSTRAINTS,
     });
     expect(d.strategy).toBe("video-scroll");
@@ -73,7 +67,6 @@ describe("strategy decision layer", () => {
       intent: "image-sequence",
       qualityBar: "stylized-premium",
       assets: { ...NO_ASSETS, frameSequence: true },
-      configuredProviders: [],
       constraints: CONSTRAINTS,
     });
     expect(d.strategy).toBe("image-sequence");
@@ -84,7 +77,6 @@ describe("strategy decision layer", () => {
       intent: "project-reveal",
       qualityBar: "photoreal",
       assets: { ...NO_ASSETS, realModel3d: true },
-      configuredProviders: [],
       constraints: CONSTRAINTS,
     });
     expect(d.strategy).toBe("webgl");
@@ -95,35 +87,41 @@ describe("strategy decision layer", () => {
       intent: "photo-depth",
       qualityBar: "stylized-premium",
       assets: { ...NO_ASSETS, stillImages: true },
-      configuredProviders: [],
       constraints: CONSTRAINTS,
     });
     expect(d.strategy).toBe("2.5d");
   });
 
-  it("photoréaliste SANS asset NI provider → PAS de low-poly : PROVIDER_NOT_CONFIGURED + fallback éditorial", () => {
+  it("photoréaliste SANS aucun média réel → MEDIA_ASSET_REQUIRED, jamais de low-poly", () => {
     const d = chooseStrategy({
       intent: "hero-cinematic",
       qualityBar: "photoreal",
       assets: NO_ASSETS,
-      configuredProviders: [],
       constraints: CONSTRAINTS,
     });
     expect(d.strategy).not.toBe("webgl");
-    expect(d.blocker).toBe("PROVIDER_NOT_CONFIGURED");
+    // ACE ne génère rien : il DEMANDE le média qui manque.
+    expect(d.blocker).toBe("MEDIA_ASSET_REQUIRED");
     expect(d.premiumFallback).toBe("editorial-fallback");
+    expect(d.rationale).toMatch(/ne fabrique/i);
   });
 
-  it("photoréaliste SANS asset MAIS provider configuré → hybrid (générer), pas de blocker", () => {
-    const d = chooseStrategy({
-      intent: "hero-cinematic",
-      qualityBar: "photoreal",
-      assets: NO_ASSETS,
-      configuredProviders: ["higgsfield"],
-      constraints: CONSTRAINTS,
-    });
-    expect(d.strategy).toBe("hybrid");
-    expect(d.blocker).toBeNull();
+  it("ne propose JAMAIS de génération : aucune stratégie « hybrid » ni mention de provider", () => {
+    const cases = [
+      { qualityBar: "photoreal" as const, assets: NO_ASSETS },
+      { qualityBar: "stylized-premium" as const, assets: NO_ASSETS },
+      { qualityBar: "editorial" as const, assets: NO_ASSETS },
+    ];
+    for (const c of cases) {
+      const d = chooseStrategy({
+        intent: "hero-cinematic",
+        qualityBar: c.qualityBar,
+        assets: c.assets,
+        constraints: CONSTRAINTS,
+      });
+      expect(d.strategy).not.toBe("hybrid");
+      expect(`${d.rationale} ${d.requirements.join(" ")}`).not.toMatch(/provider|générer|API/i);
+    }
   });
 });
 
@@ -138,31 +136,6 @@ describe("shot planner", () => {
       expect(s.durationS).toBeGreaterThan(0);
       expect(s.focusPoint.length).toBeGreaterThan(0);
     }
-  });
-});
-
-describe("cost guard", () => {
-  it("génération locale/gratuite → coût 0", () => {
-    const c = estimateCost({ strategy: "image-sequence", shotCount: 3, pricing: null });
-    expect(c.minimalCost).toBe(0);
-    expect(c.exceedsThreshold).toBe(false);
-  });
-
-  it("génération payante → coûts chiffrés depuis le tarif fourni (jamais inventé)", () => {
-    const c = estimateCost({
-      strategy: "hybrid",
-      shotCount: 3,
-      pricing: { provider: "higgsfield", unitCost: 2, currency: "USD", source: "doc" },
-      alertThreshold: 10,
-    });
-    expect(c.minimalCost).toBe(6); // 3 shots × 1 × 2
-    expect(c.recommendedCost).toBe(12); // 3 × 2 × 2
-    expect(c.exceedsThreshold).toBe(true); // 12 > 10
-  });
-
-  it("sans tarif → non chiffré avec note honnête", () => {
-    const c = estimateCost({ strategy: "hybrid", shotCount: 2, pricing: null });
-    expect(c.note).toMatch(/non chiffré|0/i);
   });
 });
 
@@ -203,7 +176,6 @@ describe("media plan builder", () => {
       qualityBar: "photoreal",
       emotionalGoal: "faire ressentir l'espace",
       assets: { ...NO_ASSETS, continuousVideo: true },
-      configuredProviders: [],
       constraints: CONSTRAINTS,
       subject: "le chalet",
     });
@@ -213,40 +185,15 @@ describe("media plan builder", () => {
     expect(plan.expectedOutput).toMatch(/mp4|webm/);
   });
 
-  it("besoin premium sans asset ni provider → risque média externe explicite", () => {
+  it("besoin premium sans média réel → risque explicite, sans jamais parler de génération", () => {
     const plan = buildMediaPlan({
       intent: "hero-cinematic",
       qualityBar: "photoreal",
       emotionalGoal: "impressionner",
       assets: NO_ASSETS,
-      configuredProviders: [],
       constraints: CONSTRAINTS,
     });
-    expect(plan.decision.blocker).toBe("PROVIDER_NOT_CONFIGURED");
-    expect(plan.risks.join(" ")).toMatch(/provider|média externe/i);
-  });
-});
-
-describe("provider layer (honnête)", () => {
-  it("higgsfield non configuré par défaut (pas de faux succès)", () => {
-    // Dans l'env de test, HIGGSFIELD_API_KEY est absent.
-    expect(isProviderConfigured("higgsfield")).toBe(false);
-    expect(configuredProviders()).not.toContain("higgsfield");
-    const hf = getProvider("higgsfield");
-    expect(hf?.status()).toBe("PROVIDER_NOT_CONFIGURED");
-  });
-
-  it("higgsfield.generate refuse proprement sans credential", async () => {
-    const hf = getProvider("higgsfield");
-    const shots = buildShotPlan("hero-cinematic", "hybrid");
-    const res = await hf!.generate!({ shot: shots[0], prompt: "x", outDir: "/tmp" });
-    expect(res.ok).toBe(false);
-    if (!res.ok) expect(res.code).toBe("PROVIDER_NOT_CONFIGURED");
-  });
-
-  it("le registre expose local + higgsfield", () => {
-    const names = allProviders().map((p) => p.name);
-    expect(names).toContain("local");
-    expect(names).toContain("higgsfield");
+    expect(plan.decision.blocker).toBe("MEDIA_ASSET_REQUIRED");
+    expect(plan.risks.join(" ")).toMatch(/visuel doit être fourni/i);
   });
 });

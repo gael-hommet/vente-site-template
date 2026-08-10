@@ -10,7 +10,7 @@ export const ACE_NAME = "Aurexia Cinematic Engine";
 export const ACE_SHORT_NAME = "ACE";
 
 /** Semver of the engine layer itself (not the app). Bump on contract changes. */
-export const ACE_VERSION = "0.2.1";
+export const ACE_VERSION = "0.2.2";
 
 /** The engine modules and what each one owns. Displayed on /ace-lab. */
 export const ACE_MODULES = {
@@ -23,7 +23,7 @@ export const ACE_MODULES = {
   "ace-autopilot":
     "Autopilot : mission en langage naturel, machine à états persistante, garde-fous, rapports",
   "ace-media-engine":
-    "Creative Media Engine 0.2 : décision, routage de modèle, verrou d'identité, génération orchestrée, QA réelle, gate premium, budget",
+    "Creative Media Engine : décision de stratégie, sources d'assets et droits, QA réelle, gate premium, continuité — sans aucune génération payante",
   "ace-content": "Intégrité du contenu : faits vérifiés vs [À CONFIRMER]",
   "ace-seo": "Metadata + JSON-LD dérivés de business.ts",
   "ace-forms": "Schémas zod partagés + contrat d'adaptateur de livraison",

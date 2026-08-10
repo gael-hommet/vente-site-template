@@ -10,39 +10,22 @@ démarrer, et les garanties de sécurité/honnêteté.
 ## Ce qui est livré (réel, vérifiable)
 
 - **Couche de décision média** (`src/ace/media-engine`) : stratégie, storyboard,
-  coût, QA structurelle, doctrine anti-low-poly, abstraction de providers.
 - **Runtime scroll-cinéma** : `CinematicScroll` au-dessus de `ScrollVideo` /
   `ScrollImageSequence` / `MediaFallback`.
 - **CLI honnête** : `ace:media:{capabilities,plan,frames,report}`,
-  `ace:provider:check`.
 - **Traitement local réel** : extraction de frames webp via ffmpeg (prouvé).
-- **Adapter Higgsfield** : codé, guardé, testé — **jamais simulé** (schéma d'API
-  à confirmer avant usage réel).
-- **Docs** : architecture, providers, Higgsfield, scroll-cinéma, cost guard,
-  media QA, anti-low-poly.
-- **Tests** : media-engine + cinematic-scroll (dans `pnpm check`).
-
-## Ce qui n'est PAS livré (honnêteté)
-
-- **Aucune génération IA fonctionnelle par défaut** : il faut configurer un
-  provider ; même configuré, le mapping de réponse Higgsfield est **À CONFIRMER**.
-- CLI `generate` / `qa` / `assemble` / `optimize` : **non fournies** en scripts
-  dans cette itération (la logique QA existe en module). À implémenter, jamais à
-  simuler. Voir [ACE-MEDIA-ARCHITECTURE.md](ACE-MEDIA-ARCHITECTURE.md).
 
 ## Ce qui reste dans un site généré vs élagué
 
 Le générateur `pnpm ace:new-site` distingue **runtime** (shippé) et **outillage
 moteur** (élagué) :
 
-| Élément                                                                                                                            | Destin dans un site client |
-| ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| `src/ace/media-engine/**` (types/logique pure)                                                                                     | **shippé** (réutilisable)  |
-| `src/components/media/CinematicScroll.tsx`                                                                                         | **shippé** (runtime)       |
-| `scripts/ace/media/**` (CLI interne)                                                                                               | **élagué**                 |
-| `docs/ACE-MEDIA-*`, `ACE-PROVIDER-*`, `ACE-HIGGSFIELD-*`, `ACE-COST-*`, `ACE-ANTI-LOW-POLY.md`, `ACE-SCROLL-CINEMA.md`, ce fichier | **élagués**                |
-| `tests/unit/media-engine.test.ts`, `tests/unit/cinematic-scroll.test.tsx`                                                          | **élagués** (tests moteur) |
-| scripts `ace:media:*` / `ace:provider:*` dans `package.json`                                                                       | **retirés**                |
+| Élément                                                                   | Destin dans un site client |
+| ------------------------------------------------------------------------- | -------------------------- |
+| `src/ace/media-engine/**` (types/logique pure)                            | **shippé** (réutilisable)  |
+| `src/components/media/CinematicScroll.tsx`                                | **shippé** (runtime)       |
+| `scripts/ace/media/**` (CLI interne)                                      | **élagué**                 |
+| `tests/unit/media-engine.test.ts`, `tests/unit/cinematic-scroll.test.tsx` | **élagués** (tests moteur) |
 
 Voir [ACE-GENERATOR.md](ACE-GENERATOR.md) et
 [ACE-GENERATION-CONTRACT.md](ACE-GENERATION-CONTRACT.md) pour le mécanisme.
@@ -51,7 +34,7 @@ Voir [ACE-GENERATOR.md](ACE-GENERATOR.md) et
 
 1. **Auditer l'environnement** :
    ```bash
-   pnpm ace:media:report          # can/can't honnête (ffmpeg, providers, runtime)
+
    ```
 2. **Planifier une expérience** à partir d'un brief JSON (`MediaBriefInput`) :
    ```bash
@@ -62,20 +45,17 @@ Voir [ACE-GENERATOR.md](ACE-GENERATOR.md) et
    ```bash
    pnpm ace:media:frames tour.mp4 --out public/media/tour --fps 12 --width 1280
    ```
-4. **Configurer un provider** (optionnel, pour générer) :
-   voir [ACE-HIGGSFIELD-SETUP.md](ACE-HIGGSFIELD-SETUP.md) et
-   [ACE-PROVIDER-INTEGRATION.md](ACE-PROVIDER-INTEGRATION.md). Statut :
    ```bash
-   pnpm ace:provider:check
+
    ```
-5. **Intégrer** le média décidé via `<CinematicScroll strategy={…} … />` — voir
+4. **Intégrer** le média décidé via `<CinematicScroll strategy={…} … />` — voir
    [ACE-SCROLL-CINEMA.md](ACE-SCROLL-CINEMA.md).
 
 ## Sécurité & confidentialité (garanties)
 
-- **Aucun secret committé.** Les credentials providers passent par l'ENV ; le
-  moteur ne lit **jamais** un fichier `.env` (gitignoré). Aucune valeur de
-  credential n'est loguée (seulement sa présence).
+moteur ne lit **jamais** un fichier `.env` (gitignoré). Aucune valeur de
+credential n'est loguée (seulement sa présence).
+
 - **Intégrations env-gated** : off par défaut, aucune clé/URL en dur.
 - **Aucun fait client inventé** : coûts, capacités et tarifs viennent de la config
   ou d'un audit réel ; sinon c'est déclaré vide/non chiffré.

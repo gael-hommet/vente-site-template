@@ -222,18 +222,13 @@ const ENGINE_ONLY_DOCS = [
   "docs/ACE-NEXT-CLIENT-RUNBOOK.md",
   // ACE 0.2 — doc interne de la couche média (le RUNTIME média, lui, reste
   // shippé : src/ace/media-engine + src/components/media/CinematicScroll).
-  "docs/ACE-0.2-IMPLEMENTATION-PLAN.md",
-  "docs/ACE-0.2-FINAL-REPORT.md",
   "docs/ACE-CHANGELOG.md",
   "docs/ACE-AUTOPILOT.md",
-  "docs/ACE-ADMIN-SETUP.md",
-  "docs/ACE-AUTOPILOT-REPORT.md",
+  "docs/ACE-ASSET-SOURCES.md",
+  "docs/ACE-0.2.2-FINAL-REPORT.md",
   "docs/ACE-MEDIA-ARCHITECTURE.md",
   "docs/ACE-MEDIA-QA.md",
-  "docs/ACE-PROVIDER-INTEGRATION.md",
-  "docs/ACE-HIGGSFIELD-SETUP.md",
   "docs/ACE-SCROLL-CINEMA.md",
-  "docs/ACE-COST-GUARD.md",
   "docs/ACE-ANTI-LOW-POLY.md",
   "docs/ACE-PUBLIC-RELEASE.md",
 ];

@@ -12,9 +12,13 @@ import { evaluateLowPolyRisk } from "./anti-low-poly";
  *
  * Choisit la technique d'expérience (webgl / video-scroll / image-sequence /
  * 2.5d / hybrid / editorial-fallback) à partir de l'intention, de la barre de
- * qualité, des assets réellement disponibles, des providers configurés et des
- * contraintes. Encode la doctrine anti-low-poly : une barre photoréaliste sans
- * modèle 3D réel ne retombe JAMAIS sur du WebGL procédural.
+ * qualité, des assets réellement disponibles et des contraintes.
+ *
+ * ACE ne génère AUCUN média via un service payant : la stratégie ne dépend donc
+ * que du matériau RÉEL disponible. Sans matériau exploitable pour une barre
+ * premium, on ne bricole pas — on annonce `MEDIA_ASSET_REQUIRED` et on propose
+ * un repli éditorial assumé. Encode aussi la doctrine anti-low-poly : une barre
+ * photoréaliste sans modèle 3D réel ne retombe JAMAIS sur du WebGL procédural.
  */
 
 /** Intentions qui exigent une continuité parfaite type « visite ». */
@@ -28,14 +32,11 @@ export interface ChooseStrategyInput {
   intent: AceMediaIntent;
   qualityBar: AceQualityBar;
   assets: AceAvailableAssets;
-  /** Providers de génération configurés (via env). */
-  configuredProviders: string[];
   constraints: AceMediaConstraints;
 }
 
 export function chooseStrategy(input: ChooseStrategyInput): AceStrategyDecision {
-  const { intent, qualityBar, assets, configuredProviders, constraints } = input;
-  const hasProvider = configuredProviders.length > 0;
+  const { intent, qualityBar, assets, constraints } = input;
 
   // 1) Reduced-motion / mobile très contraint : un fallback éditorial premium
   //    reste la sortie honnête (jamais une maquette cheap).
@@ -101,32 +102,19 @@ export function chooseStrategy(input: ChooseStrategyInput): AceStrategyDecision 
     };
   }
 
-  // 6) Rien d'exploitable pour la barre demandée.
-  //    - Barre haute + provider configuré → générer (pipeline à lancer).
-  //    - Barre haute + pas de provider → PROVIDER_NOT_CONFIGURED (honnête).
-  //    - Sinon → MEDIA_ASSET_REQUIRED.
+  // 6) Rien d'exploitable pour la barre demandée. ACE ne génère pas de média :
+  //    il DEMANDE le matériau qui manque, sans jamais bricoler un substitut.
   const highBar = qualityBar === "photoreal" || qualityBar === "stylized-premium";
-  if (highBar && hasProvider) {
-    return {
-      strategy: "hybrid",
-      rationale:
-        "Aucun asset exploitable mais un provider de génération est configuré : générer les médias (images de référence → vidéo/frames) puis assembler.",
-      requirements: [
-        "Lancer le pipeline de génération (voir CLI ace:media:generate) ; verrouiller les références du sujet.",
-      ],
-      blocker: null,
-      premiumFallback: "editorial-fallback",
-    };
-  }
-  if (highBar && !hasProvider) {
+  if (highBar) {
     return {
       strategy: "editorial-fallback",
       rationale:
-        "Besoin photoréaliste/premium, aucun asset ni provider configuré : ACE ne bricole PAS de low-poly. Un média externe ou un provider est requis.",
+        "Besoin photoréaliste/premium mais aucun média exploitable : ACE ne fabrique " +
+        "ni image de synthèse ni low-poly de substitution. Il faut un vrai visuel.",
       requirements: [
-        "Fournir un asset média premium, OU configurer un provider (voir ACE-HIGGSFIELD-SETUP.md).",
+        "Fournir un visuel réel (photo/vidéo officielle, ou média créé ailleurs et transmis).",
       ],
-      blocker: hasProvider ? "MEDIA_ASSET_REQUIRED" : "PROVIDER_NOT_CONFIGURED",
+      blocker: "MEDIA_ASSET_REQUIRED",
       premiumFallback: "editorial-fallback",
     };
   }

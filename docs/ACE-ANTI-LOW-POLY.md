@@ -11,11 +11,10 @@ Quand le besoin visuel est **photoréaliste** ou **premium stylisé**, ACE n'a
 JAMAIS le droit de produire une substitution low-poly procédurale comme
 **sortie principale**. Il doit, dans cet ordre de préférence :
 
-1. **produire le bon média** — via un provider de génération configuré ou un
-   asset réel fourni ;
-2. sinon, **déclarer honnêtement** qu'un média externe est requis
-   (`MEDIA_ASSET_REQUIRED`) ou qu'aucun provider n'est configuré
-   (`PROVIDER_NOT_CONFIGURED`) ;
+1. **utiliser le bon média RÉEL** — fourni par le client, publié officiellement
+   par l'entreprise, ou apporté par l'utilisateur depuis un outil externe ;
+2. sinon, **déclarer honnêtement** qu'un visuel est requis
+   (`MEDIA_ASSET_REQUIRED`) et le DEMANDER ;
 3. sinon, utiliser un **fallback éditorial premium explicite** (typographie,
    composition, poster de qualité) — assumé, jamais présenté comme la scène 3D
    attendue.
@@ -55,7 +54,7 @@ Verdict de `evaluateLowPolyRisk` :
 - WebGL n'est retenu que si un **vrai modèle 3D** existe **et** que le risque
   low-poly est nul.
 - Barre haute sans asset ni provider → `editorial-fallback` **avec blocker**
-  `PROVIDER_NOT_CONFIGURED` (jamais WebGL procédural).
+  `MEDIA_ASSET_REQUIRED` (jamais WebGL procédural).
 
 Et le composant runtime `CinematicScroll` ne monte **jamais** de 3D pour les
 stratégies `webgl`/`hybrid`/`2.5d` : il affiche un poster propre (le WebGL réel
@@ -66,7 +65,7 @@ passe par `AdaptiveCanvas` avec un vrai modèle, hors de ce wrapper).
 `tests/unit/media-engine.test.ts` vérifie notamment :
 
 - `webgl` + `photoreal` + **sans** `realModel3d` → `assertNoLowPolySubstitution`
-  **lève** ; `chooseStrategy` renvoie `editorial-fallback` + blocker.
+  **lève** ; `chooseStrategy` renvoie `editorial-fallback` + `MEDIA_ASSET_REQUIRED`.
 - `webgl` + `photoreal` + **avec** `realModel3d` → autorisé (pas d'exception).
 
 `tests/unit/cinematic-scroll.test.tsx` vérifie qu'aucun `<canvas>` n'est monté
@@ -89,5 +88,6 @@ comme l'expérience premium promise devient `DECLARE_FALLBACK`, jamais `SHIP`.
 
 ## Formulation courte (pour un reviewer)
 
-> Si le besoin est photoréaliste/premium et qu'il n'y a ni modèle 3D réel, ni
-> provider, ni asset : ACE **s'arrête et le dit**. Il ne peint pas des cubes.
+> Si le besoin est photoréaliste/premium et qu'il n'existe aucun visuel réel :
+> ACE **s'arrête et le demande**. Il ne peint pas des cubes, et il ne fabrique
+> pas d'image de synthèse pour combler le vide.

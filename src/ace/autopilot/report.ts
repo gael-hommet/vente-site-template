@@ -63,17 +63,6 @@ export function userReport(mission: AutopilotMission): string {
     return lines.join("\n");
   }
 
-  if (mission.state === "WAITING_FOR_APPROVAL") {
-    lines.push("J'ai besoin de votre accord pour continuer.");
-    if (mission.blockedMessage) lines.push("");
-    if (mission.blockedMessage) lines.push(mission.blockedMessage);
-    lines.push("");
-    lines.push(
-      "Répondez simplement « oui » pour lancer, ou « non » pour rester sans visuels générés.",
-    );
-    return lines.join("\n");
-  }
-
   if (mission.state === "BLOCKED") {
     lines.push("Je ne peux pas continuer sans une action de votre côté.");
     lines.push("");
@@ -176,13 +165,6 @@ export function technicalReport(mission: AutopilotMission): string {
     l.push("");
   }
 
-  l.push("## Dépense");
-  l.push("");
-  l.push(
-    `- ${String(mission.spend.amount)} ${mission.spend.currency}` +
-      (mission.spend.isLowerBound ? " (minorant : des coûts n'ont pas été communiqués)" : ""),
-  );
-  l.push("");
   l.push("## Publication");
   l.push("");
   l.push("- Aucune. AUTOPILOT ne pousse ni ne déploie jamais automatiquement.");

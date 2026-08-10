@@ -337,9 +337,9 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(existsSync(path.join(out, "scripts/ace/media"))).toBe(false);
     // Docs média internes : élaguées.
     expect(existsSync(path.join(out, "docs/ACE-MEDIA-ARCHITECTURE.md"))).toBe(false);
-    expect(existsSync(path.join(out, "docs/ACE-HIGGSFIELD-SETUP.md"))).toBe(false);
     expect(existsSync(path.join(out, "docs/ACE-ANTI-LOW-POLY.md"))).toBe(false);
-    expect(existsSync(path.join(out, "docs/ACE-0.2-FINAL-REPORT.md"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-ASSET-SOURCES.md"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-0.2.2-FINAL-REPORT.md"))).toBe(false);
     // Tests de doctrine média : élagués (tests moteur, pas du site client).
     expect(existsSync(path.join(out, "tests/unit/media-engine.test.ts"))).toBe(false);
     expect(existsSync(path.join(out, "tests/unit/cinematic-scroll.test.tsx"))).toBe(false);
@@ -362,6 +362,7 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(existsSync(path.join(out, "src/ace/media-engine/index.ts"))).toBe(true);
     expect(existsSync(path.join(out, "src/ace/media-engine/anti-low-poly.ts"))).toBe(true);
     expect(existsSync(path.join(out, "src/ace/media-engine/premium-gate.ts"))).toBe(true);
+    expect(existsSync(path.join(out, "src/ace/media-engine/asset-source.ts"))).toBe(true);
     expect(existsSync(path.join(out, "src/ace/media-engine/delivery-mode.ts"))).toBe(true);
     expect(existsSync(path.join(out, "src/components/media/CinematicScroll.tsx"))).toBe(true);
 

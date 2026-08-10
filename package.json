@@ -1,6 +1,6 @@
 {
   "name": "vente-site-template",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "packageManager": "pnpm@10.32.1",
   "engines": {
@@ -27,7 +27,6 @@
     "ace:media:plan": "tsx scripts/ace/media/plan.ts",
     "ace:media:frames": "node scripts/ace/media/frames.mjs",
     "ace:media:report": "node scripts/ace/media/report.mjs",
-    "ace:provider:check": "node scripts/ace/media/provider-check.mjs",
     "audit:site": "node scripts/audit-site.mjs",
     "assets:audit": "node scripts/assets/audit.mjs",
     "assets:images": "node scripts/assets/images.mjs",
@@ -35,7 +34,6 @@
     "assets:models": "node scripts/assets/models.mjs",
     "assets:all": "node scripts/assets/all.mjs",
     "ace:media:qa": "tsx scripts/ace/media/qa.ts",
-    "ace:media:generate": "tsx scripts/ace/media/generate.ts",
     "ace:media:assemble": "node scripts/ace/media/assemble.mjs",
     "ace:media:optimize": "node scripts/ace/media/optimize.mjs",
     "ace:doctor": "node scripts/ace/autopilot/doctor.mjs",

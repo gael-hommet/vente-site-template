@@ -5,11 +5,11 @@ qui fait évoluer ACE d'un moteur qui _intègre_ de beaux assets vers un moteur
 qui _décide, planifie, oriente la création, contrôle et assemble_ des médias
 premium — **sans jamais dégrader silencieusement l'ambition artistique**.
 
-> Périmètre honnête : cette couche **décide, planifie, route, chiffre, génère
-> (via un provider), contrôle, assemble et optimise**. La GÉNÉRATION d'images/
-> vidéos dépend d'un provider **authentifié** — sans lui, ACE fait tout le reste
-> et refuse explicitement de générer (`PROVIDER_NOT_CONFIGURED` /
-> `PROVIDER_AUTH_PENDING`). Rien n'est jamais simulé.
+> Périmètre honnête : cette couche **décide, planifie, contrôle, assemble et
+> optimise** des médias RÉELS. Elle **ne génère jamais** d'image ni de vidéo :
+> aucune API payante, aucun crédit, **coût média 0 €**. S'il manque un visuel
+> indispensable, elle le déclare (`MEDIA_ASSET_REQUIRED`) — voir
+> [ACE-ASSET-SOURCES.md](ACE-ASSET-SOURCES.md).
 >
 > La QA **visuelle** (déformations, artefacts, « trop IA ») n'est pas
 > automatisée : `REVIEW_REQUIRED` est une sortie valide et fréquente.
@@ -37,30 +37,20 @@ sujet. Décision **additive**, documentée dans
 ```
 src/ace/media-engine/            # logique pure, isomorphe (aucun node:*)
   types.ts                       # contrats typés (source de vérité)
+  asset-source.ts                # hiérarchie des sources + droits + provenance
   qa-verdict.ts                  # PASS | REVIEW_REQUIRED | REJECT (partagé)
   anti-low-poly.ts               # doctrine non négociable (garde + verdict)
   premium-gate.ts                # ACE PREMIUM OUTPUT GATE (extension)
   strategy.ts                    # chooseStrategy() — quelle technique ?
-  model-router.ts                # routeModel() — catalogue RÉEL uniquement
   shot-planner.ts                # buildShotPlan() — storyboard + raccords
   reference-lock.ts              # verrou d'identité du sujet
   plan.ts                        # buildMediaPlan() — plan complet
-  cost.ts                        # estimateCost() — estimation a priori
-  budget.ts                      # dépense consommée + arrêt au plafond
   qa.ts                          # cadre de scoring (revue humaine)
   art-direction.ts               # reviewArtDirection() — verdict esthétique
   manifest.ts                    # provenance (modèle, promptHash, tentatives)
-  orchestrator.ts                # la boucle, avec PORTS INJECTÉS (testable)
   delivery-mode.ts               # video-scroll vs image-sequence (chiffré)
   config.ts                      # lecture ENV (jamais .env)
-  providers/
-    types.ts                     # contrat MediaProvider (pluggable)
-    registry.ts                  # registre fail-safe
-    local.ts                     # ffmpeg/sharp/gltf (traitement, pas d'IA)
-    higgsfield.ts                # adapter sur CLI officiel (jamais simulé)
   node/                          # ⚠ Node UNIQUEMENT — hors du barrel
-    hf-cli.ts                    # pilote du CLI officiel `hf-api`
-    provider-runtime.ts          # câblage des capacités réelles
     technical-qa.ts              # QA RÉELLE via ffprobe
     continuity.ts                # continuité v2 (frames + SSIM + couleur)
   index.ts                       # barrel (isomorphe)
@@ -144,61 +134,23 @@ Storyboards génériques par intention (gabarits, **aucun fait client inventé**
 Chaîne les raccords : `refIn` d'un plan = `endState` du plan précédent, ce qui
 rend la continuité vérifiable par `qa.ts`.
 
-### `cost.ts` — `estimateCost(input)` (cost guard)
-
-Tarifs **exclusivement** depuis `AceProviderPricing` (config, source déclarée).
-Trois volumes (`minimal`=1, `recommended`=2, `cautious`=3 sorties/plan). Seuil
-d'alerte par défaut `50`. Stratégies locales/gratuites → coût `0`. Sans tarif →
-`0` + note honnête. Voir [ACE-COST-GUARD.md](ACE-COST-GUARD.md).
-
 ### `qa.ts` — `assessMedia()` / `assessContinuity()`
 
 Cadre de scoring (revue humaine) + heuristiques structurelles vérifiables.
 `requiresHumanReview` **toujours vrai** : la QA visuelle IA n'est pas
 automatisable ici sans modèle de vision. Voir [ACE-MEDIA-QA.md](ACE-MEDIA-QA.md).
 
-### `providers/` — abstraction pluggable
-
-Contrat `MediaProvider` (`name`, `capabilities`, `status()`, `generate?`).
-Registre fail-safe : un provider absent/non configuré est filtré, ne casse jamais
-le moteur. Voir [ACE-PROVIDER-INTEGRATION.md](ACE-PROVIDER-INTEGRATION.md).
-
 ## CLI
 
-| Commande                                     | Rôle                                                       | État                                       |
-| -------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------ |
-| `pnpm ace:media:capabilities`                | Audit réel (ffmpeg/ffprobe/sharp/gltf, providers, runtime) | ✅ réel                                    |
-| `pnpm ace:media:plan <brief>`                | Décision + storyboard + coût estimé                        | ✅ réel                                    |
-| `pnpm ace:media:generate --brief <f>`        | Pipeline orchestré complet                                 | ✅ réel — refuse honnêtement sans provider |
-| `pnpm ace:media:qa --manifest <f>`           | QA technique ffprobe + cohérence du manifeste              | ✅ réel                                    |
-| `pnpm ace:media:assemble <in...> --out <d>`  | Concat ffmpeg (copy si possible) → master                  | ✅ réel                                    |
-| `pnpm ace:media:optimize <master> --out <d>` | Variantes desktop/mobile + poster                          | ✅ réel                                    |
-| `pnpm ace:media:frames <video> --out <d>`    | Séquence webp pour le scrub                                | ✅ réel                                    |
-| `pnpm ace:media:report`                      | Rapport consolidé can/can't                                | ✅ réel                                    |
-| `pnpm ace:provider:check`                    | Statut providers (CLI installé ? authentifié ?)            | ✅ réel                                    |
-
-Codes de sortie de `generate` : `0` succès · `1` aucun plan approuvé · `2` usage
-· `3` `PROVIDER_NOT_CONFIGURED` · `4` `PROVIDER_AUTH_PENDING` · `5`
-`PROVIDER_CONTRACT_UNVERIFIED`. Aucune sortie n'est simulée.
-
-## La boucle d'orchestration
-
-```
-PLAN → RESOLVE MODEL (catalogue réel) → COST CHECK (estimate + plafond)
-     → GENERATE → STORE → QA TECHNIQUE (ffprobe) → ART REVIEW
-     → PREMIUM GATE → ACCEPT / REJECT → RETRY borné → PLAN N+1
-```
-
-Garanties, toutes couvertes par des tests :
-
-- retries bornés par `maxAttemptsPerShot` (jamais de boucle infinie) ;
-- arrêt net dès que le budget est atteint ;
-- une sortie rejetée n'est **jamais** promue ni assemblée ;
-- une erreur d'authentification n'est pas réessayée (inutile et coûteux) ;
-- le plan N approuvé devient la **référence forte** du plan N+1.
-
-L'orchestrateur reçoit des **ports injectés** (génération, estimation, QA,
-revue, horloge) : la boucle est donc prouvable sans provider payant.
+| Commande                                     | Rôle                                                       | État    |
+| -------------------------------------------- | ---------------------------------------------------------- | ------- |
+| `pnpm ace:media:capabilities`                | Audit réel (ffmpeg/ffprobe/sharp/gltf, providers, runtime) | ✅ réel |
+| `pnpm ace:media:plan <brief>`                | Décision + storyboard + coût estimé                        | ✅ réel |
+| `pnpm ace:media:qa --manifest <f>`           | QA technique ffprobe + cohérence du manifeste              | ✅ réel |
+| `pnpm ace:media:assemble <in...> --out <d>`  | Concat ffmpeg (copy si possible) → master                  | ✅ réel |
+| `pnpm ace:media:optimize <master> --out <d>` | Variantes desktop/mobile + poster                          | ✅ réel |
+| `pnpm ace:media:frames <video> --out <d>`    | Séquence webp pour le scrub                                | ✅ réel |
+| `pnpm ace:media:report`                      | Rapport consolidé can/can't                                | ✅ réel |
 
 ## Ce que la couche NE fait pas
 
@@ -210,7 +162,4 @@ revue, horloge) : la boucle est donc prouvable sans provider payant.
 ## Voir aussi
 
 - [ACE-ANTI-LOW-POLY.md](ACE-ANTI-LOW-POLY.md) — la doctrine, codifiée et testée.
-- [ACE-PROVIDER-INTEGRATION.md](ACE-PROVIDER-INTEGRATION.md) — brancher un provider.
-- [ACE-HIGGSFIELD-SETUP.md](ACE-HIGGSFIELD-SETUP.md) — setup Higgsfield.
 - [ACE-SCROLL-CINEMA.md](ACE-SCROLL-CINEMA.md) — intégration runtime.
-- [ACE-COST-GUARD.md](ACE-COST-GUARD.md) · [ACE-MEDIA-QA.md](ACE-MEDIA-QA.md).

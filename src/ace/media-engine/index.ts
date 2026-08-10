@@ -1,9 +1,11 @@
 /**
- * ACE 0.2 — Creative Media Autonomous Engine (barrel).
+ * ACE — Creative Media Engine (barrel).
  *
- * Couche qui DÉCIDE, PLANIFIE et CONTRÔLE les médias premium (elle ne rend rien
- * elle-même). Voir docs/ACE-MEDIA-ARCHITECTURE.md. Doctrine anti-low-poly :
- * jamais de substitution procédurale cheap comme sortie premium.
+ * Couche qui DÉCIDE, PLANIFIE et CONTRÔLE les médias premium à partir du
+ * matériau RÉEL disponible. **Aucune génération d'image ou de vidéo via un
+ * service payant** : le coût média d'un site ACE est de 0 €.
+ *
+ * Voir docs/ACE-MEDIA-ARCHITECTURE.md et docs/ACE-ASSET-SOURCES.md.
  */
 
 export type {
@@ -16,8 +18,6 @@ export type {
   AceStrategyDecision,
   AceShotPlan,
   AceMediaPlan,
-  AceProviderPricing,
-  AceCostEstimate,
   AceMediaQaScores,
   AceMediaQaReport,
   AceContinuityReport,
@@ -27,17 +27,23 @@ export type { TechnicalVerdict } from "./qa-verdict";
 export { TECHNICAL_VERDICTS } from "./qa-verdict";
 
 export {
-  routeModel,
-  requiredMode,
-  outputKindForShot,
-  routingNeedsHumanValidation,
-  CONTINUITY_CRITICAL_INTENTS,
-  type RoutableModel,
-  type GenerationMode,
-  type ModelRoutingInput,
-  type ModelRoutingDecision,
-  type ModelRoutingBlocker,
-} from "./model-router";
+  ASSET_SOURCE_KINDS,
+  sourcePriority,
+  validateInventory,
+  usableAssets,
+  bestAssetFor,
+  hasVisualMaterial,
+  provenanceDisclosure,
+  productionBlockers,
+  type AssetSourceKind,
+  type AssetNature,
+  type AssetRole,
+  type AssetRights,
+  type UsageContext,
+  type AssetRecord,
+  type AssetInventory,
+  type AssetIssue,
+} from "./asset-source";
 
 export {
   createReferenceLock,
@@ -68,20 +74,6 @@ export {
 } from "./art-direction";
 
 export {
-  createBudget,
-  recordSpend,
-  canGenerate,
-  remainingBudget,
-  summarizeBudget,
-  DEFAULT_BUDGET_LIMITS,
-  type BudgetLimits,
-  type BudgetState,
-  type SpendRecord,
-  type BudgetDecision,
-  type BudgetSummary,
-} from "./budget";
-
-export {
   promptHash,
   emptyManifest,
   summarizeManifest,
@@ -89,15 +81,6 @@ export {
   type AceMediaManifestEntry,
   type AceGenerationAttempt,
 } from "./manifest";
-
-export {
-  orchestrateGeneration,
-  buildShotPrompt,
-  type OrchestratorPorts,
-  type OrchestrationRequest,
-  type OrchestrationResult,
-  type ShotOutcome,
-} from "./orchestrator";
 
 export {
   chooseDeliveryMode,
@@ -111,35 +94,9 @@ export {
 export { chooseStrategy, type ChooseStrategyInput } from "./strategy";
 export { buildShotPlan } from "./shot-planner";
 export { buildMediaPlan, type MediaBriefInput } from "./plan";
-export { estimateCost, type CostGuardInput } from "./cost";
 export { assessMedia, assessContinuity, structuralIssues, QA_ACCEPT_THRESHOLD } from "./qa";
 export {
   evaluateLowPolyRisk,
   assertNoLowPolySubstitution,
   type LowPolyVerdict,
 } from "./anti-low-poly";
-
-export {
-  isProviderConfigured,
-  isProviderEnvConfigured,
-  configuredProviders,
-  unconfiguredProviders,
-  KNOWN_PROVIDERS,
-  type ProviderEnvSpec,
-} from "./config";
-
-export {
-  setHiggsfieldRuntime,
-  resetHiggsfieldRuntime,
-  type HiggsfieldRuntime,
-} from "./providers/higgsfield";
-export { setLocalToolAvailability } from "./providers/local";
-
-export { allProviders, getProvider, readyProviders, providersFor } from "./providers/registry";
-export type {
-  MediaProvider,
-  ProviderCapability,
-  ProviderStatus,
-  ProviderResult,
-  GenerateRequest,
-} from "./providers/types";

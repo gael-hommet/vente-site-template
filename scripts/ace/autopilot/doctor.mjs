@@ -6,15 +6,18 @@
  * puis-je demander un site maintenant ? La réponse tient en une ligne :
  *
  *   ACE READY
- *   ACE NEEDS ADMIN SETUP
+ *   ACE NOT READY
  *
- * Deux catégories de vérifications, jamais mélangées :
- *  - ESSENTIEL : sans ça, ACE ne peut pas produire de site du tout ;
- *  - OPTIONNEL : sans ça, ACE produit un site, mais sans génération de médias IA
- *    (il utilisera alors les assets fournis, ou déclarera honnêtement le manque).
+ * ACE n'a besoin d'AUCUN service payant ni d'aucune clé d'API : il travaille à
+ * partir des médias réels (fournis, officiels, ou apportés par l'utilisateur).
+ * Le coût média d'un site ACE est de 0 €.
  *
- * Aucun secret n'est affiché : seulement la PRÉSENCE d'un credential.
- * Sortie : 0 = READY · 1 = essentiel manquant · 2 = admin setup requis (optionnel).
+ * Deux catégories, jamais mélangées :
+ *  - ESSENTIEL : sans ça, ACE ne peut pas produire de site ;
+ *  - CONFORT  : sans ça, ACE produit quand même le site (qualité de la relecture
+ *    visuelle ou du traitement 3D en retrait).
+ *
+ * Sortie : 0 = ACE READY · 1 = un essentiel manque.
  */
 import { spawnSync } from "node:child_process";
 import { accessSync, constants, existsSync, statfsSync } from "node:fs";
@@ -80,39 +83,15 @@ function browserInstalled() {
   return cacheDirs.some((d) => existsSync(d));
 }
 
-/** Provider de génération : binaire présent ? authentifié ? (faits, pas suppositions) */
-function providerStatus() {
-  const fromEnv = (process.env.HF_API_BIN ?? "").trim();
-  const bin = fromEnv || "hf-api";
-  if (fromEnv && !existsSync(fromEnv)) {
-    return {
-      installed: false,
-      authenticated: false,
-      detail: `HF_API_BIN introuvable : ${fromEnv}`,
-    };
-  }
-  const probe = spawnSync(bin, ["--version"], { encoding: "utf8" });
-  if (probe.error) {
-    return { installed: false, authenticated: false, detail: "CLI `hf-api` non installé" };
-  }
-  const auth = spawnSync(bin, ["auth", "status", "--json"], { encoding: "utf8" });
-  if (!auth.error && auth.status === 0) {
-    return { installed: true, authenticated: true, detail: "authentifié" };
-  }
-  const msg = (auth.stderr ?? "").trim().split("\n")[0] || "non authentifié";
-  return { installed: true, authenticated: false, detail: msg };
-}
-
 /* -------------------------------------------------------------------------- */
 /* Collecte                                                                   */
 /* -------------------------------------------------------------------------- */
 
 const nodeMajor = Number(process.versions.node.split(".")[0]);
-const provider = providerStatus();
 const disk = freeDiskGb();
 const previewPortFree = await portFree(3000);
 
-/** tier: "essential" bloque tout ; "optional" ne bloque que la génération IA. */
+/** tier: "essential" bloque tout ; "optional" = confort, jamais bloquant. */
 const checks = [
   {
     id: "node",
@@ -216,39 +195,13 @@ const checks = [
     detail: previewPortFree ? "libre" : "déjà utilisé",
     fix: "Arrêter le serveur qui occupe le port 3000.",
   },
-  {
-    id: "provider-cli",
-    tier: "optional",
-    label: "Provider média : CLI installé",
-    ok: provider.installed,
-    detail: provider.installed ? "hf-api présent" : "hf-api absent",
-    fix: "npm i -g @higgsfield/cloud-cli",
-    admin: true,
-  },
-  {
-    id: "provider-auth",
-    tier: "optional",
-    label: "Provider média : authentifié",
-    ok: provider.authenticated,
-    // On n'affiche JAMAIS la valeur d'une clé, seulement l'état.
-    detail: provider.detail,
-    fix: "hf-api auth login   (ou définir le secret HIGGSFIELD_API_KEY)",
-    admin: true,
-  },
 ];
 
 const essentialFailures = checks.filter((c) => c.tier === "essential" && !c.ok);
-const adminTasks = checks.filter((c) => c.admin && !c.ok);
-const optionalFailures = checks.filter((c) => c.tier === "optional" && !c.ok && !c.admin);
+const optionalFailures = checks.filter((c) => c.tier === "optional" && !c.ok);
 
 const canBuildSites = essentialFailures.length === 0;
-const canGenerateMedia = canBuildSites && provider.installed && provider.authenticated;
-
-const status = !canBuildSites
-  ? "ACE NOT READY"
-  : adminTasks.length > 0
-    ? "ACE NEEDS ADMIN SETUP"
-    : "ACE READY";
+const status = canBuildSites ? "ACE READY" : "ACE NOT READY";
 
 /* -------------------------------------------------------------------------- */
 /* Sortie                                                                     */
@@ -260,16 +213,7 @@ if (asJson) {
       {
         status,
         canBuildSites,
-        canGenerateMedia,
-        checks: checks.map(({ id, tier, label, ok, detail, admin }) => ({
-          id,
-          tier,
-          label,
-          ok,
-          detail,
-          admin: Boolean(admin),
-        })),
-        adminTasks: adminTasks.map((c) => ({ label: c.label, fix: c.fix })),
+        checks: checks.map(({ id, tier, label, ok, detail }) => ({ id, tier, label, ok, detail })),
       },
       null,
       2,
@@ -289,16 +233,12 @@ if (asJson) {
     console.log("  ⛔ ACE ne peut pas produire de site tant que ceci n'est pas réglé :");
     for (const c of essentialFailures) console.log(`     • ${c.label} → ${c.fix}`);
     console.log("");
-  } else if (adminTasks.length > 0) {
-    console.log("  ACE peut créer des sites dès maintenant.");
-    console.log("  La GÉNÉRATION DE MÉDIAS IA demande une action de l'administrateur :");
-    for (const c of adminTasks) console.log(`     • ${c.label} → ${c.fix}`);
-    console.log("");
-    console.log("  → Voir docs/ACE-ADMIN-SETUP.md (opération à faire UNE seule fois).");
-    console.log("");
   } else {
     console.log("  Tout est prêt. Ouvrez Claude et décrivez le site que vous voulez.");
-    console.log("  Exemple : « Fais-moi un site premium pour ce restaurant : https://… »");
+    console.log("  Exemple : « Fais-moi un site premium pour cette entreprise : https://… »");
+    console.log("");
+    console.log("  Aucune clé, aucun abonnement, aucun crédit : ACE travaille à partir");
+    console.log("  des médias réels (officiels, fournis, ou que vous lui donnez).");
     console.log("");
   }
 
@@ -309,4 +249,4 @@ if (asJson) {
   }
 }
 
-process.exit(!canBuildSites ? 1 : adminTasks.length > 0 ? 2 : 0);
+process.exit(canBuildSites ? 0 : 1);

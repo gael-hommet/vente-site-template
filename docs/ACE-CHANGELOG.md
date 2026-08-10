@@ -3,6 +3,52 @@
 Document **interne au moteur** (élagué à la génération). Versions de la couche
 moteur (`src/ace/core/version.ts`), pas de l'application.
 
+## 0.2.2 — Free Media Autopilot (coût média 0 €)
+
+**Correction de paradigme.** La 0.2.1 supposait qu'ACE devait _générer_ ses
+visuels via un service payant. C'était une erreur d'interprétation : ACE doit
+produire des sites **gratuitement**, à partir des **vrais** médias disponibles.
+
+### Retiré
+
+Tout le paradigme de génération distante : adapter Higgsfield, pilote `hf-api`,
+`provider-runtime`, registre de providers, model router, cost guard (`cost.ts`,
+`budget.ts`), orchestrateur de génération, `ace:media:generate`,
+`ace:provider:check`, et les docs associées (Higgsfield, provider integration,
+cost guard, admin setup). **Aucun code mort conservé.**
+
+Disparaissent aussi du workflow : l'état `MEDIA_GENERATION`, l'état
+`WAITING_FOR_APPROVAL`, les blocages `ADMIN_PROVIDER_AUTH_REQUIRED` et
+`SPEND_APPROVAL_REQUIRED`, et tout seuil de dépense.
+
+### Ajouté
+
+- **Asset Source Policy** (`asset-source.ts`) — hiérarchie obligatoire
+  CLIENT_PROVIDED → OFFICIAL_WEBSITE → OFFICIAL_SOCIAL →
+  OTHER_VERIFIED_OFFICIAL → USER_SUPPLIED_GENERATED → EDITORIAL_FALLBACK, avec
+  provenance, nature (`REAL`/`CONCEPTUAL`) et droits pour chaque média.
+- **PRIVATE_DEMO vs PRODUCTION** — la démo privée exploite les médias officiels
+  publics (provenance conservée, mention explicite, noindex) ; la production
+  exige des droits confirmés et les liste sinon.
+- **Nouveaux états** : `ASSET_DISCOVERY` (chercher d'abord, demander ensuite) et
+  `ASSET_VALIDATION` ; `MEDIA_PROCESSING` remplace la génération.
+- **La direction artistique vient APRÈS l'analyse des visuels réels.**
+- **SITE_BUILD est une vraie étape** : génère, écrit le contenu, câble les
+  visuels PAR RÔLE, puis vérifie 11 points (pages, navigation, CTA, formulaire,
+  SEO, sitemap/robots, noindex en démo, visuels réellement référencés).
+- **MOBILE_QA est une vraie étape** : capture mobile réelle obligatoire +
+  mesures (débordement horizontal, images chargées, lisibilité, h1 unique,
+  taille du CTA). Un échec mobile empêche `COMPLETE`.
+- `ace:doctor` renvoie **`ACE READY`** sans aucun service tiers.
+
+### Corrigé
+
+- Le **logo servait de fond de hero** : les visuels sont désormais câblés par
+  RÔLE (`hero`, `gallery`…), jamais par ordre de fichier.
+- Un **fait vérifié prime** sur le nom extrait de la phrase de départ.
+- La sonde mobile mesurait des éléments **masqués** (CTA à 0 px) : elle ne
+  considère plus que les éléments visibles.
+
 ## 0.2.1 — ACE AUTOPILOT (une phrase suffit)
 
 Complète la promesse de 0.2 : « moteur média + orchestration provider +

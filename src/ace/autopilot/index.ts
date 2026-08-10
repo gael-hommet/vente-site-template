@@ -18,6 +18,7 @@ export type {
   MissionStep,
   QualityIteration,
   SiteContentDraft,
+  StageReport,
 } from "./types";
 export { AUTOPILOT_STATES, TERMINAL_STATES } from "./types";
 
@@ -48,14 +49,13 @@ export {
 
 export {
   environmentGate,
-  providerGate,
-  spendGate,
+  assetGate,
+  rightsGate,
   factsGate,
   qualityGate,
   deploymentGate,
   unsourcedFacts,
   firstFailure,
-  spendSummary,
   type GateResult,
 } from "./gates";
 

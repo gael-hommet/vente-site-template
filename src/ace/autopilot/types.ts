@@ -1,3 +1,5 @@
+import type { AssetInventory, UsageContext } from "@/ace/media-engine";
+
 /**
  * ACE AUTOPILOT — contrats de mission.
  *
@@ -19,12 +21,12 @@ export const AUTOPILOT_STATES = [
   "INTAKE",
   "RESEARCH",
   "FACT_CHECK",
-  "SITE_BOOTSTRAP",
+  "ASSET_DISCOVERY",
+  "ASSET_VALIDATION",
   "ART_DIRECTION",
   "CONTENT",
   "MEDIA_PLAN",
-  "MEDIA_GENERATION",
-  "MEDIA_QA",
+  "MEDIA_PROCESSING",
   "SITE_BUILD",
   "VISUAL_QA",
   "MOBILE_QA",
@@ -32,28 +34,24 @@ export const AUTOPILOT_STATES = [
   "PREVIEW",
   "COMPLETE",
   "BLOCKED",
-  "WAITING_FOR_APPROVAL",
 ] as const;
 
 export type AutopilotState = (typeof AUTOPILOT_STATES)[number];
 
 /** États terminaux : la machine ne progresse plus d'elle-même. */
-export const TERMINAL_STATES: readonly AutopilotState[] = [
-  "COMPLETE",
-  "BLOCKED",
-  "WAITING_FOR_APPROVAL",
-];
+export const TERMINAL_STATES: readonly AutopilotState[] = ["COMPLETE", "BLOCKED"];
 
 /** Raisons de blocage — lisibles par un humain non technique. */
 export type BlockedReason =
-  /** L'administrateur doit authentifier le provider média (une seule fois). */
-  | "ADMIN_PROVIDER_AUTH_REQUIRED"
   /** Une information indispensable est introuvable et non déductible. */
   | "MISSING_ESSENTIAL_INFO"
-  /** Un média externe est requis et aucun provider ne peut le produire. */
+  /**
+   * Un visuel réel est indispensable et introuvable : ACE n'en fabrique aucun,
+   * il DEMANDE le média manquant.
+   */
   | "MEDIA_ASSET_REQUIRED"
-  /** La dépense dépasse le seuil : une confirmation humaine est requise. */
-  | "SPEND_APPROVAL_REQUIRED"
+  /** Les droits d'un média ne permettent pas la mise en production. */
+  | "MEDIA_RIGHTS_UNCONFIRMED"
   /** L'environnement n'est pas prêt (voir `ace:doctor`). */
   | "ENVIRONMENT_NOT_READY"
   /** Trop d'itérations sans atteindre la barre de qualité. */
@@ -155,13 +153,17 @@ export interface AutopilotMission {
   slug: string;
   /** Dossier du site généré. */
   targetDir: string | null;
-  /**
-   * Assets fournis par le client (photos, vidéos, logo). Leur présence rend la
-   * génération IA inutile : on n'invente pas ce qui existe déjà.
-   */
+  /** Fichiers d'assets prêts à être copiés dans le site (noms de fichiers). */
   providedAssets: string[];
   /** Dossier source de ces assets, transmis au générateur. */
   assetsDir: string | null;
+  /**
+   * Inventaire tracé des médias : provenance, nature (réel/conceptuel), droits.
+   * `null` tant que la découverte n'a pas eu lieu.
+   */
+  assetInventory: AssetInventory | null;
+  /** Démo privée (noindex, aucune publication) ou production. */
+  usage: UsageContext;
   state: AutopilotState;
   blockedReason: BlockedReason | null;
   /** Message court, compréhensible sans compétence technique. */
@@ -177,6 +179,8 @@ export interface AutopilotMission {
    */
   content: SiteContentDraft | null;
   iterations: QualityIteration[];
+  /** Rapports des étapes réellement exécutées (SITE_BUILD, MOBILE_QA). */
+  stageReports: StageReport[];
   steps: MissionStep[];
   /** Dépense cumulée connue (devise du provider). */
   spend: { amount: number; currency: string; isLowerBound: boolean };
@@ -205,6 +209,13 @@ export interface SiteContentDraft {
     items: { title: string; meta: string[] }[];
   };
   conversion: { title: string; description: string };
+}
+
+/** Rapport d'une étape réellement exécutée (SITE_BUILD, MOBILE_QA). */
+export interface StageReport {
+  stage: AutopilotState;
+  checks: { label: string; ok: boolean; detail?: string }[];
+  ok: boolean;
 }
 
 /** Ce que la machine attend de l'agent pour pouvoir avancer. */

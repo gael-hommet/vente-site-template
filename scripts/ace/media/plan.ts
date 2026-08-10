@@ -11,12 +11,11 @@
  *   pnpm exec tsx scripts/ace/media/plan.ts --demo
  *
  * Le brief JSON suit `MediaBriefInput` (intent, qualityBar, emotionalGoal,
- * assets, constraints, subject, pricing?). `configuredProviders` est ignoré du
- * brief et RÉSOLU depuis l'environnement (honnêteté : on ne prétend pas un
- * provider configuré s'il ne l'est pas).
+ * assets, constraints, subject, pricing?). ACE ne génère aucun média :
+ * la stratégie ne dépend que du matériau RÉEL déclaré dans `assets`.
  */
 import { readFileSync } from "node:fs";
-import { buildMediaPlan, configuredProviders, type MediaBriefInput } from "@/ace/media-engine";
+import { buildMediaPlan, type MediaBriefInput } from "@/ace/media-engine";
 
 function demoBrief(): MediaBriefInput {
   return {
@@ -30,7 +29,6 @@ function demoBrief(): MediaBriefInput {
       realModel3d: false,
       depthMaps: false,
     },
-    configuredProviders: [],
     constraints: { minTier: "BALANCED", reducedMotionSafe: true, mobilePremium: true },
     subject: "le lieu à présenter",
   };
@@ -52,9 +50,7 @@ function main() {
     }
   }
 
-  // HONNÊTETÉ : les providers configurés viennent de l'ENV, jamais du brief.
-  const resolved: MediaBriefInput = { ...brief, configuredProviders: configuredProviders() };
-  const plan = buildMediaPlan(resolved);
+  const plan = buildMediaPlan(brief);
   console.log(JSON.stringify(plan, null, 2));
 
   // Code de sortie explicite si un asset/provider manque (utile en CI).

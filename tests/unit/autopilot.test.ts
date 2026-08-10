@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { RECIPE_IDS } from "@/ace/recipes/catalog";
 import {
   INDUSTRIES,
@@ -27,15 +29,26 @@ import {
   nextState,
   isTerminal,
   environmentGate,
-  providerGate,
-  spendGate,
+  assetGate,
+  rightsGate,
   factsGate,
   qualityGate,
   deploymentGate,
   userReport,
   technicalReport,
+  AUTOPILOT_STATES,
   type AutopilotMission,
 } from "@/ace/autopilot";
+import {
+  hasVisualMaterial,
+  validateInventory,
+  usableAssets,
+  bestAssetFor,
+  provenanceDisclosure,
+  productionBlockers,
+  type AssetInventory,
+  type AssetRecord,
+} from "@/ace/media-engine";
 import { AUTOPILOT_POLICY } from "@/config/ace-autopilot-policy";
 
 /**
@@ -160,43 +173,6 @@ describe("Garde-fous", () => {
     expect(g.reason).toBe("ENVIRONMENT_NOT_READY");
   });
 
-  it("exige l'activation ADMIN plutôt qu'un faux média (jamais de low-poly)", () => {
-    const g = providerGate({ mediaRequired: true, providerAuthenticated: false });
-    expect(g.pass).toBe(false);
-    expect(g.reason).toBe("ADMIN_PROVIDER_AUTH_REQUIRED");
-    expect(g.message).not.toMatch(/hf-api|CLI|exit/i); // message non technique
-  });
-
-  it("laisse passer si aucun média généré n'est nécessaire", () => {
-    expect(providerGate({ mediaRequired: false, providerAuthenticated: false }).pass).toBe(true);
-  });
-
-  it("demande UN accord au-dessus du seuil, et rien en dessous", () => {
-    const under = spendGate({ estimatedTotal: 1, currency: "USD" });
-    expect(under.pass).toBe(true);
-    const over = spendGate({
-      estimatedTotal: AUTOPILOT_POLICY.spend.approvalThreshold + 1,
-      currency: "USD",
-    });
-    expect(over.pass).toBe(false);
-    expect(over.reason).toBe("SPEND_APPROVAL_REQUIRED");
-    // Une fois approuvé, on ne redemande pas.
-    expect(spendGate({ estimatedTotal: 10, currency: "USD", approved: true }).pass).toBe(true);
-  });
-
-  it("ne traite JAMAIS un coût inconnu comme gratuit", () => {
-    expect(spendGate({ estimatedTotal: null, currency: "USD" }).pass).toBe(false);
-  });
-
-  it("refuse de dépasser le plafond absolu, même approuvé", () => {
-    const g = spendGate({
-      estimatedTotal: AUTOPILOT_POLICY.spend.hardCap + 1,
-      currency: "USD",
-      approved: true,
-    });
-    expect(g.pass).toBe(false);
-  });
-
   it("exige au minimum d'avoir identifié l'entreprise", () => {
     expect(factsGate({ facts: [], notFound: [] }).pass).toBe(false);
     expect(
@@ -249,7 +225,8 @@ describe("Machine à états & reprise", () => {
       "INTAKE",
       "RESEARCH",
       "FACT_CHECK",
-      "SITE_BOOTSTRAP",
+      "ASSET_DISCOVERY",
+      "ASSET_VALIDATION",
       "ART_DIRECTION",
     ] as const) {
       m = beginStep({ ...m, state: s }, s, NOW);
@@ -271,18 +248,12 @@ describe("Machine à états & reprise", () => {
     let m = mission("Fais un site pour Atelier Nova");
     m = beginStep(m, "INTAKE", NOW);
     m = endStep(m, { ok: true, notes: ["ok"] }, NOW);
-    m = block(m, "ADMIN_PROVIDER_AUTH_REQUIRED", NOW);
+    m = block(m, "MEDIA_ASSET_REQUIRED", NOW);
     expect(m.state).toBe("BLOCKED");
     expect(m.steps).toHaveLength(1); // rien n'est perdu
     const resumed = unblock(m, resumeState(m), NOW);
     expect(resumed.state).toBe("RESEARCH");
     expect(resumed.blockedReason).toBeNull();
-  });
-
-  it("route une demande d'accord vers WAITING_FOR_APPROVAL", () => {
-    const m = block(mission("Fais un site"), "SPEND_APPROVAL_REQUIRED", NOW, "≈ 12 USD");
-    expect(m.state).toBe("WAITING_FOR_APPROVAL");
-    expect(m.blockedMessage).toContain("12 USD");
   });
 });
 
@@ -299,16 +270,17 @@ describe("Rapports — deux publics", () => {
   });
 
   it("le rapport utilisateur explique un blocage sans log technique", () => {
-    const m = block(mission("Fais un site"), "ADMIN_PROVIDER_AUTH_REQUIRED", NOW);
+    const m = block(mission("Fais un site"), "MEDIA_ASSET_REQUIRED", NOW);
     const r = userReport(m);
-    expect(r).toMatch(/administrateur/i);
-    expect(r).not.toMatch(/hf-api|exit \d|stderr/i);
+    expect(r).toMatch(/visuel/i);
+    // Ni jargon, ni mention d'un service payant.
+    expect(r).not.toMatch(/hf-api|exit \d|stderr|provider|API/i);
   });
 
   it("le rapport technique, lui, contient bien le détail", () => {
     let m = mission("Fais un site premium pour Atelier Nova");
     m = { ...m, artDirection: decideArtDirection(m.intent) };
-    m = beginStep(m, "SITE_BOOTSTRAP", NOW);
+    m = beginStep(m, "SITE_BUILD", NOW);
     m = endStep(m, { ok: true, commands: ["node scripts/ace/new-site.mjs …"] }, NOW);
     const r = technicalReport(m);
     expect(r).toContain("new-site.mjs");
@@ -318,36 +290,6 @@ describe("Rapports — deux publics", () => {
 });
 
 describe("Scénarios du mandat", () => {
-  it("TEST 3 — média requis + provider absent ⇒ ADMIN_PROVIDER_AUTH_REQUIRED, jamais de low-poly", () => {
-    const intent = detectIntent("Fais un site premium pour ce restaurant");
-    const ad = decideArtDirection(intent);
-    // Parti-pris porté par l'image, aucun asset fourni, aucun provider.
-    const g = providerGate({
-      mediaRequired: requiresGeneratedMedia(ad, { hasUsableAssets: false }),
-      providerAuthenticated: false,
-    });
-    expect(g.reason).toBe("ADMIN_PROVIDER_AUTH_REQUIRED");
-    // Le message décrit une action ADMIN, jamais une solution de repli bricolée.
-    expect(g.message).toMatch(/administrateur/i);
-    expect(g.message).not.toMatch(/low-?poly|3D|cube/i);
-  });
-
-  it("TEST 5 — sous le seuil : automatique ; au-dessus : WAITING_FOR_APPROVAL", () => {
-    const under = spendGate({
-      estimatedTotal: AUTOPILOT_POLICY.spend.approvalThreshold - 1,
-      currency: "USD",
-    });
-    expect(under.pass).toBe(true);
-
-    const over = spendGate({
-      estimatedTotal: AUTOPILOT_POLICY.spend.approvalThreshold + 1,
-      currency: "USD",
-    });
-    expect(over.pass).toBe(false);
-    const m = block(mission("Fais un site"), over.reason ?? "SPEND_APPROVAL_REQUIRED", NOW);
-    expect(m.state).toBe("WAITING_FOR_APPROVAL");
-  });
-
   it("TEST 6 — une mission COMPLETE ne pousse ni ne déploie jamais", () => {
     let m = mission("Fais un site pour Atelier Nova");
     m = { ...m, state: "COMPLETE", targetDir: "/workspaces/atelier-nova" };
@@ -364,5 +306,130 @@ describe("Scénarios du mandat", () => {
     m = { ...m, state: "COMPLETE", targetDir: "/tmp/x", previewUrl: null };
     // On n'invente pas une adresse qui ne répond pas.
     expect(userReport(m)).not.toMatch(/localhost:\d+/);
+  });
+});
+
+describe("ACE 0.2.2 — coût média nul, aucun service de génération", () => {
+  const asset = (over: Partial<AssetRecord> = {}): AssetRecord => ({
+    path: "/assets/client/photo-01.jpg",
+    source: "OFFICIAL_WEBSITE",
+    sourceRef: "https://exemple.test/galerie",
+    nature: "REAL",
+    role: "gallery",
+    kind: "image",
+    alt: "Vue de l'atelier",
+    rights: "OFFICIAL_PUBLIC_UNCONFIRMED",
+    ...over,
+  });
+
+  it("A — ace:doctor ne dépend d'AUCUN service de génération", () => {
+    const doctor = readFileSync(
+      path.join(__dirname, "../../scripts/ace/autopilot/doctor.mjs"),
+      "utf8",
+    );
+    expect(doctor).not.toMatch(/higgsfield|hf-api|HIGGSFIELD/i);
+    expect(doctor).not.toMatch(/ACE NEEDS ADMIN SETUP/);
+  });
+
+  it("B/C — des visuels (officiels OU fournis) suffisent : aucun blocage", () => {
+    for (const source of [
+      "OFFICIAL_WEBSITE",
+      "CLIENT_PROVIDED",
+      "USER_SUPPLIED_GENERATED",
+    ] as const) {
+      const inv: AssetInventory = {
+        usage: "PRIVATE_DEMO",
+        assets: [asset({ source, rights: "CONFIRMED" })],
+        missing: [],
+      };
+      expect(hasVisualMaterial(inv)).toBe(true);
+      expect(assetGate({ imageLedDirection: true, hasVisualMaterial: true }).pass).toBe(true);
+    }
+  });
+
+  it("D/E/F — sans aucun visuel : on DEMANDE le média, jamais un provider ni une dépense", () => {
+    const g = assetGate({ imageLedDirection: true, hasVisualMaterial: false });
+    expect(g.pass).toBe(false);
+    expect(g.reason).toBe("MEDIA_ASSET_REQUIRED");
+    // Aucune trace du paradigme supprimé.
+    expect(g.message).not.toMatch(/provider|générer|crédit|abonnement|coût/i);
+    expect(JSON.stringify(AUTOPILOT_POLICY)).not.toMatch(/higgsfield|spend|approvalThreshold/i);
+  });
+
+  it("H — une démo privée conserve la provenance et l'annonce", () => {
+    const inv: AssetInventory = { usage: "PRIVATE_DEMO", assets: [asset()], missing: [] };
+    expect(validateInventory(inv).filter((i) => i.severity === "error")).toHaveLength(0);
+    expect(provenanceDisclosure(inv)).toMatch(/propriété|officiels/i);
+    expect(usableAssets(inv)[0]?.sourceRef).toBe("https://exemple.test/galerie");
+  });
+
+  it("I — en production, les droits non confirmés bloquent", () => {
+    const inv: AssetInventory = { usage: "PRODUCTION", assets: [asset()], missing: [] };
+    expect(productionBlockers(inv).length).toBeGreaterThan(0);
+    const g = rightsGate({ usage: "PRODUCTION", unconfirmed: productionBlockers(inv) });
+    expect(g.pass).toBe(false);
+    expect(g.reason).toBe("MEDIA_RIGHTS_UNCONFIRMED");
+    // Confirmés ⇒ plus de blocage.
+    const ok: AssetInventory = {
+      usage: "PRODUCTION",
+      assets: [asset({ rights: "CONFIRMED" })],
+      missing: [],
+    };
+    expect(productionBlockers(ok)).toHaveLength(0);
+  });
+
+  it("un média CONCEPTUEL ne peut pas illustrer une réalisation réelle", () => {
+    const inv: AssetInventory = {
+      usage: "PRIVATE_DEMO",
+      assets: [asset({ nature: "CONCEPTUAL", role: "project", rights: "CONFIRMED" })],
+      missing: [],
+    };
+    const errors = validateInventory(inv).filter((i) => i.severity === "error");
+    expect(errors[0]?.message).toMatch(/trompeuse/i);
+    expect(usableAssets(inv)).toHaveLength(0);
+  });
+
+  it("la hiérarchie des sources est respectée (client > officiel > fourni)", () => {
+    const inv: AssetInventory = {
+      usage: "PRIVATE_DEMO",
+      assets: [
+        asset({ path: "/c.jpg", source: "USER_SUPPLIED_GENERATED", rights: "CONFIRMED" }),
+        asset({ path: "/a.jpg", source: "CLIENT_PROVIDED", rights: "CONFIRMED" }),
+        asset({ path: "/b.jpg", source: "OFFICIAL_WEBSITE", rights: "CONFIRMED" }),
+      ],
+      missing: [],
+    };
+    expect(usableAssets(inv).map((a) => a.path)).toEqual(["/a.jpg", "/b.jpg", "/c.jpg"]);
+    expect(bestAssetFor(inv, "gallery")?.path).toBe("/a.jpg");
+  });
+
+  it("E/L — le workflow ne contient plus ni génération, ni auth, ni approbation", () => {
+    expect(AUTOPILOT_STATES).not.toContain("MEDIA_GENERATION");
+    expect(AUTOPILOT_STATES).not.toContain("WAITING_FOR_APPROVAL");
+    expect(AUTOPILOT_STATES).toContain("ASSET_DISCOVERY");
+    expect(AUTOPILOT_STATES).toContain("ASSET_VALIDATION");
+    expect(AUTOPILOT_STATES).toContain("MEDIA_PROCESSING");
+    // L — aucune substitution low-poly : la stratégie reste un repli éditorial.
+    const ad = decideArtDirection(detectIntent("Fais un site premium pour un restaurant"), {
+      hasUsableAssets: false,
+    });
+    expect(ad.webglIntensity).not.toBe("immersive");
+  });
+
+  it("J/K — SITE_BUILD et MOBILE_QA sont de vraies étapes du workflow", () => {
+    const run = readFileSync(path.join(__dirname, "../../scripts/ace/autopilot/run.ts"), "utf8");
+    // Elles exécutent du travail, pas un simple jalon.
+    expect(run).toMatch(/function doSiteBuild/);
+    expect(run).toMatch(/function doMobileQa/);
+    expect(existsSync(path.join(__dirname, "../../scripts/ace/autopilot/mobile-qa.mjs"))).toBe(
+      true,
+    );
+    // La capture mobile est réellement prise par Playwright.
+    const mobile = readFileSync(
+      path.join(__dirname, "../../scripts/ace/autopilot/mobile-qa.mjs"),
+      "utf8",
+    );
+    expect(mobile).toMatch(/page\.screenshot/);
+    expect(mobile).toMatch(/scrollWidth/);
   });
 });

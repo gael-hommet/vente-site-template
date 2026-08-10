@@ -1,0 +1,76 @@
+{
+  "usage": "PRIVATE_DEMO",
+  "assets": [
+    {
+      "path": "logo.png",
+      "source": "OFFICIAL_WEBSITE",
+      "sourceRef": "https://maison-verrier.test/logo.png",
+      "nature": "REAL",
+      "role": "logo",
+      "kind": "image",
+      "alt": "Logo Maison Verrier",
+      "rights": "OFFICIAL_PUBLIC_UNCONFIRMED"
+    },
+    {
+      "path": "atelier-01.jpg",
+      "source": "OFFICIAL_WEBSITE",
+      "sourceRef": "https://maison-verrier.test/atelier",
+      "nature": "REAL",
+      "role": "hero",
+      "kind": "image",
+      "alt": "L'atelier de soufflage à Biot",
+      "rights": "OFFICIAL_PUBLIC_UNCONFIRMED"
+    },
+    {
+      "path": "atelier-02.jpg",
+      "source": "OFFICIAL_WEBSITE",
+      "sourceRef": "https://maison-verrier.test/atelier",
+      "nature": "REAL",
+      "role": "gallery",
+      "kind": "image",
+      "alt": "Pièce de verre soufflé en cours",
+      "rights": "OFFICIAL_PUBLIC_UNCONFIRMED"
+    },
+    {
+      "path": "atelier-03.jpg",
+      "source": "OFFICIAL_WEBSITE",
+      "sourceRef": "https://maison-verrier.test/realisations",
+      "nature": "REAL",
+      "role": "gallery",
+      "kind": "image",
+      "alt": "Vitrail posé en chapelle",
+      "rights": "OFFICIAL_PUBLIC_UNCONFIRMED"
+    },
+    {
+      "path": "atelier-04.jpg",
+      "source": "OFFICIAL_SOCIAL",
+      "sourceRef": "https://social.test/maisonverrier/post/42",
+      "nature": "REAL",
+      "role": "gallery",
+      "kind": "image",
+      "alt": "Détail d'assemblage au plomb",
+      "rights": "OFFICIAL_PUBLIC_UNCONFIRMED"
+    },
+    {
+      "path": "atelier-05.jpg",
+      "source": "OFFICIAL_WEBSITE",
+      "sourceRef": "https://maison-verrier.test/atelier",
+      "nature": "REAL",
+      "role": "venue",
+      "kind": "image",
+      "alt": "Façade de l'atelier",
+      "rights": "OFFICIAL_PUBLIC_UNCONFIRMED"
+    },
+    {
+      "path": "atelier.mp4",
+      "source": "OFFICIAL_WEBSITE",
+      "sourceRef": "https://maison-verrier.test/video",
+      "nature": "REAL",
+      "role": "video",
+      "kind": "video",
+      "alt": "Séquence de soufflage",
+      "rights": "OFFICIAL_PUBLIC_UNCONFIRMED"
+    }
+  ],
+  "missing": ["photo d'équipe", "plan d'accès"]
+}

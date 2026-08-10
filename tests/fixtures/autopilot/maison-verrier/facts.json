@@ -1,0 +1,35 @@
+{
+  "facts": [
+    {
+      "key": "businessName",
+      "value": "Maison Verrier",
+      "source": "https://maison-verrier.test/",
+      "confidence": "verified"
+    },
+    {
+      "key": "activity",
+      "value": "verrerie d'art et vitraux contemporains",
+      "source": "https://maison-verrier.test/atelier",
+      "confidence": "verified"
+    },
+    {
+      "key": "city",
+      "value": "Biot",
+      "source": "https://maison-verrier.test/contact",
+      "confidence": "verified"
+    },
+    {
+      "key": "email",
+      "value": "contact@maison-verrier.test",
+      "source": "https://maison-verrier.test/contact",
+      "confidence": "verified"
+    },
+    {
+      "key": "founded",
+      "value": "1978",
+      "source": "https://maison-verrier.test/atelier",
+      "confidence": "verified"
+    }
+  ],
+  "notFound": ["horaires d'ouverture", "numéro de téléphone"]
+}

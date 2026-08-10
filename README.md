@@ -45,22 +45,27 @@ d'images ». ACE tranche.
 - publier ou déployer le site (il reste sur votre machine) ;
 - inventer une information sur l'entreprise (tout ce qui manque est marqué
   `[À CONFIRMER]`) ;
-- dépenser au-delà d'un petit seuil sans vous poser **une** question ;
 - livrer un visuel bas de gamme pour combler un manque.
 
-### Configuration administrateur (une seule fois)
+### Aucune configuration, aucun abonnement
 
-La génération d'**images et vidéos par IA** demande un compte fournisseur. Cette
-étape se fait **une fois** par l'administrateur du Codespace, jamais par les
-utilisateurs : voir **[docs/ACE-ADMIN-SETUP.md](docs/ACE-ADMIN-SETUP.md)**.
+ACE **ne génère pas d'images ni de vidéos** via un service payant. Il n'y a donc
+**aucune clé d'API à obtenir, aucun crédit à acheter, aucun coût par site**.
 
-Sans elle, ACE reste pleinement utilisable : il construit le site avec les
-visuels que vous fournissez, ou vous dit franchement qu'un visuel manque.
+Les visuels viennent du réel, dans cet ordre :
+
+1. ce que vous fournissez ;
+2. le site officiel de l'entreprise ;
+3. ses réseaux officiels ;
+4. une image que vous avez créée ailleurs et que vous lui donnez.
+
+Si rien d'utilisable n'existe, ACE vous le dit et vous demande une photo — il ne
+fabrique jamais un visuel de substitution.
 
 ### Mode expert (développeurs)
 
 Le moteur reste pilotable à la main : `pnpm ace:new-site`, `pnpm ace:media:*`,
-`pnpm ace:provider:check`, `pnpm check`… Voir
+`pnpm ace:media:*`, `pnpm check`… Voir
 [docs/ACE-AUTOPILOT.md](docs/ACE-AUTOPILOT.md) et les docs `docs/ACE-*`.
 
 ## Commandes essentielles

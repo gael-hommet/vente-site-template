@@ -134,46 +134,12 @@ export interface AceMediaPlan {
   qualityBar: AceQualityBar;
   emotionalGoal: string;
   decision: AceStrategyDecision;
-  /** Providers potentiels (config-driven, pas inventés). */
-  candidateProviders: string[];
   shots: AceShotPlan[];
   /** Références visuelles à verrouiller (identité du sujet). */
   referenceLocks: string[];
   risks: string[];
-  cost: AceCostEstimate;
   /** Sortie attendue (ex. « mp4 + webm + poster + séquence webp »). */
   expectedOutput: string;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Cost guard                                                                 */
-/* -------------------------------------------------------------------------- */
-
-/** Tarifs d'un provider — DONNÉES de config, jamais inventées par le moteur. */
-export interface AceProviderPricing {
-  provider: string;
-  /** Coût unitaire par sortie (devise laissée à l'utilisateur). */
-  unitCost: number;
-  currency: string;
-  /** Source du tarif (URL/doc) pour la traçabilité. */
-  source: string;
-}
-
-export interface AceCostEstimate {
-  provider: string | null;
-  currency: string;
-  /** Nombre de sorties de la stratégie minimale. */
-  minimalOutputs: number;
-  recommendedOutputs: number;
-  cautiousOutputs: number;
-  minimalCost: number | null;
-  recommendedCost: number | null;
-  cautiousCost: number | null;
-  /** Seuil au-delà duquel une confirmation est requise. */
-  alertThreshold: number;
-  exceedsThreshold: boolean;
-  /** Note honnête si aucun tarif n'est fourni. */
-  note: string;
 }
 
 /* -------------------------------------------------------------------------- */

@@ -1,4 +1,4 @@
-import type { AutopilotMission, BlockedReason, FactRegistry } from "./types";
+import type { BlockedReason, FactRegistry } from "./types";
 import type { AutopilotPolicy } from "@/config/ace-autopilot-policy";
 import { AUTOPILOT_POLICY } from "@/config/ace-autopilot-policy";
 
@@ -39,79 +39,56 @@ export function environmentGate(doctor: {
 }
 
 /**
- * Le provider média est-il requis, et disponible ?
+ * Y a-t-il assez de MATIÈRE VISUELLE réelle pour l'ambition demandée ?
  *
- * C'est LE gate anti-médiocrité : sans provider, on ne fabrique jamais une
- * fausse version low-poly. Soit on produit un site éditorial premium assumé,
- * soit on bloque en disant exactement ce que l'ADMIN doit faire.
+ * ACE ne génère aucun média : si un parti-pris porté par l'image est retenu mais
+ * qu'aucun visuel réel n'existe, on ne bricole pas — on demande le média, ou on
+ * bascule sur un parti-pris éditorial assumé.
  */
-export function providerGate(input: {
-  mediaRequired: boolean;
-  providerAuthenticated: boolean;
+export function assetGate(input: {
+  imageLedDirection: boolean;
+  hasVisualMaterial: boolean;
   policy?: AutopilotPolicy;
 }): GateResult {
   const policy = input.policy ?? AUTOPILOT_POLICY;
-  if (!input.mediaRequired || input.providerAuthenticated) return OK;
+  if (!input.imageLedDirection || input.hasVisualMaterial) return OK;
 
-  if (policy.provider.whenUnavailable === "editorial-only") {
+  if (policy.assets.whenNoVisual === "editorial-fallback") {
     return {
       pass: true,
       reason: null,
       message:
-        "Aucun générateur d'images n'est activé : le site sera produit en version éditoriale premium (assumée).",
+        "Aucun visuel exploitable trouvé : le site sera construit en parti-pris éditorial premium (assumé).",
     };
   }
   return {
     pass: false,
-    reason: "ADMIN_PROVIDER_AUTH_REQUIRED",
+    reason: "MEDIA_ASSET_REQUIRED",
     message:
-      "Ce site a besoin de visuels sur mesure. L'administrateur doit activer le générateur d'images " +
-      "(une seule fois) — voir docs/ACE-ADMIN-SETUP.md.",
-    detail: "hf-api non authentifié ; aucune substitution low-poly n'est produite.",
+      "Je n'ai trouvé aucun visuel utilisable pour cette entreprise. " +
+      "Pouvez-vous m'envoyer une ou deux photos (ou l'adresse d'une page où elles sont publiées) ?",
+    detail: "aucun média réel ; aucune génération n'est tentée (coût média = 0 €).",
   };
 }
 
 /**
- * La dépense prévue est-elle autorisée sans demander ?
- * Un coût inconnu n'est jamais traité comme gratuit : il demande un accord.
+ * Les droits permettent-ils ce contexte d'usage ?
+ * Une démo privée tolère les médias officiels publics (provenance conservée) ;
+ * une mise en production exige des droits confirmés.
  */
-export function spendGate(input: {
-  estimatedTotal: number | null;
-  currency: string;
-  approved?: boolean;
-  policy?: AutopilotPolicy;
+export function rightsGate(input: {
+  usage: "PRIVATE_DEMO" | "PRODUCTION";
+  unconfirmed: string[];
 }): GateResult {
-  const policy = input.policy ?? AUTOPILOT_POLICY;
-  const { estimatedTotal, currency } = input;
-
-  if (estimatedTotal !== null && estimatedTotal > policy.spend.hardCap) {
-    return {
-      pass: false,
-      reason: "SPEND_APPROVAL_REQUIRED",
-      message:
-        `Le coût estimé (${String(estimatedTotal)} ${currency}) dépasse le plafond absolu ` +
-        `(${String(policy.spend.hardCap)} ${currency}). La mission s'arrête ici par sécurité.`,
-    };
-  }
-  if (input.approved === true) return OK;
-
-  if (estimatedTotal === null) {
-    return {
-      pass: false,
-      reason: "SPEND_APPROVAL_REQUIRED",
-      message:
-        "Le coût de production des visuels n'est pas communiqué par le fournisseur. " +
-        "Votre accord est nécessaire avant de lancer.",
-    };
-  }
-  if (estimatedTotal > policy.spend.approvalThreshold) {
-    return {
-      pass: false,
-      reason: "SPEND_APPROVAL_REQUIRED",
-      message: `Cette production coûtera environ ${String(estimatedTotal)} ${currency}. Continuer ?`,
-    };
-  }
-  return OK;
+  if (input.usage === "PRIVATE_DEMO" || input.unconfirmed.length === 0) return OK;
+  return {
+    pass: false,
+    reason: "MEDIA_RIGHTS_UNCONFIRMED",
+    message:
+      "Avant de publier ce site, les droits d'utilisation de certains visuels doivent être " +
+      "confirmés par l'entreprise.",
+    detail: input.unconfirmed.join(" · "),
+  };
 }
 
 /** Informations réellement indispensables pour produire un site honnête. */
@@ -185,11 +162,4 @@ export function deploymentGate(): GateResult {
 /** Applique les gates dans l'ordre et renvoie le premier échec. */
 export function firstFailure(results: readonly GateResult[]): GateResult | null {
   return results.find((r) => !r.pass) ?? null;
-}
-
-/** Résumé des dépenses de la mission, pour le rapport. */
-export function spendSummary(mission: AutopilotMission): string {
-  const { amount, currency, isLowerBound } = mission.spend;
-  if (amount === 0) return "aucune dépense";
-  return `${String(amount)} ${currency}${isLowerBound ? " (au moins)" : ""}`;
 }

@@ -11,12 +11,10 @@
  *   pnpm ace:autopilot status                                    # état courant
  *   pnpm ace:autopilot run                                       # avance au max
  *   pnpm ace:autopilot supply --state RESEARCH --file facts.json # apport agent
- *   pnpm ace:autopilot approve                                   # accord dépense
  *   pnpm ace:autopilot resume                                    # reprise
  *   pnpm ace:autopilot report [--technical]
  *
- * Sorties : 0 = avancé/terminé · 3 = besoin de l'agent · 4 = bloqué ·
- * 5 = attente d'accord · 2 = usage.
+ * Sorties : 0 = avancé/terminé · 2 = usage · 3 = besoin de l'agent · 4 = bloqué.
  */
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -30,14 +28,14 @@ import {
   decideArtDirection,
   detectIntent,
   endStep,
+  assetGate,
   environmentGate,
   factsGate,
   missionSlug,
-  providerGate,
   qualityGate,
   requiresGeneratedMedia,
   resumeState,
-  spendGate,
+  rightsGate,
   statusLine,
   technicalReport,
   unblock,
@@ -45,22 +43,22 @@ import {
   type AutopilotMission,
   type AutopilotState,
   type FactRegistry,
+  type StageReport,
 } from "@/ace/autopilot";
+import {
+  hasVisualMaterial,
+  productionBlockers,
+  bestAssetFor,
+  usableAssets,
+  validateInventory,
+  type AssetInventory,
+} from "@/ace/media-engine";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const MISSION_DIR = path.join(ROOT, ".ace/missions");
 
 const argv = process.argv.slice(2);
-const KNOWN_COMMANDS = [
-  "start",
-  "run",
-  "resume",
-  "supply",
-  "approve",
-  "status",
-  "report",
-  "list",
-] as const;
+const KNOWN_COMMANDS = ["start", "run", "resume", "supply", "status", "report", "list"] as const;
 // La commande est le PREMIER argument, et seulement s'il en est une : sinon le
 // texte du brief serait pris pour une commande.
 const first = argv[0];
@@ -159,6 +157,17 @@ const AGENT_NEEDS: Partial<Record<AutopilotState, string[]>> = {
     "Aucun avis, prix, promesse, récompense ou chiffre ne doit être inventé.",
     "Écrire un JSON { hero, story, collection, conversion } (voir SiteContentDraft).",
   ],
+  ASSET_DISCOVERY: [
+    "CHERCHER D'ABORD, ne pas demander : inspecter le site officiel, les réseaux",
+    "officiels et les sources publiques vérifiables de l'entreprise.",
+    "Collecter logo, photos, vidéos, réalisations, produits, équipe, lieu.",
+    'Écrire un JSON { usage: "PRIVATE_DEMO"|"PRODUCTION", assets: AssetRecord[], missing: string[] }',
+    "où chaque asset porte : path, source (CLIENT_PROVIDED|OFFICIAL_WEBSITE|OFFICIAL_SOCIAL|",
+    "OTHER_VERIFIED_OFFICIAL|USER_SUPPLIED_GENERATED), sourceRef, nature (REAL|CONCEPTUAL),",
+    "role, kind, alt, rights. Télécharger les fichiers dans le dossier d'assets de la mission.",
+    "ACE NE GÉNÈRE AUCUNE IMAGE : ne demander un visuel à l'utilisateur QUE si la recherche",
+    "n'a rien donné.",
+  ],
   VISUAL_QA: [
     "Regarder les captures d'écran produites, noter le rendu (0..1) et lister les défauts.",
     "Écrire un JSON { score: number, issues: string[], screenshots: string[] }.",
@@ -198,23 +207,32 @@ function emitBlocked(m: AutopilotMission): never {
   } else {
     console.log("\n" + userReport(m));
   }
-  process.exit(m.state === "WAITING_FOR_APPROVAL" ? 5 : 4);
+  process.exit(4);
 }
 
 /* -------------------------------------------------------------------------- */
 /* Étapes automatisables                                                      */
 /* -------------------------------------------------------------------------- */
 
-/** SITE_BOOTSTRAP : génère réellement le projet client via ace:new-site. */
-function doSiteBootstrap(m: AutopilotMission): AutopilotMission {
+/**
+ * SITE_BUILD — étape RÉELLE, pas un jalon.
+ *
+ * 1. génère le projet via `ace:new-site` ;
+ * 2. écrit les textes et câble les visuels ;
+ * 3. VÉRIFIE ce qui a été produit (pages, nav, CTA, contact, SEO, noindex,
+ *    responsive, médias réellement référencés) et rend un rapport d'étape.
+ */
+function doSiteBuild(m: AutopilotMission): AutopilotMission {
   const outDir = path.resolve(ROOT, "..", m.slug);
   const configPath = path.join(MISSION_DIR, `${m.id}.client.config.ts`);
 
   const ad =
     m.artDirection ??
     decideArtDirection(m.intent, { hasUsableAssets: m.providedAssets.length > 0 });
-  const name = m.intent.businessName ?? m.slug;
-  const isDemo = m.intent.deliverable === "demo";
+  // Un FAIT VÉRIFIÉ prime sur l'extraction faite depuis la phrase de départ.
+  const factName = m.facts.facts.find((f) => f.key === "businessName")?.value;
+  const name = factName ?? m.intent.businessName ?? m.slug;
+  const isDemo = m.intent.deliverable === "demo" || m.usage === "PRIVATE_DEMO";
 
   // Config client dérivée de la mission — aucun fait inventé : seuls le nom, le
   // secteur et les choix de DESIGN sont écrits. Le contenu reste [À CONFIRMER].
@@ -267,9 +285,138 @@ export default config;
     const failed = endStep(m, { ok: false, commands: [cmd], notes: [res.out.slice(-600)] }, now());
     return block(failed, "UNRECOVERABLE_ERROR", now(), "La création du projet a échoué.");
   }
+  const built: AutopilotMission = { ...m, targetDir: outDir, artDirection: ad };
+
+  // 2) Écriture des textes + câblage des visuels.
+  const written = writeSiteContent(built);
+  if (!written.ok) {
+    const failed = endStep(
+      built,
+      { ok: false, notes: [written.error ?? "contenu non écrit"] },
+      now(),
+    );
+    return block(failed, "UNRECOVERABLE_ERROR", now(), "Le contenu n'a pas pu être écrit.");
+  }
+
+  // 3) Vérifications RÉELLES de ce qui a été produit.
+  const has = (rel: string): boolean => existsSync(path.join(outDir, rel));
+  const read = (rel: string): string => {
+    try {
+      return readFileSync(path.join(outDir, rel), "utf8");
+    } catch {
+      return "";
+    }
+  };
+  const content = read("src/config/site-content.ts");
+  const robots = read("src/app/robots.ts");
+  const isDemoSite = built.usage === "PRIVATE_DEMO" || isDemo;
+
+  const checks: { label: string; ok: boolean; detail?: string }[] = [
+    { label: "page d'accueil", ok: has("src/app/page.tsx") },
+    { label: "page contact", ok: has("src/app/contact/page.tsx") },
+    { label: "mentions légales", ok: has("src/app/mentions-legales/page.tsx") },
+    { label: "contenu éditorial écrit", ok: content.length > 0 },
+    { label: "navigation définie", ok: /nav:\s*\[/.test(content) },
+    { label: "CTA principal", ok: /primaryCta/.test(content) },
+    {
+      label: "formulaire de contact",
+      ok: has("src/components/conversion") || has("src/app/api/lead"),
+    },
+    {
+      label: "métadonnées SEO",
+      ok: has("src/lib/seo/metadata.ts") || /buildMetadata/.test(read("src/app/page.tsx")),
+    },
+    { label: "sitemap + robots", ok: has("src/app/sitemap.ts") && has("src/app/robots.ts") },
+    {
+      label: isDemoSite ? "noindex (démo privée)" : "indexation autorisée",
+      ok: isDemoSite ? /disallow/i.test(robots) : true,
+      detail: isDemoSite ? "robots.ts interdit l'indexation" : undefined,
+    },
+    {
+      label: "visuels réellement référencés",
+      ok: built.providedAssets.length === 0 || /\/assets\/client\//.test(content),
+      detail: `${String(built.providedAssets.length)} visuel(s) disponible(s)`,
+    },
+  ];
+  const failed = checks.filter((c) => !c.ok);
+
+  const report: StageReport = { stage: "SITE_BUILD", checks, ok: failed.length === 0 };
+  const withReport: AutopilotMission = {
+    ...built,
+    stageReports: [...built.stageReports.filter((r) => r.stage !== "SITE_BUILD"), report],
+  };
+
   return endStep(
-    { ...m, targetDir: outDir, artDirection: ad },
-    { ok: true, commands: [cmd], notes: [`projet créé dans ${outDir}`] },
+    withReport,
+    {
+      ok: failed.length === 0,
+      commands: [cmd],
+      notes: [
+        `projet créé dans ${outDir}`,
+        `contenu écrit : ${written.file}`,
+        ...checks.map((c) => `${c.ok ? "✓" : "✗"} ${c.label}${c.detail ? ` (${c.detail})` : ""}`),
+      ],
+    },
+    now(),
+  );
+}
+
+/**
+ * MOBILE_QA — étape RÉELLE : une capture mobile est OBLIGATOIRE avant COMPLETE.
+ *
+ * Démarre le site construit, ouvre un viewport mobile réel (Playwright) et
+ * mesure des faits : débordement horizontal, CTA visible, images chargées,
+ * taille de police, présence du menu. Aucun de ces points n'est supposé.
+ */
+function doMobileQa(m: AutopilotMission): AutopilotMission {
+  if (!m.targetDir) {
+    return block(m, "UNRECOVERABLE_ERROR", now(), "Aucun site à contrôler.");
+  }
+  const shotDir = path.join(MISSION_DIR, `${m.id}.shots`);
+  mkdirSync(shotDir, { recursive: true });
+
+  const res = spawnSync(
+    "node",
+    [path.join(ROOT, "scripts/ace/autopilot/mobile-qa.mjs"), m.targetDir, shotDir],
+    { encoding: "utf8", cwd: ROOT, maxBuffer: 32 * 1024 * 1024 },
+  );
+  interface MobileQaOutput {
+    ok: boolean;
+    screenshot: string | null;
+    checks: { label: string; ok: boolean; detail?: string }[];
+  }
+  let parsed: MobileQaOutput | null = null;
+  try {
+    parsed = JSON.parse(res.stdout) as MobileQaOutput;
+  } catch {
+    parsed = null;
+  }
+  if (!parsed) {
+    // Sans capture réelle, on ne prétend PAS avoir contrôlé le mobile.
+    return endStep(
+      m,
+      { ok: false, notes: ["capture mobile impossible : contrôle mobile NON effectué"] },
+      now(),
+    );
+  }
+
+  const report: StageReport = { stage: "MOBILE_QA", checks: parsed.checks, ok: parsed.ok };
+  const withReport: AutopilotMission = {
+    ...m,
+    stageReports: [...m.stageReports.filter((r) => r.stage !== "MOBILE_QA"), report],
+  };
+  return endStep(
+    withReport,
+    {
+      ok: parsed.ok,
+      commands: ["capture mobile (Playwright, viewport iPhone)"],
+      notes: [
+        parsed.screenshot ? `capture : ${parsed.screenshot}` : "capture non enregistrée",
+        ...parsed.checks.map(
+          (c) => `${c.ok ? "✓" : "✗"} ${c.label}${c.detail ? ` (${c.detail})` : ""}`,
+        ),
+      ],
+    },
     now(),
   );
 }
@@ -294,15 +441,37 @@ function writeSiteContent(m: AutopilotMission): { ok: boolean; file: string; err
         ? "Demander un devis"
         : "Nous contacter";
 
-  // Les visuels FOURNIS par le client sont réellement câblés dans la page :
-  // les copier sans les afficher reviendrait à livrer un site vide de leur
-  // matière. `public/assets/client/<f>` est servi sous `/assets/client/<f>`.
-  const assetUrls = m.providedAssets
-    .filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f))
-    .map((f) => `/assets/client/${f}`);
-  const heroMedia = assetUrls[0]
-    ? { src: assetUrls[0], alt: `${m.intent.businessName ?? m.slug} — visuel principal` }
-    : null;
+  // Les visuels sont câblés PAR RÔLE (hiérarchie de sources respectée) : le
+  // logo n'est jamais un fond de hero, et un média conceptuel n'illustre jamais
+  // une réalisation. `public/assets/client/<f>` est servi sous `/assets/client/<f>`.
+  const inv = m.assetInventory;
+  const toUrl = (rec: { path: string }): string => `/assets/client/${path.basename(rec.path)}`;
+
+  let heroMedia: { src: string; alt: string } | null = null;
+  let galleryMedia: { src: string; alt: string }[] = [];
+
+  if (inv) {
+    const usable = usableAssets(inv).filter((a) => a.kind === "image" && a.role !== "logo");
+    const hero = bestAssetFor(inv, "hero") ?? usable[0] ?? null;
+    if (hero && hero.role !== "logo") heroMedia = { src: toUrl(hero), alt: hero.alt };
+    galleryMedia = usable.filter((a) => a !== hero).map((a) => ({ src: toUrl(a), alt: a.alt }));
+  } else {
+    // Sans inventaire (assets bruts), on écarte au moins le logo par son nom.
+    const files = m.providedAssets.filter(
+      (f) => /\.(jpe?g|png|webp|avif)$/i.test(f) && !/logo/i.test(f),
+    );
+    const first = files[0];
+    if (first) {
+      heroMedia = {
+        src: `/assets/client/${first}`,
+        alt: `${m.intent.businessName ?? m.slug} — visuel principal`,
+      };
+    }
+    galleryMedia = files.slice(1).map((f) => ({
+      src: `/assets/client/${f}`,
+      alt: `${m.intent.businessName ?? m.slug} — visuel`,
+    }));
+  }
 
   const data = {
     hero: {
@@ -322,8 +491,9 @@ function writeSiteContent(m: AutopilotMission): { ok: boolean; file: string; err
         title: i.title,
         href: "/realisations",
         meta: i.meta,
-        // Les visuels restants illustrent la collection, dans l'ordre fourni.
-        media: assetUrls[idx + 1] ? { src: assetUrls[idx + 1] as string, alt: i.title } : null,
+        // Les visuels restants illustrent la collection, sans jamais réutiliser
+        // le hero ni le logo.
+        media: galleryMedia[idx] ?? null,
       })),
     },
     conversion: {
@@ -391,10 +561,9 @@ function doTechnicalQa(m: AutopilotMission): AutopilotMission {
 
 function runLoop(startMission: AutopilotMission): AutopilotMission {
   let m = startMission;
-  // Borne dure : la machine a 20 transitions max par invocation (anti-boucle).
-  for (let guard = 0; guard < 20; guard += 1) {
-    if (m.state === "COMPLETE" || m.state === "BLOCKED" || m.state === "WAITING_FOR_APPROVAL")
-      break;
+  // Borne dure : 24 transitions max par invocation (anti-boucle).
+  for (let guard = 0; guard < 24; guard += 1) {
+    if (m.state === "COMPLETE" || m.state === "BLOCKED") break;
 
     m = beginStep(m, m.state, now());
 
@@ -426,7 +595,6 @@ function runLoop(startMission: AutopilotMission): AutopilotMission {
       }
 
       case "RESEARCH": {
-        // Un script ne sait pas chercher sur le web : c'est le travail de l'agent.
         if (m.facts.facts.length === 0) {
           m = endStep(m, { ok: false, notes: ["recherche déléguée à l'agent"] }, now());
           saveMission(m);
@@ -457,16 +625,78 @@ function runLoop(startMission: AutopilotMission): AutopilotMission {
         break;
       }
 
-      case "SITE_BOOTSTRAP":
-        m = doSiteBootstrap(m);
-        if (m.state === "BLOCKED") break;
+      case "ASSET_DISCOVERY": {
+        // CHERCHER D'ABORD : c'est l'agent qui inspecte les sources officielles.
+        if (!m.assetInventory) {
+          m = endStep(m, { ok: false, notes: ["recherche des visuels déléguée à l'agent"] }, now());
+          saveMission(m);
+          emitAgentRequest(m, "ASSET_DISCOVERY");
+        }
+        const inv = m.assetInventory;
+        m = endStep(
+          m,
+          {
+            ok: true,
+            notes: [
+              `${String(inv.assets.length)} média(s) inventorié(s)`,
+              inv.missing.length > 0
+                ? `introuvables : ${inv.missing.join(", ")}`
+                : "rien d'introuvable",
+            ],
+          },
+          now(),
+        );
         m = advance(m, now());
         break;
+      }
+
+      case "ASSET_VALIDATION": {
+        const inv = m.assetInventory as AssetInventory;
+        const issues = validateInventory(inv);
+        const errors = issues.filter((i) => i.severity === "error");
+        const usable = usableAssets(inv);
+        // Les fichiers réellement exploitables alimentent le site.
+        m = {
+          ...m,
+          providedAssets: usable.map((a) => path.basename(a.path)),
+          usage: inv.usage,
+        };
+        // En production, un droit non confirmé bloque.
+        const rights = rightsGate({ usage: inv.usage, unconfirmed: productionBlockers(inv) });
+        if (!rights.pass) {
+          m = endStep(m, { ok: false, notes: [rights.detail ?? rights.message] }, now());
+          m = block(m, "MEDIA_RIGHTS_UNCONFIRMED", now(), rights.message);
+          break;
+        }
+        m = endStep(
+          m,
+          {
+            ok: true,
+            notes: [
+              `${String(usable.length)} média(s) utilisable(s)`,
+              ...errors.map((e) => `écarté : ${e.path} — ${e.message}`),
+            ],
+          },
+          now(),
+        );
+        m = advance(m, now());
+        break;
+      }
 
       case "ART_DIRECTION": {
-        const ad =
-          m.artDirection ??
-          decideArtDirection(m.intent, { hasUsableAssets: m.providedAssets.length > 0 });
+        // La DA est décidée APRÈS avoir vu le matériau réel.
+        const inv = m.assetInventory;
+        const material = inv ? hasVisualMaterial(inv) : m.providedAssets.length > 0;
+        const ad = m.artDirection ?? decideArtDirection(m.intent, { hasUsableAssets: material });
+        const gate = assetGate({
+          imageLedDirection: requiresGeneratedMedia(ad, { hasUsableAssets: material }),
+          hasVisualMaterial: material,
+        });
+        if (!gate.pass) {
+          m = endStep(m, { ok: false, notes: [gate.detail ?? gate.message] }, now());
+          m = block(m, "MEDIA_ASSET_REQUIRED", now(), gate.message);
+          break;
+        }
         m = { ...m, artDirection: ad };
         m = endStep(m, { ok: true, notes: [`concept : ${ad.concept}`, ad.rationale] }, now());
         m = advance(m, now());
@@ -479,54 +709,23 @@ function runLoop(startMission: AutopilotMission): AutopilotMission {
           saveMission(m);
           emitAgentRequest(m, "CONTENT");
         }
-        const written = writeSiteContent(m);
-        m = endStep(
-          m,
-          written.ok
-            ? { ok: true, commands: [], notes: [`contenu écrit dans ${written.file}`] }
-            : { ok: false, notes: [written.error ?? "écriture du contenu impossible"] },
-          now(),
-        );
-        if (!written.ok) {
-          m = block(
-            m,
-            "UNRECOVERABLE_ERROR",
-            now(),
-            "Le contenu n'a pas pu être écrit dans le site.",
-          );
-          break;
-        }
+        m = endStep(m, { ok: true, notes: ["textes fournis par l'agent"] }, now());
         m = advance(m, now());
         break;
       }
 
       case "MEDIA_PLAN": {
-        const ad = m.artDirection;
-        const hasAssets = m.providedAssets.length > 0;
-        const mediaRequired = ad
-          ? requiresGeneratedMedia(ad, { hasUsableAssets: hasAssets })
-          : false;
-        const doctor = runDoctor();
-        const gate = providerGate({
-          mediaRequired,
-          providerAuthenticated: doctor.canGenerateMedia,
-        });
-        if (!gate.pass) {
-          m = endStep(m, { ok: false, notes: [gate.detail ?? gate.message] }, now());
-          m = block(m, "ADMIN_PROVIDER_AUTH_REQUIRED", now());
-          break;
-        }
+        const inv = m.assetInventory;
+        const material = inv ? hasVisualMaterial(inv) : false;
         m = endStep(
           m,
           {
             ok: true,
             notes: [
-              hasAssets
-                ? `${String(m.providedAssets.length)} asset(s) fourni(s) : aucune génération nécessaire`
-                : mediaRequired
-                  ? "médias générés requis"
-                  : "aucun média généré requis",
-              gate.message,
+              material
+                ? `habillage porté par ${String(m.providedAssets.length)} visuel(s) réel(s)`
+                : "aucun visuel : parti-pris éditorial assumé",
+              "aucune génération d'image : coût média 0 €",
             ],
           },
           now(),
@@ -535,54 +734,35 @@ function runLoop(startMission: AutopilotMission): AutopilotMission {
         break;
       }
 
-      case "MEDIA_GENERATION": {
-        if (m.providedAssets.length > 0) {
-          m = endStep(
-            m,
-            { ok: true, notes: ["assets du client utilisés : aucune génération"] },
-            now(),
-          );
+      case "MEDIA_PROCESSING": {
+        // Optimisation RÉELLE des médias importés (sharp/ffmpeg via le pipeline).
+        if (!m.assetsDir || m.providedAssets.length === 0) {
+          m = endStep(m, { ok: true, notes: ["aucun média à optimiser"] }, now());
           m = advance(m, now());
           break;
         }
-        const doctor = runDoctor();
-        if (!doctor.canGenerateMedia) {
-          // Pas de provider : on ne fabrique JAMAIS un substitut cheap.
-          m = endStep(
-            m,
-            { ok: true, notes: ["aucun provider : version éditoriale premium assumée"] },
-            now(),
-          );
-          m = advance(m, now());
-          break;
-        }
-        // Coût : au-dessus du seuil, on demande UNE fois.
-        const gate = spendGate({
-          estimatedTotal: null,
-          currency: "provider",
-          approved: Boolean(opt("--approved")) || argv.includes("--approved"),
-        });
-        if (!gate.pass) {
-          m = endStep(m, { ok: false, notes: [gate.message] }, now());
-          m = block(m, "SPEND_APPROVAL_REQUIRED", now(), gate.message);
-          break;
-        }
-        m = endStep(m, { ok: true, notes: ["génération autorisée"] }, now());
+        const r = exec("pnpm", ["run", "assets:images"], ROOT);
+        m = endStep(
+          m,
+          {
+            ok: true,
+            commands: ["pnpm run assets:images"],
+            notes: [r.ok ? "images optimisées" : "optimisation ignorée (pipeline indisponible)"],
+          },
+          now(),
+        );
         m = advance(m, now());
         break;
       }
 
-      case "MEDIA_QA":
-      case "SITE_BUILD":
-      case "MOBILE_QA": {
-        // Étapes couvertes par TECHNICAL_QA et le media-engine ; tracées ici.
-        m = endStep(m, { ok: true, notes: ["rien à produire à cette étape"] }, now());
+      case "SITE_BUILD": {
+        m = doSiteBuild(m);
+        if (m.state === "BLOCKED") break;
         m = advance(m, now());
         break;
       }
 
       case "VISUAL_QA": {
-        // Le jugement visuel exige de REGARDER : c'est le travail de l'agent.
         if (m.iterations.length === 0) {
           m = endStep(m, { ok: false, notes: ["revue visuelle déléguée à l'agent"] }, now());
           saveMission(m);
@@ -596,11 +776,9 @@ function runLoop(startMission: AutopilotMission): AutopilotMission {
         if (!quality.pass) {
           m = endStep(m, { ok: false, notes: [quality.detail ?? quality.message] }, now());
           if (quality.reason === "QUALITY_NOT_REACHED") {
-            // Plusieurs passes n'ont pas suffi : on le DIT plutôt que de livrer.
             m = block(m, "QUALITY_NOT_REACHED", now());
             break;
           }
-          // Une passe de plus : les défauts relevés doivent d'abord être corrigés.
           saveMission(m);
           emitAgentRequest(m, "VISUAL_QA");
         }
@@ -613,11 +791,34 @@ function runLoop(startMission: AutopilotMission): AutopilotMission {
         break;
       }
 
+      case "MOBILE_QA": {
+        m = doMobileQa(m);
+        if (m.state === "BLOCKED") break;
+        // Une capture mobile réelle est OBLIGATOIRE, et ses constats aussi :
+        // un site qui échoue au mobile n'est pas terminé.
+        const mobile = m.stageReports.find((r) => r.stage === "MOBILE_QA");
+        if (!mobile || !mobile.ok) {
+          const failing = (mobile?.checks ?? [])
+            .filter((c) => !c.ok)
+            .map((c) => `${c.label}${c.detail ? ` (${c.detail})` : ""}`);
+          m = block(
+            m,
+            "QUALITY_NOT_REACHED",
+            now(),
+            failing.length > 0
+              ? `Sur mobile : ${failing.join(" · ")}.`
+              : "Le contrôle mobile n'a pas pu être effectué.",
+          );
+          break;
+        }
+        m = advance(m, now());
+        break;
+      }
+
       case "TECHNICAL_QA": {
         m = doTechnicalQa(m);
         if (m.state === "BLOCKED") break;
-        const failed = m.steps[m.steps.length - 1]?.ok === false;
-        if (failed) {
+        if (m.steps[m.steps.length - 1]?.ok === false) {
           m = block(m, "UNRECOVERABLE_ERROR", now(), "Les vérifications techniques ont échoué.");
           break;
         }
@@ -626,9 +827,6 @@ function runLoop(startMission: AutopilotMission): AutopilotMission {
       }
 
       case "PREVIEW": {
-        // On ne démarre pas de serveur bloquant ici : on donne la commande, que
-        // l'agent lance en tâche de fond. On n'AFFIRME une URL que si un serveur
-        // répond réellement — sinon on donne la marche à suivre.
         const port = Number(opt("--port") ?? "3000");
         const url = `http://localhost:${String(port)}`;
         const probe = spawnSync("curl", ["-s", "-o", "/dev/null", "-m", "2", url]);
@@ -686,7 +884,7 @@ switch (command) {
       console.log(`  ${statusLine(m)}`);
     }
     m = runLoop(m);
-    if (m.state === "BLOCKED" || m.state === "WAITING_FOR_APPROVAL") emitBlocked(m);
+    if (m.state === "BLOCKED") emitBlocked(m);
     console.log("\n" + userReport(m));
     break;
   }
@@ -701,7 +899,7 @@ switch (command) {
     }
     m = runLoop(m);
     saveMission(m);
-    if (m.state === "BLOCKED" || m.state === "WAITING_FOR_APPROVAL") emitBlocked(m);
+    if (m.state === "BLOCKED") emitBlocked(m);
     console.log("\n" + userReport(m));
     break;
   }
@@ -731,6 +929,19 @@ switch (command) {
         );
       }
       updated = { ...m, facts: { facts, notFound: p.notFound ?? [] }, updatedAt: now() };
+    } else if (state === "ASSET_DISCOVERY") {
+      const inv = payload as AssetInventory;
+      // Provenance obligatoire : un média sans source est refusé (rien d'inventé).
+      const bad = (inv.assets ?? []).filter(
+        (a) => a.source !== "EDITORIAL_FALLBACK" && !a.sourceRef?.trim(),
+      );
+      if (bad.length > 0) {
+        die(
+          `${String(bad.length)} média(s) sans provenance — refusé. Chaque visuel doit être sourcé.`,
+          2,
+        );
+      }
+      updated = { ...m, assetInventory: inv, usage: inv.usage ?? m.usage, updatedAt: now() };
     } else if (state === "CONTENT") {
       updated = { ...m, content: payload as AutopilotMission["content"], updatedAt: now() };
     } else if (state === "VISUAL_QA") {
@@ -755,17 +966,8 @@ switch (command) {
     saveMission(updated);
     const after = runLoop(updated);
     saveMission(after);
-    if (after.state === "BLOCKED" || after.state === "WAITING_FOR_APPROVAL") emitBlocked(after);
+    if (after.state === "BLOCKED") emitBlocked(after);
     console.log("\n" + userReport(after));
-    break;
-  }
-
-  case "approve": {
-    const m = requireMission();
-    if (m.state !== "WAITING_FOR_APPROVAL") die("aucune approbation en attente.", 2);
-    const resumed = unblock(m, "MEDIA_GENERATION", now());
-    saveMission(resumed);
-    console.log("  Accord enregistré. Relancez : pnpm ace:autopilot run --approved");
     break;
   }
 
@@ -802,6 +1004,6 @@ switch (command) {
   default:
     die(
       `commande inconnue : ${command}\n` +
-        '  usage : --brief "..." | run | resume | supply | approve | status | report | list',
+        '  usage : --brief "..." | run | resume | supply | status | report | list',
     );
 }

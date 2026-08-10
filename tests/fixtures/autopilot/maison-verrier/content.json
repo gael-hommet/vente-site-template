@@ -1,0 +1,41 @@
+{
+  "hero": {
+    "eyebrow": "Verrerie d'art & vitraux contemporains · Biot",
+    "title": "Maison Verrier",
+    "subtitle": "Depuis 1978, nous soufflons et assemblons à Biot des pièces de verre destinées à durer plus longtemps que nous."
+  },
+  "story": {
+    "heading": "Le verre, la lumière, le temps",
+    "intro": "Chaque pièce naît d'un four, d'une main et d'une contrainte de lumière propre au lieu qui l'accueillera.",
+    "chapters": [
+      {
+        "eyebrow": "01",
+        "title": "Lire la lumière",
+        "body": "Nous commençons par observer comment le jour traverse l'espace : orientation, saisons, heures de passage."
+      },
+      {
+        "eyebrow": "02",
+        "title": "Souffler la matière",
+        "body": "Le verre est travaillé à chaud dans notre atelier de Biot, sans sous-traitance."
+      },
+      {
+        "eyebrow": "03",
+        "title": "Assembler et poser",
+        "body": "L'assemblage au plomb et la pose sont réalisés par l'atelier, du gabarit à la mise en place."
+      }
+    ]
+  },
+  "collection": {
+    "heading": "Réalisations",
+    "intro": "Un aperçu de pièces posées ces dernières années.",
+    "itemLabel": "réalisation",
+    "items": [
+      { "title": "[À CONFIRMER — nom du projet]", "meta": ["[À CONFIRMER — année]", "vitrail"] },
+      { "title": "[À CONFIRMER — nom du projet]", "meta": ["[À CONFIRMER — année]", "verrerie"] }
+    ]
+  },
+  "conversion": {
+    "title": "Parlons de votre projet",
+    "description": "Décrivez-nous le lieu et la lumière : nous revenons vers vous avec une première intention."
+  }
+}

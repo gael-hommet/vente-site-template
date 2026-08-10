@@ -12,7 +12,7 @@ L'utilisateur écrit **une phrase**. ACE fait le reste.
 ```
 
 AUTOPILOT ne remplace rien : il **commande** l'existant (générateur de sites,
-media-engine, providers, tests, build). Il apporte ce qui manquait : une
+media-engine, pipeline d'assets, tests, build). Il apporte ce qui manquait : une
 **machine à états persistante**, des **garde-fous**, et deux niveaux de rapport.
 
 ## Répartition des rôles — honnête et explicite
@@ -24,7 +24,7 @@ si une page est belle. AUTOPILOT ne prétend pas le contraire :
 | --------------------------------------------------- | ------------------------------------ |
 | machine à états, persistance, reprise               | recherche publique sourcée           |
 | exécution des commandes (générateur, build, tests)  | rédaction éditoriale                 |
-| garde-fous (coût, provider, faits, qualité)         | jugement visuel sur captures réelles |
+| garde-fous (visuels, droits, faits, qualité)        | jugement visuel sur captures réelles |
 | direction artistique de base (secteur → parti-pris) | affinage créatif                     |
 | rapports utilisateur / technique                    | —                                    |
 
@@ -34,11 +34,14 @@ Quand le script a besoin de l'agent, il s'arrête avec `NEEDS_AGENT <ÉTAT>` et
 ## Machine à états
 
 ```
-INTAKE → RESEARCH → FACT_CHECK → SITE_BOOTSTRAP → ART_DIRECTION → CONTENT
-       → MEDIA_PLAN → MEDIA_GENERATION → MEDIA_QA → SITE_BUILD
-       → VISUAL_QA → MOBILE_QA → TECHNICAL_QA → PREVIEW → COMPLETE
+INTAKE → RESEARCH → FACT_CHECK → ASSET_DISCOVERY → ASSET_VALIDATION
+       → ART_DIRECTION → CONTENT → MEDIA_PLAN → MEDIA_PROCESSING
+       → SITE_BUILD → VISUAL_QA → MOBILE_QA → TECHNICAL_QA → PREVIEW → COMPLETE
 
-états terminaux : COMPLETE · BLOCKED · WAITING_FOR_APPROVAL
+états terminaux : COMPLETE · BLOCKED
+
+La direction artistique vient APRÈS l'analyse des vrais visuels : on ne décide
+pas d'un parti-pris avant d'avoir vu le matériau.
 ```
 
 L'état est persisté dans `.ace/missions/<id>.json` (gitignoré). Une coupure de
@@ -53,15 +56,40 @@ pnpm ace:autopilot --brief "<phrase>" [--assets <dir>]
 pnpm ace:autopilot status                         # où en est-on ?
 pnpm ace:autopilot run                            # avancer au maximum
 pnpm ace:autopilot supply --state <S> --file <f>  # apport de l'agent
-pnpm ace:autopilot approve                        # accord de dépense
 pnpm ace:resume                                   # reprendre après coupure
 pnpm ace:autopilot report [--technical]
 ```
 
 Codes de sortie : `0` avancé/terminé · `2` usage · `3` besoin de l'agent ·
-`4` bloqué · `5` accord de dépense attendu.
+`4` bloqué.
 
 ## Ce que l'agent doit fournir
+
+### ASSET_DISCOVERY
+
+**CHERCHER D'ABORD, demander seulement si rien n'existe.** Inventaire attendu :
+
+```json
+{
+  "usage": "PRIVATE_DEMO",
+  "assets": [
+    {
+      "path": "atelier-01.jpg",
+      "source": "OFFICIAL_WEBSITE",
+      "sourceRef": "https://exemple.test/atelier",
+      "nature": "REAL",
+      "role": "hero",
+      "kind": "image",
+      "alt": "L'atelier",
+      "rights": "OFFICIAL_PUBLIC_UNCONFIRMED"
+    }
+  ],
+  "missing": ["photo d'équipe"]
+}
+```
+
+Un média **sans provenance est refusé**. Voir
+[ACE-ASSET-SOURCES.md](ACE-ASSET-SOURCES.md).
 
 ### RESEARCH
 
@@ -101,18 +129,19 @@ corriger d'abord. Après `maxVisualIterations`, il bloque en
 
 ## Garde-fous
 
-| Gate          | Bloque quand                               | Résultat                       |
-| ------------- | ------------------------------------------ | ------------------------------ |
-| environnement | `ace:doctor` dit non                       | `ENVIRONMENT_NOT_READY`        |
-| provider      | média sur mesure requis, aucun fournisseur | `ADMIN_PROVIDER_AUTH_REQUIRED` |
-| dépense       | au-dessus du seuil, ou coût inconnu        | `WAITING_FOR_APPROVAL`         |
-| faits         | l'entreprise n'est pas identifiée          | `MISSING_ESSENTIAL_INFO`       |
-| qualité       | score insuffisant après N passes           | `QUALITY_NOT_REACHED`          |
-| déploiement   | **toujours**                               | rien n'est jamais publié       |
+| Gate          | Bloque quand                                   | Résultat                   |
+| ------------- | ---------------------------------------------- | -------------------------- |
+| environnement | `ace:doctor` dit non                           | `ENVIRONMENT_NOT_READY`    |
+| visuels       | parti-pris porté par l'image, aucun média réel | `MEDIA_ASSET_REQUIRED`     |
+| droits        | production avec des droits non confirmés       | `MEDIA_RIGHTS_UNCONFIRMED` |
+| faits         | l'entreprise n'est pas identifiée              | `MISSING_ESSENTIAL_INFO`   |
+| qualité       | score insuffisant après N passes               | `QUALITY_NOT_REACHED`      |
+| déploiement   | **toujours**                                   | rien n'est jamais publié   |
 
-Un fournisseur absent ne produit **jamais** une 3D low-poly de substitution :
-c'est la doctrine anti-low-poly, appliquée jusqu'au bout
-([ACE-ANTI-LOW-POLY.md](ACE-ANTI-LOW-POLY.md)).
+**ACE ne génère aucun média** : aucune API payante, aucun crédit, coût 0 €. S'il
+manque un visuel indispensable, il le DEMANDE — jamais de 3D low-poly ni d'image
+de substitution ([ACE-ANTI-LOW-POLY.md](ACE-ANTI-LOW-POLY.md),
+[ACE-ASSET-SOURCES.md](ACE-ASSET-SOURCES.md)).
 
 ## Direction artistique autonome
 
@@ -130,10 +159,11 @@ pas proposer une recipe qui n'existe pas.
 
 ## Politique
 
-Tout est centralisé dans `src/config/ace-autopilot-policy.ts` : seuils de
-dépense, itérations, fournisseur préféré, et les deux listes explicites de ce
-qu'ACE peut faire seul / ne fera jamais sans demande (pousser, déployer, acheter
-un domaine, inventer une information client).
+Tout est centralisé dans `src/config/ace-autopilot-policy.ts` : comportement
+quand aucun visuel n'existe, itérations visuelles, et les deux listes explicites
+de ce qu'ACE peut faire seul / ne fera jamais sans demande (pousser, déployer,
+acheter un domaine, inventer une information client). **Aucun seuil de dépense :
+ACE ne dépense rien.**
 
 ## Template vs site client
 
