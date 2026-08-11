@@ -3,6 +3,50 @@
 Document **interne au moteur** (élagué à la génération). Versions de la couche
 moteur (`src/ace/core/version.ts`), pas de l'application.
 
+## 0.3.0 — Spatial Cinema Engine
+
+Nouvelle couche : des **images réelles** deviennent un **espace traversé par une
+caméra**, piloté par le scroll. Pas un diaporama, pas un carrousel, pas un fondu.
+
+### Ajouté
+
+- `src/ace/spatial-cinema/` — cœur **pur** (timeline réversible, trajets de
+  caméra, implantation des scènes, stratégie, gate qualité) + runtime WebGL
+  (`DepthMesh`, rig caméra, raccords portail, chapitres, replis).
+- **Profondeur géométrique réelle** : maillage très subdivisé, sommets déplacés
+  en Z par la carte de profondeur dans le vertex shader. Pas un effet CSS.
+- **Raccords spatiaux** : `OCCLUSION`, `PUSH_THROUGH`, `DARK_FRAME`,
+  `GLASS_PASS`, `EDGE_WIPE_SPATIAL`, `DEPTH_WARP`.
+- `decideSpatialStrategy()` — l'Autopilot choisit seul le mode à partir de
+  l'inventaire média réel (aucun questionnaire technique).
+- CLI `ace:spatial:doctor` · `ace:spatial:plan` · `ace:spatial:verify`.
+- Docs : moteur, guide de prise de vue, contrôle qualité.
+- 38 tests dédiés, dont la preuve anti-diaporama sur la **source du shader**.
+
+### Corrigé pendant la mise au point (défauts réels, vus à l'écran)
+
+- Le tier `LITE` **coupait** la 3D en pleine expérience : le voyage s'effondrait
+  en image fixe au milieu du scroll. Désormais LITE **allège** (maillage, DPR) ;
+  le repli éditorial est le dernier cran, pas le premier réflexe.
+- Les scènes étaient espacées d'une constante : la scène d'arrivée apparaissait
+  **au loin, petite, au milieu de la précédente**. Les origines sont maintenant
+  **enchaînées** — la caméra ne saute jamais.
+- Les plans, de taille fixe, laissaient apparaître **un fond vide**. Ils sont
+  désormais taillés sur le **tronc de vision réel** (portrait mobile inclus).
+- La bascule entre deux scènes s'étalait sur tout le raccord : elle est
+  **confinée au pic d'occlusion**, écran masqué à plus de 70 %.
+- Une scène qui chargeait ses textures **vidait le cadre** : frontière de
+  suspense par scène + préchargement de la scène suivante.
+- L'Autopilot comptait les **cartes de profondeur comme des scènes**.
+
+### Limites assumées
+
+`multiview-candidate` (reconstruction depuis des vues qui se recouvrent) est
+**annoncé, pas réalisé**. Aucune estimation de profondeur n'est embarquée : sans
+carte fournie, la scène est refusée (`DEPTH_MAP_REQUIRED`) — jamais simulée.
+
+Coût média externe : **0 €**.
+
 ## 0.2.2 — Free Media Autopilot (coût média 0 €)
 
 **Correction de paradigme.** La 0.2.1 supposait qu'ACE devait _générer_ ses

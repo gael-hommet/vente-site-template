@@ -10,7 +10,7 @@ export const ACE_NAME = "Aurexia Cinematic Engine";
 export const ACE_SHORT_NAME = "ACE";
 
 /** Semver of the engine layer itself (not the app). Bump on contract changes. */
-export const ACE_VERSION = "0.2.2";
+export const ACE_VERSION = "0.3.0";
 
 /** The engine modules and what each one owns. Displayed on /ace-lab. */
 export const ACE_MODULES = {
