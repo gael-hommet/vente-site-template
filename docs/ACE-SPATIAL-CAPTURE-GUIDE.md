@@ -10,13 +10,13 @@ ce qui existe.
 
 ## Ce que vous fournissez → ce que ça donne
 
-| Vous avez | Vous obtenez | Condition |
-| --- | --- | --- |
-| **1 photo** | une scène en profondeur : la caméra s'y déplace, le relief se creuse | il faut **sa carte de profondeur** |
-| **4 photos d'endroits différents** (sans recouvrement) | un **voyage** : 4 espaces enchaînés sans coupure | une carte de profondeur **par photo** |
-| **20 à 100 vues qui se recouvrent** (ou une vidéo continue) | candidat à une reconstruction 3D | **non réalisé par ACE 0.3** — signalé, jamais simulé |
-| **un fichier `.glb` / `.gltf`** | de la vraie 3D navigable | — |
-| **une vraie vidéo continue** | un défilement vidéo au scroll (ScrollVideo) | — |
+| Vous avez                                                   | Vous obtenez                                                         | Condition                                            |
+| ----------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- |
+| **1 photo**                                                 | une scène en profondeur : la caméra s'y déplace, le relief se creuse | il faut **sa carte de profondeur**                   |
+| **4 photos d'endroits différents** (sans recouvrement)      | un **voyage** : 4 espaces enchaînés sans coupure                     | une carte de profondeur **par photo**                |
+| **20 à 100 vues qui se recouvrent** (ou une vidéo continue) | candidat à une reconstruction 3D                                     | **non réalisé par ACE 0.3** — signalé, jamais simulé |
+| **un fichier `.glb` / `.gltf`**                             | de la vraie 3D navigable                                             | —                                                    |
+| **une vraie vidéo continue**                                | un défilement vidéo au scroll (ScrollVideo)                          | —                                                    |
 
 ## La carte de profondeur est obligatoire
 

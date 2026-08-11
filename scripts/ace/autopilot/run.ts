@@ -26,6 +26,8 @@ import {
   block,
   createMission,
   decideArtDirection,
+  decideSpatialStrategy,
+  explainSpatialDecision,
   detectIntent,
   endStep,
   assetGate,
@@ -43,6 +45,7 @@ import {
   type AutopilotMission,
   type AutopilotState,
   type FactRegistry,
+  type SpatialStrategyRecord,
   type StageReport,
 } from "@/ace/autopilot";
 import {
@@ -697,8 +700,34 @@ function runLoop(startMission: AutopilotMission): AutopilotMission {
           m = block(m, "MEDIA_ASSET_REQUIRED", now(), gate.message);
           break;
         }
-        m = { ...m, artDirection: ad };
-        m = endStep(m, { ok: true, notes: [`concept : ${ad.concept}`, ad.rationale] }, now());
+        // ACE 0.3 — la stratégie SPATIALE se décide ici, en regardant le
+        // matériau réel. L'utilisateur n'a répondu à aucune question technique :
+        // c'est le nombre de vraies photos et la présence de cartes de
+        // profondeur qui déterminent le mode.
+        const spatialDecision = inv ? decideSpatialStrategy(inv) : null;
+        const spatial: SpatialStrategyRecord | null = spatialDecision
+          ? {
+              // `null` = aucune expérience spatiale possible : on le nomme.
+              mode: spatialDecision.mode ?? "none",
+              explanation: explainSpatialDecision(spatialDecision),
+              images: spatialDecision.images,
+              missing: spatialDecision.missing,
+            }
+          : null;
+        m = { ...m, artDirection: ad, spatial };
+        m = endStep(
+          m,
+          {
+            ok: true,
+            notes: [
+              `concept : ${ad.concept}`,
+              ad.rationale,
+              ...(spatial ? [`spatial : ${spatial.mode} — ${spatial.explanation}`] : []),
+              ...(spatial?.missing ?? []),
+            ],
+          },
+          now(),
+        );
         m = advance(m, now());
         break;
       }

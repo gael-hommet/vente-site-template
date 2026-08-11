@@ -129,7 +129,14 @@ describe("ANTI-SLIDESHOW — la caméra se déplace réellement", () => {
   it("la bascule entre deux scènes se produit dans l'obscurité, jamais en fondu visible", () => {
     // Au croisement (t = 0.5) les deux opacités valent 0.5 : c'est le seul
     // instant où un fondu pourrait se voir. L'écran doit alors être masqué.
-    for (const type of ["OCCLUSION", "PUSH_THROUGH", "DARK_FRAME", "GLASS_PASS", "DEPTH_WARP", "EDGE_WIPE_SPATIAL"]) {
+    for (const type of [
+      "OCCLUSION",
+      "PUSH_THROUGH",
+      "DARK_FRAME",
+      "GLASS_PASS",
+      "DEPTH_WARP",
+      "EDGE_WIPE_SPATIAL",
+    ]) {
       // Balayage fin : PARTOUT où les deux scènes coexistent, l'écran est masqué.
       for (let t = 0; t <= 1.0001; t += 0.01) {
         const bothVisible = Math.min(outgoingOpacity(t), incomingOpacity(t));
@@ -310,9 +317,7 @@ describe("Caméra — primitives cinématiques", () => {
   });
 
   it("l'assombrissement de traversée dépend du type de transition", () => {
-    expect(transitionDarken("DARK_FRAME", 0.5)).toBeGreaterThan(
-      transitionDarken("OCCLUSION", 0.5),
-    );
+    expect(transitionDarken("DARK_FRAME", 0.5)).toBeGreaterThan(transitionDarken("OCCLUSION", 0.5));
     expect(transitionDarken("DARK_FRAME", 0)).toBeCloseTo(0, 3);
   });
 });

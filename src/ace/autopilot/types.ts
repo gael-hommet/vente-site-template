@@ -170,6 +170,11 @@ export interface AutopilotMission {
   blockedMessage: string | null;
   facts: FactRegistry;
   artDirection: ArtDirection | null;
+  /**
+   * Stratégie spatiale retenue (ACE 0.3), décidée à partir du matériau RÉEL.
+   * `null` tant que les médias n'ont pas été inventoriés.
+   */
+  spatial: SpatialStrategyRecord | null;
   /** Chemin du manifeste média, s'il y en a un. */
   mediaManifestPath: string | null;
   /**
@@ -209,6 +214,20 @@ export interface SiteContentDraft {
     items: { title: string; meta: string[] }[];
   };
   conversion: { title: string; description: string };
+}
+
+/**
+ * Trace de la décision spatiale (ACE 0.3). Sérialisable : elle vit dans
+ * `.ace/missions/` et survit à une reprise.
+ */
+export interface SpatialStrategyRecord {
+  mode: "depth-scene" | "hybrid-spatial" | "real-3d" | "multiview-candidate" | "none";
+  /** Phrase destinée à l'utilisateur, sans jargon. */
+  explanation: string;
+  /** Images retenues pour le voyage. */
+  images: string[];
+  /** Ce qui manque pour aller plus loin (jamais comblé par une invention). */
+  missing: string[];
 }
 
 /** Rapport d'une étape réellement exécutée (SITE_BUILD, MOBILE_QA). */

@@ -12,12 +12,16 @@ import { execSync } from "node:child_process";
  */
 
 const checks = [];
-const add = (name, ok, detail, blocking = false) =>
-  checks.push({ name, ok, detail, blocking });
+const add = (name, ok, detail, blocking = false) => checks.push({ name, ok, detail, blocking });
 
 // 1. Le moteur de rendu est-il là ?
 for (const pkg of ["three", "@react-three/fiber", "@react-three/drei", "gsap"]) {
-  add(pkg, existsSync(`node_modules/${pkg}`), existsSync(`node_modules/${pkg}`) ? "présent" : "absent", true);
+  add(
+    pkg,
+    existsSync(`node_modules/${pkg}`),
+    existsSync(`node_modules/${pkg}`) ? "présent" : "absent",
+    true,
+  );
 }
 
 // 2. Fabrication locale d'images/cartes de profondeur de test (coût 0 €).
@@ -56,7 +60,9 @@ for (const c of checks) {
 }
 
 if (blocking.length > 0) {
-  console.log(`\n${String(blocking.length)} élément(s) indispensable(s) manquant(s). Lancez « pnpm install ».\n`);
+  console.log(
+    `\n${String(blocking.length)} élément(s) indispensable(s) manquant(s). Lancez « pnpm install ».\n`,
+  );
   process.exit(1);
 }
 console.log("\nPrêt : le moteur spatial peut tourner (rendu réel, coût externe nul).\n");

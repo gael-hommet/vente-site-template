@@ -56,6 +56,7 @@ z = +2.80 → +2.15 → +1.90 → +1.45 → +0.30 → +0.68 : un seul voyage, sa
 `EDGE_WIPE_SPATIAL` · `DEPTH_WARP`.
 
 Deux mécanismes interdisent le fondu :
+
 1. **Origines enchaînées** — la caméra finit une scène là où commence la
    suivante, donc la scène d'arrivée est déjà à sa distance de cadrage.
 2. **Bascule confinée au pic d'occlusion** (12 % du raccord) : partout où les
@@ -88,7 +89,8 @@ shader** contenant l'échantillonnage de profondeur et le déplacement des somme
 sur géométrie subdivisée · caméra sans saut entre scènes · plan couvrant le cadre
 de 0,46 à 2,4 de rapport · masquage > 70 % partout où deux scènes coexistent ·
 un manifeste « diaporama » est **REJETÉ** (`NO_CAMERA_MOVEMENT` + `FLAT_TEXTURE`
-+ `HARD_CUT`).
+
+- `HARD_CUT`).
 
 **Navigateur réel** — 45 positions balayées, 8 points capturés desktop + mobile.
 À chaque point : `canvas = 1`, `img = 0` (aucune image ne remplace le rendu),
@@ -113,7 +115,7 @@ progressive en 3 crans avant tout repli · **une seule** scène suivante
 préchargée · seules les scènes actives sont montées · frontière de suspense par
 scène. Aucune erreur console sur l'ensemble des balayages desktop et mobile.
 
-*Non mesuré :* FPS chiffré et profil mémoire sur GPU réel — l'environnement de
+_Non mesuré :_ FPS chiffré et profil mémoire sur GPU réel — l'environnement de
 vérification est un rendu **logiciel** (SwiftShader), non représentatif.
 
 ## 13. Générateur

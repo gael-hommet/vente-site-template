@@ -6,6 +6,8 @@ import {
   depthMapFor,
 } from "@/ace/autopilot/spatial-decision";
 import type { AssetInventory, AssetRecord } from "@/ace/media-engine/asset-source";
+import { createMission, userReport } from "@/ace/autopilot";
+import { detectIntent } from "@/ace/autopilot/intent";
 
 /**
  * ACE 0.3 — l'Autopilot choisit SEUL la stratégie spatiale.
@@ -28,7 +30,10 @@ const asset = (over: Partial<AssetRecord> = {}): AssetRecord => ({
   ...over,
 });
 
-const inventory = (assets: AssetRecord[], usage: AssetInventory["usage"] = "PRIVATE_DEMO"): AssetInventory => ({
+const inventory = (
+  assets: AssetRecord[],
+  usage: AssetInventory["usage"] = "PRIVATE_DEMO",
+): AssetInventory => ({
   usage,
   assets,
   missing: [],
@@ -60,7 +65,10 @@ describe("Autopilot — stratégie spatiale", () => {
   });
 
   it("un vrai modèle 3D l'emporte sur tout le reste", () => {
-    const inv = inventory([asset({ path: "/a/salle.jpg" }), asset({ path: "/a/lieu.glb", kind: "image" })]);
+    const inv = inventory([
+      asset({ path: "/a/salle.jpg" }),
+      asset({ path: "/a/lieu.glb", kind: "image" }),
+    ]);
     expect(decideSpatialStrategy(inv).mode).toBe("real-3d");
   });
 
@@ -110,5 +118,48 @@ describe("Autopilot — stratégie spatiale", () => {
     expect(depthMapFor(asset({ path: "/a/salle.jpg" }), inv)).toBe("/a/salle.depth.png");
     expect(depthMapFor(asset({ path: "/a/bar.jpg" }), inv)).toBe("/a/bar-depth.png");
     expect(depthMapFor(asset({ path: "/a/seul.jpg" }), inv)).toBeNull();
+  });
+
+  it("la décision est EXPOSÉE par le barrel Autopilot (intégration, pas module orphelin)", async () => {
+    const mod = await import("@/ace/autopilot");
+    expect(typeof mod.decideSpatialStrategy).toBe("function");
+    expect(typeof mod.explainSpatialDecision).toBe("function");
+  });
+
+  it("une mission porte la décision spatiale et la formule sans jargon", () => {
+    const brief = "Transforme ces quatre images en visite immersive.";
+    const mission = createMission({
+      id: "m1",
+      brief,
+      intent: detectIntent(brief),
+      slug: "visite",
+      now: "2026-08-11T00:00:00.000Z",
+    });
+    // Le champ existe dès la création : la reprise après coupure le conserve.
+    expect(mission.spatial).toBeNull();
+
+    const inv = inventory(
+      ["salle", "bar", "terrasse", "cave"].flatMap((n) => [
+        asset({ path: `/a/${n}.jpg` }),
+        asset({ path: `/a/${n}.depth.png` }),
+      ]),
+    );
+    const d = decideSpatialStrategy(inv);
+    const withSpatial = {
+      ...mission,
+      state: "COMPLETE" as const,
+      targetDir: "/tmp/visite",
+      spatial: {
+        mode: d.mode ?? ("none" as const),
+        explanation: explainSpatialDecision(d),
+        images: d.images,
+        missing: d.missing,
+      },
+    };
+
+    // Le rapport utilisateur parle du résultat, jamais de WebGL ni de depth map.
+    const report = userReport(withSpatial);
+    expect(report).toContain("espaces traversés par une caméra");
+    expect(report).not.toMatch(/WebGL|depth map|shader|hybrid-spatial/i);
   });
 });

@@ -36,7 +36,12 @@ export const SPATIAL_FIXTURE: SpatialManifest = {
         occlusionAnchor: { x: 0.5, y: 0.6 },
         direction: "forward",
         anchors: [
-          { sceneA: { x: 0.5, y: 0.55 }, sceneB: { x: 0.5, y: 0.5 }, importance: 1, label: "ouverture" },
+          {
+            sceneA: { x: 0.5, y: 0.55 },
+            sceneB: { x: 0.5, y: 0.5 },
+            importance: 1,
+            label: "ouverture",
+          },
         ],
       },
       alt: "Vue d'approche : premier plan proche, fond lointain.",
@@ -56,7 +61,12 @@ export const SPATIAL_FIXTURE: SpatialManifest = {
         occlusionAnchor: { x: 0.5, y: 0.5 },
         direction: "forward",
         anchors: [
-          { sceneA: { x: 0.5, y: 0.5 }, sceneB: { x: 0.5, y: 0.48 }, importance: 1, label: "passage" },
+          {
+            sceneA: { x: 0.5, y: 0.5 },
+            sceneB: { x: 0.5, y: 0.48 },
+            importance: 1,
+            label: "passage",
+          },
         ],
       },
       alt: "Seuil : la caméra franchit une ouverture.",
@@ -94,7 +104,18 @@ export const SPATIAL_FIXTURE: SpatialManifest = {
   chapters: [
     { at: 0, eyebrow: "01", title: "L'approche", body: "La caméra avance : le relief se creuse." },
     { at: 0.3, eyebrow: "02", title: "Le seuil", body: "On traverse l'ouverture, sans coupure." },
-    { at: 0.55, eyebrow: "03", title: "L'intérieur", side: "right", body: "Un travelling révèle le volume." },
-    { at: 0.82, eyebrow: "04", title: "L'ouverture", body: "Le regard se dégage, le mouvement se pose." },
+    {
+      at: 0.55,
+      eyebrow: "03",
+      title: "L'intérieur",
+      side: "right",
+      body: "Un travelling révèle le volume.",
+    },
+    {
+      at: 0.82,
+      eyebrow: "04",
+      title: "L'ouverture",
+      body: "Le regard se dégage, le mouvement se pose.",
+    },
   ],
 };

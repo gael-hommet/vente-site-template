@@ -18,7 +18,9 @@ export function SpatialCinemaLab() {
   const debug = params.get("spatialDebug") === "1";
   const tierParam = params.get("spatialTier")?.toUpperCase();
   const pin =
-    tierParam === "ULTRA" || tierParam === "BALANCED" || tierParam === "LITE" ? tierParam : undefined;
+    tierParam === "ULTRA" || tierParam === "BALANCED" || tierParam === "LITE"
+      ? tierParam
+      : undefined;
   // Banc de test : supprime l'inertie du scrub pour capturer un point précis.
   const instantScrub = params.get("spatialScrub") === "0";
 

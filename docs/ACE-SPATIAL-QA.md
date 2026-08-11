@@ -7,11 +7,11 @@ Une expérience spatiale ne se valide **jamais** sur un build vert. Il faut
 
 ## 1. Verdicts
 
-| Verdict | Signification |
-| --- | --- |
-| `REJECT` | un défaut mesurable existe : l'expérience ne part pas |
+| Verdict           | Signification                                                    |
+| ----------------- | ---------------------------------------------------------------- |
+| `REJECT`          | un défaut mesurable existe : l'expérience ne part pas            |
 | `REVIEW_REQUIRED` | rien de mesurable à redire, **mais personne n'a encore regardé** |
-| `PASS` | mesures propres **+ revue visuelle réelle** confirmée |
+| `PASS`            | mesures propres **+ revue visuelle réelle** confirmée            |
 
 `pnpm ace:spatial:verify` ne peut **pas** délivrer `PASS` : une ligne de commande
 ne voit rien. Le maximum atteignable en CLI est `REVIEW_REQUIRED`.
@@ -19,16 +19,16 @@ ne voit rien. Le maximum atteignable en CLI est `REVIEW_REQUIRED`.
 
 ## 2. Motifs de refus mesurables
 
-| Violation | Ce qui la déclenche |
-| --- | --- |
-| `NO_CAMERA_MOVEMENT` | la caméra ne bouge pas — c'est un diaporama |
-| `FLAT_TEXTURE` | relief nul : un plan plat texturé |
-| `CROSSFADE_ONLY` | raccord non spatial |
-| `HARD_CUT` | raccord absent ou trop bref |
-| `DISCONTINUOUS_DIRECTION` | la caméra pivote de plus de 45° au raccord |
-| `EXCESSIVE_PARALLAX` | amplitude > 2,2 : le maillage va se trouer |
-| `BROKEN_TIMELINE` | trou, inversion ou bornes incohérentes |
-| `DEPTH_MAP_MISSING` | profondeur absente : la scène ne peut pas être spatiale |
+| Violation                 | Ce qui la déclenche                                     |
+| ------------------------- | ------------------------------------------------------- |
+| `NO_CAMERA_MOVEMENT`      | la caméra ne bouge pas — c'est un diaporama             |
+| `FLAT_TEXTURE`            | relief nul : un plan plat texturé                       |
+| `CROSSFADE_ONLY`          | raccord non spatial                                     |
+| `HARD_CUT`                | raccord absent ou trop bref                             |
+| `DISCONTINUOUS_DIRECTION` | la caméra pivote de plus de 45° au raccord              |
+| `EXCESSIVE_PARALLAX`      | amplitude > 2,2 : le maillage va se trouer              |
+| `BROKEN_TIMELINE`         | trou, inversion ou bornes incohérentes                  |
+| `DEPTH_MAP_MISSING`       | profondeur absente : la scène ne peut pas être spatiale |
 
 ## 3. Motifs de refus visuels (il faut regarder)
 

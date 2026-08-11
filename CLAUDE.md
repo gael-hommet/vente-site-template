@@ -19,6 +19,7 @@ Déclencheurs (langage naturel, aucune commande à connaître pour l'utilisateur
 > « Fais-moi un site premium pour ce restaurant : https://… »
 > « Crée un site pour le cabinet de mon père. Moderne et rassurant. »
 > « Refais complètement ce site. » · « Fais une démo privée pour cette entreprise. »
+> « Transforme ces quatre images en visite immersive. » (→ Spatial Cinema)
 
 L'utilisateur peut être **totalement non technique**. Il ne doit jamais avoir à
 connaître pnpm, Next.js, ffmpeg, WebGL, les tiers de qualité ni les commandes
@@ -83,6 +84,7 @@ Détails : `docs/ACE-AUTOPILOT.md`.
 - `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm test:e2e` · `pnpm test:a11y`.
 - `pnpm audit:site` · `pnpm assets:{audit,images,video,models,all}`.
 - Autopilot : `pnpm ace:doctor` · `pnpm ace:autopilot` · `pnpm ace:resume`.
+- Spatial : `pnpm ace:spatial:doctor` · `pnpm ace:spatial:plan` · `pnpm ace:spatial:verify`.
 - Skills Claude Code : `/build-site` · `/preview-site` · `/audit-site` · `/finalize-site` · `/ingest-assets`.
 
 ## Loi de séparation des animations (non négociable)
@@ -97,6 +99,32 @@ Détails : `docs/ACE-AUTOPILOT.md`.
 - **Jamais de WebGL en SSR.** Scènes lourdes en `next/dynamic({ ssr: false })`.
 - Toujours une **WebGL boundary + fallback** image/vidéo. Aucun contenu ne doit _exiger_ WebGL pour être lisible.
 - Tiers **ULTRA / BALANCED / LITE** (détection device + reduced-motion + save-data). DPR adaptatif, cull/pause hors écran.
+
+## Spatial Cinema (ACE 0.3) — images → espace traversé
+
+Quand l'utilisateur demande une **visite**, une **immersion**, un **parcours dans
+un lieu**, ACE choisit **seul** la stratégie — aucun questionnaire technique :
+
+| Matière réellement disponible                     | Mode                                  |
+| ------------------------------------------------- | ------------------------------------- |
+| un `.glb` / `.gltf`                               | `real-3d`                             |
+| plusieurs photos **+ leurs cartes de profondeur** | `hybrid-spatial`                      |
+| une photo **+ sa carte de profondeur**            | `depth-scene`                         |
+| rien d'exploitable                                | page éditoriale — **aucune promesse** |
+
+`decideSpatialStrategy(inventory)` (`src/ace/autopilot/spatial-decision.ts`) est
+appelé à l'étape `ART_DIRECTION`, une fois le matériau réel inventorié.
+
+**La carte de profondeur est obligatoire et n'est JAMAIS inventée.** Absente, la
+scène est refusée (`DEPTH_MAP_REQUIRED`) et la page reste éditoriale : mieux vaut
+une page honnête qu'un faux relief. Nommage reconnu : `salle.jpg` +
+`salle.depth.png` (ou `salle-depth.png`).
+
+**Jamais un diaporama** : ni fondu, ni carrousel, ni remplacement d'image. Le
+scroll pilote une **caméra** dans une géométrie réellement déplacée en Z.
+
+Détails : `docs/ACE-SPATIAL-CINEMA.md` · prise de vue :
+`docs/ACE-SPATIAL-CAPTURE-GUIDE.md` · contrôle : `docs/ACE-SPATIAL-QA.md`.
 
 ## Responsive
 

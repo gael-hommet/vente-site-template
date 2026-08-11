@@ -18,6 +18,7 @@ export type {
   MissionStep,
   QualityIteration,
   SiteContentDraft,
+  SpatialStrategyRecord,
   StageReport,
 } from "./types";
 export { AUTOPILOT_STATES, TERMINAL_STATES } from "./types";
@@ -60,5 +61,15 @@ export {
 } from "./gates";
 
 export { decideArtDirection, requiresGeneratedMedia, PROFILED_SECTORS } from "./art-direction";
+
+export {
+  decideSpatialStrategy,
+  explainSpatialDecision,
+  spatialCandidates,
+  depthMapFor,
+  hasRealModel,
+  isDepthMapPath,
+  type AutopilotSpatialDecision,
+} from "./spatial-decision";
 
 export { userReport, technicalReport, statusLine } from "./report";

@@ -11,12 +11,12 @@ téléchargé.
 
 ## 1. Ce que le moteur fait réellement
 
-| Mode | Matière nécessaire | État en 0.3 |
-| --- | --- | --- |
-| `depth-scene` | 1 photo **+ sa carte de profondeur** | **fonctionnel** |
-| `hybrid-spatial` | plusieurs photos, chacune avec sa profondeur | **fonctionnel** |
-| `real-3d` | un `.glb` / `.gltf` | délégué aux scènes R3F existantes |
-| `multiview-candidate` | 20–100 vues qui se recouvrent | **non réalisé** — signalé, jamais simulé |
+| Mode                  | Matière nécessaire                           | État en 0.3                              |
+| --------------------- | -------------------------------------------- | ---------------------------------------- |
+| `depth-scene`         | 1 photo **+ sa carte de profondeur**         | **fonctionnel**                          |
+| `hybrid-spatial`      | plusieurs photos, chacune avec sa profondeur | **fonctionnel**                          |
+| `real-3d`             | un `.glb` / `.gltf`                          | délégué aux scènes R3F existantes        |
+| `multiview-candidate` | 20–100 vues qui se recouvrent                | **non réalisé** — signalé, jamais simulé |
 
 La profondeur n'est **pas** un effet CSS : chaque image habille un **maillage
 très subdivisé** dont les sommets sont **déplacés en Z** dans le vertex shader.
@@ -51,15 +51,16 @@ Réutilise l'existant plutôt que de le dupliquer : `WebGLBoundary`,
 ```ts
 const manifest: SpatialManifest = {
   mode: "hybrid-spatial",
-  poster: "/media/salle.jpg",       // repli sans WebGL / reduced-motion
+  poster: "/media/salle.jpg", // repli sans WebGL / reduced-motion
   alt: "Visite de la salle principale",
-  length: 8,                        // écrans de scroll
+  length: 8, // écrans de scroll
   scenes: [
     {
       id: "approche",
       image: "/media/salle.jpg",
       depthMap: "/media/salle.depth.png",
-      start: 0, end: 0.28,
+      start: 0,
+      end: 0.28,
       camera: cameraPathFor("dolly-in", vec3(0, 0, 2.8)),
       depth: { strength: 1.15, near: 1, far: 0 },
       transitionOut: { type: "OCCLUSION", duration: 0.05 },

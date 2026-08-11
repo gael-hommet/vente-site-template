@@ -23,6 +23,10 @@ function deliveredItems(mission: AutopilotMission): string[] {
   if (mission.artDirection && mission.artDirection.motionIntensity !== "none") {
     items.push("des animations au défilement");
   }
+  // ACE 0.3 — la visite spatiale, dite sans jargon.
+  if (mission.spatial && mission.spatial.mode !== "none") {
+    items.push(mission.spatial.explanation);
+  }
   if (mission.mediaManifestPath) items.push("des visuels produits et contrôlés");
   items.push("un formulaire de contact fonctionnel");
   items.push("les pages essentielles (accueil, présentation, contact, mentions légales)");
@@ -31,7 +35,11 @@ function deliveredItems(mission: AutopilotMission): string[] {
 
 /** Points à confirmer : ce qu'ACE n'a pas pu vérifier (jamais inventé). */
 function pendingConfirmations(mission: AutopilotMission): string[] {
-  return mission.facts.notFound.map((k) => `${k} (laissé à confirmer, rien n'a été inventé)`);
+  return [
+    ...mission.facts.notFound.map((k) => `${k} (laissé à confirmer, rien n'a été inventé)`),
+    // Ce qui manquait pour aller plus loin — jamais comblé par une invention.
+    ...(mission.spatial?.missing ?? []),
+  ];
 }
 
 /**

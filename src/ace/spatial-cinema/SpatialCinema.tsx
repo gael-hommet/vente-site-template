@@ -83,7 +83,11 @@ function SpatialCameraRig({ manifest, stateRef, pointer, reduced, debug, origins
     const pz = origin[2] + cam.position.z;
 
     camera.position.set(px, py, pz);
-    target.current.set(origin[0] + cam.target.x, origin[1] + cam.target.y, origin[2] + cam.target.z);
+    target.current.set(
+      origin[0] + cam.target.x,
+      origin[1] + cam.target.y,
+      origin[2] + cam.target.z,
+    );
     camera.lookAt(target.current);
 
     if (camera instanceof THREE.PerspectiveCamera && camera.fov !== cam.fov) {
@@ -187,13 +191,15 @@ interface ScenesProps {
 
 /** Monte les scènes actives et pilote leurs uniformes au fil du scroll. */
 function SpatialScenes({ manifest, stateRef, segments, origins }: ScenesProps) {
-  const [render, setRender] = React.useState<{ opacity: number[]; darken: number[]; visible: boolean[] }>(
-    () => ({
-      opacity: manifest.scenes.map((_, i) => (i === 0 ? 1 : 0)),
-      darken: manifest.scenes.map(() => 0),
-      visible: manifest.scenes.map((_, i) => i === 0),
-    }),
-  );
+  const [render, setRender] = React.useState<{
+    opacity: number[];
+    darken: number[];
+    visible: boolean[];
+  }>(() => ({
+    opacity: manifest.scenes.map((_, i) => (i === 0 ? 1 : 0)),
+    darken: manifest.scenes.map(() => 0),
+    visible: manifest.scenes.map((_, i) => i === 0),
+  }));
 
   useFrame(() => {
     const state = stateRef.current;
@@ -282,7 +288,10 @@ export type SpatialStrain = 0 | 1 | 2 | 3;
 export const STRAIN_FALLBACK: SpatialStrain = 3;
 
 /** Subdivisions réellement utilisées, tier ET charge mesurée confondus. */
-export function spatialSegments(tier: "ULTRA" | "BALANCED" | "LITE", strain: SpatialStrain): number {
+export function spatialSegments(
+  tier: "ULTRA" | "BALANCED" | "LITE",
+  strain: SpatialStrain,
+): number {
   const base = segmentsForTier(tier);
   const factor = strain === 0 ? 1 : strain === 1 ? 0.66 : 0.45;
   return Math.max(48, Math.round((base * factor) / 2) * 2);
@@ -444,7 +453,7 @@ export function SpatialCinema({
           <WebGLBoundary fallback={{ poster: manifest.poster, alt: manifest.alt }}>
             <ThreeCanvas
               className="h-full w-full"
-            camera={{ position: [0, 0, 2.6], fov: 48 }}
+              camera={{ position: [0, 0, 2.6], fov: 48 }}
               dpr={spatialDpr(strain)}
               noPerfGuard
             >

@@ -132,6 +132,7 @@ export function createMission(input: {
     blockedMessage: null,
     facts: { facts: [], notFound: [] },
     artDirection: null,
+    spatial: null,
     mediaManifestPath: null,
     iterations: [],
     stageReports: [],

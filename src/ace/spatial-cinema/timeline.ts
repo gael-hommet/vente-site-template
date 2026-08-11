@@ -91,9 +91,7 @@ export function resolveTimeline(manifest: SpatialManifest, rawProgress: number):
     };
   }
 
-  const activeScenes = transition
-    ? [transition.fromIndex, transition.toIndex]
-    : [sceneIndex];
+  const activeScenes = transition ? [transition.fromIndex, transition.toIndex] : [sceneIndex];
 
   return { progress, sceneIndex, localProgress, transition, activeScenes };
 }

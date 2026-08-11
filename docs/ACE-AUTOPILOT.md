@@ -44,6 +44,13 @@ La direction artistique vient APRÈS l'analyse des vrais visuels : on ne décide
 pas d'un parti-pris avant d'avoir vu le matériau.
 ```
 
+`ART_DIRECTION` décide aussi la **stratégie spatiale** (ACE 0.3) via
+`decideSpatialStrategy()` : un `.glb` → 3D réelle ; plusieurs photos avec leurs
+cartes de profondeur → voyage `hybrid-spatial` ; une seule → `depth-scene` ;
+rien d'exploitable → page éditoriale. La décision est enregistrée sur la mission
+(`mission.spatial`), donc conservée par `pnpm ace:resume`. Une carte de
+profondeur absente n'est **jamais** inventée. Voir `ACE-SPATIAL-CINEMA.md`.
+
 L'état est persisté dans `.ace/missions/<id>.json` (gitignoré). Une coupure de
 session ne fait **jamais** repartir de zéro : `pnpm ace:resume` reprend à
 l'étape suivant la dernière étape **réussie**.

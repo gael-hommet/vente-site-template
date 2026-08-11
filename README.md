@@ -29,6 +29,13 @@ voulez.** Le reste appartient à ACE.
 
    > Fais-moi un site premium pour ce restaurant : https://exemple.fr
 
+   Ou, pour une **visite immersive** à partir de vos photos :
+
+   > Transforme ces quatre images en visite immersive.
+
+   ACE choisit seul comment les mettre en scène (voir
+   `docs/ACE-SPATIAL-CAPTURE-GUIDE.md` pour savoir quoi photographier).
+
    ou :
 
    > Crée un site pour le cabinet de mon père. Moderne, rassurant et classe.
