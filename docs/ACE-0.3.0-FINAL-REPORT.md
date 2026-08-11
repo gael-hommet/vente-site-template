@@ -120,11 +120,20 @@ vérification est un rendu **logiciel** (SwiftShader), non représentatif.
 
 ## 13. Générateur
 
-`public/ace-lab`, `fixture.ts`, le test moteur et les trois docs spatiales sont
+`public/ace-lab`, `fixture.ts`, les tests moteur et les trois docs spatiales sont
 élagués. Le **runtime** n'est conservé que si le site s'en sert réellement
 (inspection du code livré) ; sinon `src/ace/spatial-cinema` est retiré et les
-commandes `ace:spatial:*` disparaissent de `package.json`. Test de non-régression
-dans `tests/unit/ace-generator-cli.test.ts`, exécuté contre le contenu commité.
+commandes `ace:spatial:*` disparaissent de `package.json`.
+
+**Vérifié en générant réellement un site**, pas en relisant le code — et c'est
+ce qui a révélé un défaut : `tests/unit/spatial-autopilot.test.ts` partait chez
+le client alors qu'il importe `@/ace/autopilot`, couche toujours élaguée. Le site
+livré aurait eu un test aux imports cassés. Corrigé (`6192edc`), et le détecteur
+de fuite couvre désormais les couches moteur élaguées, pas seulement les routes
+internes.
+
+Preuve finale : un site généré passe **son propre `pnpm check`** — lint +
+typecheck + **134 tests** + build.
 
 ## 14. Autopilot
 
@@ -132,13 +141,24 @@ dans `tests/unit/ace-generator-cli.test.ts`, exécuté contre le contenu commit�
 GLB → `real-3d` · plusieurs photos avec profondeur → `hybrid-spatial` · une photo
 → `depth-scene` · rien d'exploitable → page éditoriale, aucune promesse.
 Écarte logos, visuels `CONCEPTUAL` et, en production, les droits non confirmés.
-`explainSpatialDecision()` répond en langage clair. **Aucun questionnaire
-technique** n'est posé à l'utilisateur.
+**Aucun questionnaire technique** n'est posé à l'utilisateur.
+
+**Réellement branché** (et non un module orphelin) : l'étape `ART_DIRECTION` du
+runner appelle la décision une fois le matériau inventorié, l'enregistre sur la
+mission (`mission.spatial`) — donc `pnpm ace:resume` la conserve — et le rapport
+utilisateur l'annonce sans jargon. Ce qui manque (carte de profondeur absente)
+est listé tel quel, jamais comblé par une invention. Un test vérifie que le
+rapport ne contient ni « WebGL », ni « depth map », ni le nom du mode.
+
+Découvrabilité : `CLAUDE.md`, `README.md` et `docs/ACE-AUTOPILOT.md` indiquent
+qu'une phrase comme « Transforme ces quatre images en visite immersive » mène à
+Spatial Cinema, avec la règle des cartes de profondeur.
 
 ## 15. Tests
 
-`pnpm check` **vert** : lint + typecheck + **293 tests** + build.
-38 tests dédiés (30 moteur spatial + 8 Autopilot spatial).
+`pnpm format:check` + `pnpm check` **verts** : lint + typecheck + **295 tests** +
+build. **40 tests dédiés** (30 moteur spatial + 10 Autopilot spatial, dont
+l'intégration de bout en bout). 28/28 tests générateur contre le HEAD réel.
 
 ## 16. Captures examinées
 
@@ -172,6 +192,9 @@ Oui — réellement regardées, pas seulement produites. Ce qu'elles ont montré
 
 - `a6426cc` — moteur Spatial Cinema (runtime, cœur pur, CLI, élagage, 30 tests)
 - `b5dc372` — Autopilot spatial, docs, version 0.3.0
+- `43644b0` — rapport final
+- `2310c40` — décision spatiale **branchée dans** l'Autopilot + découvrabilité
+- `6192edc` — correctif : le test Autopilot spatial fuitait dans les sites clients
 
 ## 19. État git
 
