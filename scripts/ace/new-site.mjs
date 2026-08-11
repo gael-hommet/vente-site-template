@@ -270,6 +270,9 @@ const ENGINE_ONLY_TESTS = [
   "tests/unit/media-delivery.test.ts",
   "tests/unit/media-pipeline-e2e.test.ts",
   "tests/unit/autopilot.test.ts",
+  // ACE 0.3 — décision spatiale de l'Autopilot : teste `src/ace/autopilot`,
+  // qui est élagué. Le laisser casserait le typecheck du site client.
+  "tests/unit/spatial-autopilot.test.ts",
 ];
 // Le générateur lui-même : un site client ne régénère jamais de site depuis
 // lui-même (et `git archive HEAD` y échouerait de toute façon, le site

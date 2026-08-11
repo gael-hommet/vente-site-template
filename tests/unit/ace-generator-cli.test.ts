@@ -280,6 +280,12 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
       /@\/components\/ace-lab\//,
       /@\/components\/EngineStatus/,
       /scripts\/ace\//,
+      // Couches MOTEUR TOUJOURS élaguées : un test conservé qui les importe
+      // casse le typecheck du site client (invisible tant qu'on ne génère pas).
+      // `spatial-cinema` n'y figure pas : son élagage est CONDITIONNEL (il reste
+      // si le site s'en sert), donc l'importer n'est pas fautif en soi.
+      /@\/ace\/autopilot(\/|["'`])/,
+      /@\/ace\/media-engine\/node(\/|["'`])/,
     ];
 
     const walkTestFiles = (dir: string): string[] => {
