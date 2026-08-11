@@ -38,7 +38,10 @@
     "ace:media:optimize": "node scripts/ace/media/optimize.mjs",
     "ace:doctor": "node scripts/ace/autopilot/doctor.mjs",
     "ace:autopilot": "tsx scripts/ace/autopilot/run.ts",
-    "ace:resume": "tsx scripts/ace/autopilot/run.ts resume"
+    "ace:resume": "tsx scripts/ace/autopilot/run.ts resume",
+    "ace:spatial:doctor": "node scripts/ace/spatial/doctor.mjs",
+    "ace:spatial:plan": "tsx scripts/ace/spatial/plan.ts",
+    "ace:spatial:verify": "tsx scripts/ace/spatial/verify.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

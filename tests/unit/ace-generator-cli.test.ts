@@ -231,6 +231,28 @@ describe("ace:new-site CLI — génération réussie (structurelle)", () => {
     expect(existsSync(path.join(out, "src/components/ace-lab"))).toBe(false);
   });
 
+  it("n'expédie ni le banc d'essai spatial ni un runtime spatial inutilisé", () => {
+    const out = tmpOut("no-spatial");
+    const res = runCli(["--name", "Sans Spatial", "--out", out, "--skip-install", "--skip-check"]);
+    expect(res.status).toBe(0);
+    // Fixtures et outillage de fabrication : jamais livrés.
+    expect(existsSync(path.join(out, "public/ace-lab"))).toBe(false);
+    expect(existsSync(path.join(out, "src/ace/spatial-cinema/fixture.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "tests/unit/spatial-cinema.test.ts"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-SPATIAL-CINEMA.md"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-SPATIAL-CAPTURE-GUIDE.md"))).toBe(false);
+    expect(existsSync(path.join(out, "docs/ACE-SPATIAL-QA.md"))).toBe(false);
+    // Le site de démarrage n'utilise pas le moteur spatial : il ne l'embarque pas.
+    expect(existsSync(path.join(out, "src/ace/spatial-cinema"))).toBe(false);
+    // Les commandes spatiales ne doivent pas rester dans package.json.
+    const pkg = JSON.parse(readFileSync(path.join(out, "package.json"), "utf8")) as {
+      scripts: Record<string, string>;
+    };
+    for (const key of Object.keys(pkg.scripts)) {
+      expect(key.startsWith("ace:spatial")).toBe(false);
+    }
+  });
+
   it("aucun test conservé dans le site généré n'importe un chemin élagué (Studio/Lab/Engine/générateur)", () => {
     // Régression : un test resté dans le site généré mais important
     // @/app/lab, @/app/ace-lab, @/app/engine, @/components/lab/*,

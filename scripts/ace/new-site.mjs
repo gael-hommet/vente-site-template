@@ -300,8 +300,50 @@ const ENGINE_ONLY_FIXTURES = [
   "tests/unit/anti-template.test.ts",
 ];
 
+// ACE 0.3 — SPATIAL CINEMA. Le banc d'essai (mires, cartes de profondeur
+// synthétiques, manifeste de démonstration, test moteur, docs d'ingénierie) ne
+// part JAMAIS chez un client : ce sont des outils de fabrication.
+const SPATIAL_ENGINE_ONLY = [
+  "public/ace-lab",
+  "src/ace/spatial-cinema/fixture.ts",
+  "tests/unit/spatial-cinema.test.ts",
+  "docs/ACE-SPATIAL-CINEMA.md",
+  "docs/ACE-SPATIAL-CAPTURE-GUIDE.md",
+  "docs/ACE-SPATIAL-QA.md",
+];
+
+/**
+ * Le RUNTIME spatial (`src/ace/spatial-cinema`) n'est conservé que si le site
+ * s'en sert réellement. Un site éditorial ne doit pas embarquer un moteur 3D
+ * qu'il n'utilise pas (§23) : on regarde le code livré, pas une intention.
+ */
+function spatialRuntimeIsUsed(root) {
+  const roots = ["src/app", "src/components", "src/scenes", "src/config"];
+  const needle = /spatial-cinema|SpatialCinema/;
+  const stack = roots.map((r) => path.join(root, r));
+  while (stack.length > 0) {
+    const dir = stack.pop();
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(full);
+      } else if (/\.(ts|tsx)$/.test(entry.name) && needle.test(readFileSync(full, "utf8"))) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 const pruned = [
   ...ENGINE_ONLY_DOCS,
+  ...SPATIAL_ENGINE_ONLY,
   ...STUDIO_ROUTES,
   ...STUDIO_COMPONENT_DIRS,
   ...STUDIO_ONLY_COMPONENTS,
@@ -313,6 +355,15 @@ for (const rel of pruned) {
   rmSync(path.join(extracted, rel), { recursive: true, force: true });
 }
 console.log(`✓ Studio/Lab/Engine + documents internes exclus (${pruned.length} entrées élaguées)`);
+
+// Le moteur spatial suit le même principe que le reste : on ne livre que ce qui
+// sert. La fixture ayant déjà été retirée, on inspecte le code du site.
+if (!spatialRuntimeIsUsed(extracted)) {
+  rmSync(path.join(extracted, "src/ace/spatial-cinema"), { recursive: true, force: true });
+  console.log("✓ runtime Spatial Cinema retiré : ce site ne l'utilise pas");
+} else {
+  console.log("✓ runtime Spatial Cinema conservé : ce site s'en sert");
+}
 
 /* -------------------------------------------------------------------------- */
 /* B/D. Copie du contrat d'entrée (brief + config) dans le site généré        */
